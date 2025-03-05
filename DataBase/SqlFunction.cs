@@ -38,7 +38,7 @@ namespace DataBase
             return $"VAR({expression})";
         }
         #endregion
-
+         
         #region Mathematical Functions
         public static string Abs(string expression)
         {
