@@ -121,27 +121,27 @@ namespace DataBase
             if (WithList.Count > 0)
             {
                 Query.Append("WITH ");
-                Query.Append(string.Join(", ", WithList));
-                Query.Append(" ");
+                Query.Append(string.Join(",\n\t", WithList));
+                Query.Append(" \n");
             }
 
             Query.Append("SELECT ");
             if (TopCount.HasValue)
                 Query.Append($"TOP {TopCount.Value} ");
 
-            Query.Append(ColumnList.Count > 0 ? string.Join(", ", ColumnList) : "*");
-            Query.Append($" FROM {TableName} ");
+            Query.Append(ColumnList.Count > 0 ? string.Join(",\n\t", ColumnList) : "*");
+            Query.Append($"\nFROM {TableName} \n");
 
             if (JoinClauseList.Count > 0)
-                Query.Append(string.Join(" ", JoinClauseList) + " ");
+                Query.Append(string.Join("\n\t", JoinClauseList) + " \n");
             if (ConditionList.Count > 0)
-                Query.Append($"WHERE {string.Join(" AND ", ConditionList)} ");
+                Query.Append($"WHERE {string.Join(" AND \n\t", ConditionList)} \n");
             if (GroupByList.Count > 0)
-                Query.Append($"GROUP BY {string.Join(", ", GroupByList)} ");
+                Query.Append($"GROUP BY {string.Join(", \n\t", GroupByList)} \n");
             if (HavingList.Count > 0)
-                Query.Append($"HAVING {string.Join(" AND ", HavingList)} ");
+                Query.Append($"HAVING {string.Join(" AND \n\t", HavingList)} \n");
             if (OrderByList.Count > 0)
-                Query.Append($"ORDER BY {string.Join(", ", OrderByList)}");
+                Query.Append($"ORDER BY {string.Join(", \n\t", OrderByList)} \n");
 
             return Query.ToString().Trim();
         }
