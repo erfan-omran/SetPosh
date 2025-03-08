@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataBase.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,6 +21,10 @@ namespace DataBase
         {
             this.TableName = tableName;
         }
+        public void SetTable(TableEnum table)
+        {
+            this.TableName = '[' + table.ToString() + ']';
+        }
         public void AddWith(string WithName, string Query)
         {
             WithList.Add($"{WithName} AS ({Query})");
@@ -33,14 +38,17 @@ namespace DataBase
             ColumnList.Add(columnName);
         }
 
-        public void AddJoin(string joinType, string table, string onCondition)
+        public void AddJoin(string joinType, string table, string onCondition, string aliasName = "")
         {
-            JoinClauseList.Add($"{joinType} JOIN {table} ON {onCondition}");
+            if (aliasName == "")
+                JoinClauseList.Add($"{joinType} JOIN {table} ON {onCondition}");
+            else
+                JoinClauseList.Add($"{joinType} JOIN {table} AS {aliasName} ON {onCondition}");
         }
-        public void AddInnerJoin(string table, string onCondition) => AddJoin("INNER", table, onCondition);
-        public void AddLeftJoin(string table, string onCondition) => AddJoin("LEFT", table, onCondition);
-        public void AddRightJoin(string table, string onCondition) => AddJoin("RIGHT", table, onCondition);
-        public void AddFullJoin(string table, string onCondition) => AddJoin("Full", table, onCondition);
+        public void AddInnerJoin(string table, string onCondition, string aliasName = "") => AddJoin("INNER", table, onCondition, aliasName);
+        public void AddLeftJoin(string table, string onCondition, string aliasName = "") => AddJoin("LEFT", table, onCondition, aliasName);
+        public void AddRightJoin(string table, string onCondition, string aliasName = "") => AddJoin("RIGHT", table, onCondition, aliasName);
+        public void AddFullJoin(string table, string onCondition, string aliasName = "") => AddJoin("Full", table, onCondition, aliasName);
 
         public void AddCondition(string condition)
         {

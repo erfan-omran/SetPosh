@@ -20,7 +20,7 @@ namespace DataBase
             ConnectionStr = configuration.GetConnectionString("SetPosh");
         }
 
-        public DataTable GetDataTable(string query, List<SqlParameter> parameters = null)
+        public DataTable GetDataTable(string query, List<SqlParameter>? parameters = null)
         {
             DataTable dataTable = new DataTable();
             try
@@ -45,34 +45,20 @@ namespace DataBase
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                // ثبت خطا و بازنویسی خطای بهتر
-                string parameterDetails = string.Empty;
-                if (parameters != null)
-                    parameterDetails = string.Join(", ", parameters.Select(p => $"{p.ParameterName}={p.Value}"));
-                else
-                    parameterDetails = "No parameters";
+            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
 
-                List<SqlParameter> logParams = new List<SqlParameter>
-                {
-                    new SqlParameter("@Query", query + " | Parameters: " + parameterDetails),
-                    new SqlParameter("@Exception", ex.Message)
-                };
-                ExecProcedure("[Log_Exception.Add]", logParams);
-            }
             return dataTable;
         }
-        public DataRow GetDataRow(string Query, List<object> Parameters = null)
+        public DataRow? GetDataRow(string query, List<SqlParameter>? parameters = null)
         {
             try
             {
                 SqlConnection sqlconnection = new SqlConnection(ConnectionStr);
                 SqlCommand cmd = new SqlCommand();
-                cmd.CommandText = Query;
-                if (Parameters != null && Parameters.Count > 0)
-                    for (int i = 0; i < Parameters.Count; i++)
-                        cmd.Parameters.Add(Parameters[i]);
+                cmd.CommandText = query;
+                if (parameters != null && parameters.Count > 0)
+                    for (int i = 0; i < parameters.Count; i++)
+                        cmd.Parameters.Add(parameters[i]);
                 cmd.CommandTimeout = 300;
                 cmd.CommandType = CommandType.Text;
                 cmd.Connection = sqlconnection;
@@ -89,32 +75,21 @@ namespace DataBase
             }
             catch (Exception ex)
             {
-                List<SqlParameter> Params = new List<SqlParameter>();
-                Params.Clear();
-                string tmp = " \r\n";
-                if (Parameters != null && Parameters.Count > 0)
-                {
-                    for (int i = 0; i < Parameters.Count; i++)
-                        tmp += (Parameters[i] as SqlParameter).ParameterName + "= " + (Parameters[i] as SqlParameter).Value.ToString() + ", ";
-                }
-                Params.Add(new SqlParameter("@Query", @"/*GetDataRow*/ " + "\r\n" + Query + tmp));
-                Params.Add(new SqlParameter("@Exception", ex.Message));
-                ExecProcedure("[Log_Select.Add]", Params);
-
+                ExecLogExceptionProcedure(ex, query, parameters);
                 throw;
             }
         }
-        public string GetFirstValue(string Query, List<object> Parameters = null)
+        public string? GetFirstValue(string query, List<SqlParameter>? parameters = null)
         {
             try
             {
                 SqlConnection sqlconnection = new SqlConnection(ConnectionStr);
                 SqlCommand cmd = new SqlCommand();
                 cmd.Parameters.Clear();
-                cmd.CommandText = Query;
-                if (Parameters != null && Parameters.Count > 0)
-                    for (int i = 0; i < Parameters.Count; i++)
-                        cmd.Parameters.Add(Parameters[i]);
+                cmd.CommandText = query;
+                if (parameters != null && parameters.Count > 0)
+                    for (int i = 0; i < parameters.Count; i++)
+                        cmd.Parameters.Add(parameters[i]);
                 cmd.CommandTimeout = 300;
                 cmd.CommandType = CommandType.Text;
                 cmd.Connection = sqlconnection;
@@ -129,25 +104,97 @@ namespace DataBase
                     return dataTable.Rows[0][0].ToString();
                 return "";
             }
-            catch (Exception ex)
-            {
-                List<SqlParameter> Params = new List<SqlParameter>();
-                Params.Clear();
-                string tmp = " \r\n";
-                if (Parameters != null && Parameters.Count > 0)
-                {
-                    for (int i = 0; i < Parameters.Count; i++)
-                        tmp += (Parameters[i] as SqlParameter).ParameterName + "= " + (Parameters[i] as SqlParameter).Value.ToString() + ", ";
-                }
-                Params.Add(new SqlParameter("@Query", @"/*GetFirstValue*/ " + "\r\n" + Query + tmp));
-                Params.Add(new SqlParameter("@Exception", ex.Message));
-                ExecProcedure("[Log_Select.Add]", Params);
+            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
 
-                return null;
-            }
+            return null;
         }
+        public List<T> GetModels<T>(string query, List<SqlParameter>? parameters = null) where T : new()
+        {
+            List<T> result = new List<T>();
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
+                    {
+                        cmd.CommandTimeout = 300;
+                        cmd.CommandType = CommandType.Text;
+
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters.ToArray());
+                        }
+
+                        if (sqlConnection.State == ConnectionState.Closed)
+                            sqlConnection.Open();
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                T obj = new T();
+                                foreach (var property in typeof(T).GetProperties())
+                                {
+                                    if (HasColumn(reader, property.Name) && !reader.IsDBNull(reader.GetOrdinal(property.Name)))
+                                    {
+                                        property.SetValue(obj, reader[property.Name]);
+                                    }
+                                }
+                                result.Add(obj);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
+
+            return result;
+        }
+        public T? GetModel<T>(string query, List<SqlParameter>? parameters = null) where T : new()
+        {
+            T result = new T();
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
+                    {
+                        cmd.CommandTimeout = 300;
+                        cmd.CommandType = CommandType.Text;
+
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters.ToArray());
+                        }
+
+                        if (sqlConnection.State == ConnectionState.Closed)
+                            sqlConnection.Open();
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read()) // فقط یک ردیف را پردازش می‌کند
+                            {
+                                T obj = new T();
+                                foreach (var property in typeof(T).GetProperties())
+                                {
+                                    if (HasColumn(reader, property.Name) && !reader.IsDBNull(reader.GetOrdinal(property.Name)))
+                                    {
+                                        property.SetValue(obj, reader[property.Name]);
+                                    }
+                                }
+                                return obj;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
+
+            return default(T); // اگر هیچ داده‌ای یافت نشود، مقدار پیش‌فرض برمی‌گرداند
+        }
+
         //----------------------------------------------------------------------------------------------
-        public long ExecProcedure(string ProcedureName, List<SqlParameter> parameters)
+        public long ExecProcedure(string procedureName, List<SqlParameter> parameters)
         {
             try
             {
@@ -159,7 +206,7 @@ namespace DataBase
                         CommandTimeout = 180, // تایم‌اوت 180 ثانیه
                         Connection = sqlConnection,
                         CommandType = CommandType.StoredProcedure,
-                        CommandText = ProcedureName
+                        CommandText = procedureName
                     };
 
                     // افزودن پارامترها به فرمان SQL
@@ -174,7 +221,7 @@ namespace DataBase
                     cmd.ExecuteNonQuery();
 
                     // اگر پروسیجر مربوط به افزودن است و نیاز به برگشتن SID دارد
-                    if (ProcedureName.Contains(".Add") && !ProcedureName.Contains("Log_"))
+                    if (procedureName.Contains(".Add") && !procedureName.Contains("Log_"))
                     {
                         // اطمینان از وجود پارامتر SID
                         if (cmd.Parameters.Contains("@SID"))
@@ -188,26 +235,36 @@ namespace DataBase
             }
             catch (Exception ex)
             {
-                // ایجاد پیام خطا برای لاگ کردن
-                string title = ProcedureName;
-                if (parameters != null && parameters.Count > 0)
-                {
-                    title += ": ";
-                    foreach (var param in parameters)
-                    {
-                        title += param.ToString() + ", ";
-                    }
-                }
-
-                // لاگ کردن خطا به دیتابیس
-                List<SqlParameter> logParams = new List<SqlParameter>
-                {
-                    new SqlParameter("@Query", title),
-                    new SqlParameter("@Exception", ex.Message)
-                };
-                ExecProcedure("[Log_Exception.Add]", logParams);// فراخوانی تابع لاگ خطا
+                ExecLogExceptionProcedure(ex, "ExecProcedure Func", parameters);
                 throw;// پرتاب مجدد استثنا
             }
+        }
+        public bool ExecLogExceptionProcedure(Exception ex, string query, List<SqlParameter>? parameters = null)
+        {
+            string parameterDetails = parameters != null
+                    ? string.Join(", ", parameters.Select(p => $"{p.ParameterName}={p.Value}"))
+                    : "No parameters";
+
+            List<SqlParameter> logParams = new List<SqlParameter>
+                {
+                    new SqlParameter("@Query", query + " | Parameters: " + parameterDetails),
+                    new SqlParameter("@Exception", ex.Message)
+                };
+            long result = ExecProcedure("[Log_Exception.Add]", logParams);
+
+            return result >= 0;
+        }
+        //----------------------------------------------------------------------------------------------
+        private bool HasColumn(IDataRecord reader, string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

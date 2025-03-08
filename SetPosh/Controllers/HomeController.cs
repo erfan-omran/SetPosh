@@ -1,8 +1,12 @@
-﻿using DataBase;
+using Core.Model;
+using DataBase;
+using DataBase.Enum;
 using Microsoft.AspNetCore.Mvc;
 using SetPosh.Models;
 using System.Data;
 using System.Diagnostics;
+using Core;
+using Service;
 
 namespace SetPosh.Controllers
 {
@@ -12,14 +16,6 @@ namespace SetPosh.Controllers
 
         public HomeController(ILogger<HomeController> logger)
         {
-            QueryBuilder QB = new QueryBuilder();
-            QB.AddColumn(SqlFunction.Count("*"));
-            QB.SetTable("User");
-            string q = QB.CreateQuery();
-
-            DBConnection a = new DBConnection();
-            DataTable b = a.GetDataTable(q);
-
             _logger = logger;
         }
 
