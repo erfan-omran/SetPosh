@@ -1,32 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
+using DataBase;
 
 namespace Core.Model
 {
     public class BaseModel
     {
-        public long SID { get; set; }
-        public long CreationUSID { get; set; }
-        //public Date CreationDate { get; set; }
-        //public Time CreationTime { get; set; }
-        public long LastModifiedUSID { get; set; }
-        //public Date LastModifiedDate { get; set; }
-        //public Time LastModifiedTime { get; set; }
+        public long SID { get; set; } = default;
+        public long CreationUSID { get; set; } = default;
+        //public Date CreationDate { get; set; } = default;
+        //public Time CreationTime { get; set; } = default;
+        public long LastModifiedUSID { get; set; } = default;
+        //public Date LastModifiedDate { get; set; } = default;
+        //public Time LastModifiedTime { get; set; } = default;
         public void InitBaseModel(DataRow dr)
         {
-            SID = (long)dr[nameof(SID)];
-            CreationUSID = (long)dr[nameof(CreationUSID)];
-            //CreationDate = dr[nameof(CreationDate)];
-            //CreationTime = dr[nameof(CreationTime)];
-            LastModifiedUSID = (long)dr[nameof(LastModifiedUSID)];
-            //LastModifiedDate = dr[nameof(LastModifiedDate)];
-            //LastModifiedTime = dr[nameof(LastModifiedTime)];
-
+            SID = dr[nameof(SID)].ConvertToLong();
+            CreationUSID = dr[nameof(CreationUSID)].ConvertToLong();
+            //CreationDate = dr[nameof(CreationDate)].ConvertToDateTime();
+            //CreationTime = dr[nameof(CreationTime)].ConvertToDateTime();
+            LastModifiedUSID = dr[nameof(LastModifiedUSID)].ConvertToLong();
+            //LastModifiedDate = dr[nameof(LastModifiedDate)].ConvertToDateTime();
+            //LastModifiedTime = dr[nameof(LastModifiedTime)].ConvertToDateTime();
         }
     }
 }

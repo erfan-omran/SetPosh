@@ -1,27 +1,30 @@
-﻿using System.Data;
+﻿using DataBase;
+using System.Data;
 
 namespace Core.Model
 {
     public class UserModel : BaseModel
     {
-        public UserTypeModel UserType { get; set; }
-        public string UName { get; set; }
-        public string UFirstName { get; set; }
-        public string ULastName { get; set; }
-        public string UEmail { get; set; }
-        public string UTel { get; set; }
-        public string UPass { get; set; }
+        public UserTypeModel UserType { get; set; } = new UserTypeModel();
+        public string UName { get; set; } = string.Empty;
+        public string UFirstName { get; set; } = string.Empty;
+        public string ULastName { get; set; } = string.Empty;
+        public string UEmail { get; set; } = string.Empty;
+        public string UTel { get; set; } = string.Empty;
+        public string UPass { get; set; } = string.Empty;
 
         public UserModel() { }
         public UserModel(DataRow dr)
         {
             UserType = new UserTypeModel(dr);
-            UName = (string)dr[nameof(UName)];
-            UFirstName = (string)dr[nameof(UFirstName)];
-            ULastName = (string)dr[nameof(ULastName)];
-            UEmail = (string)dr[nameof(UEmail)];
-            UTel = (string)dr[nameof(UTel)];
-            UPass = (string)dr[nameof(UPass)];
+
+            UName = dr[nameof(UName)].ConvertToString();
+            UFirstName = dr[nameof(UFirstName)].ConvertToString();
+            ULastName = dr[nameof(ULastName)].ConvertToString();
+            UEmail = dr[nameof(UEmail)].ConvertToString();
+            UTel = dr[nameof(UTel)].ConvertToString();
+            UPass = dr[nameof(UPass)].ConvertToString();
+
             base.InitBaseModel(dr);
         }
     }

@@ -108,91 +108,6 @@ namespace DataBase
 
             return null;
         }
-        public List<T> GetModels<T>(string query, List<SqlParameter>? parameters = null) where T : new()
-        {
-            List<T> result = new List<T>();
-            try
-            {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
-                {
-                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
-                    {
-                        cmd.CommandTimeout = 300;
-                        cmd.CommandType = CommandType.Text;
-
-                        if (parameters != null)
-                        {
-                            cmd.Parameters.AddRange(parameters.ToArray());
-                        }
-
-                        if (sqlConnection.State == ConnectionState.Closed)
-                            sqlConnection.Open();
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                T obj = new T();
-                                foreach (var property in typeof(T).GetProperties())
-                                {
-                                    if (HasColumn(reader, property.Name) && !reader.IsDBNull(reader.GetOrdinal(property.Name)))
-                                    {
-                                        property.SetValue(obj, reader[property.Name]);
-                                    }
-                                }
-                                result.Add(obj);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
-
-            return result;
-        }
-        public T? GetModel<T>(string query, List<SqlParameter>? parameters = null) where T : new()
-        {
-            T result = new T();
-            try
-            {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
-                {
-                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
-                    {
-                        cmd.CommandTimeout = 300;
-                        cmd.CommandType = CommandType.Text;
-
-                        if (parameters != null)
-                        {
-                            cmd.Parameters.AddRange(parameters.ToArray());
-                        }
-
-                        if (sqlConnection.State == ConnectionState.Closed)
-                            sqlConnection.Open();
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read()) // فقط یک ردیف را پردازش می‌کند
-                            {
-                                T obj = new T();
-                                foreach (var property in typeof(T).GetProperties())
-                                {
-                                    if (HasColumn(reader, property.Name) && !reader.IsDBNull(reader.GetOrdinal(property.Name)))
-                                    {
-                                        property.SetValue(obj, reader[property.Name]);
-                                    }
-                                }
-                                return obj;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
-
-            return default(T); // اگر هیچ داده‌ای یافت نشود، مقدار پیش‌فرض برمی‌گرداند
-        }
-
         //----------------------------------------------------------------------------------------------
         public long ExecProcedure(string procedureName, List<SqlParameter> parameters)
         {
@@ -255,16 +170,6 @@ namespace DataBase
             return result >= 0;
         }
         //----------------------------------------------------------------------------------------------
-        private bool HasColumn(IDataRecord reader, string columnName)
-        {
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+
     }
 }

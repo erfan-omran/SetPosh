@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace DataBase
             return $"VAR({expression})";
         }
         #endregion
-         
+
         #region Mathematical Functions
         public static string Abs(string expression)
         {
@@ -290,5 +291,22 @@ namespace DataBase
             return $"SERVERPROPERTY({property})";
         }
         #endregion
+
+        //-----------------------
+        public static bool HasColumn(IDataRecord reader, string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool HasColumn(DataRow dataRow, string columnName)
+        {
+            return dataRow.Table.Columns.Contains(columnName);
+        }
     }
 }
