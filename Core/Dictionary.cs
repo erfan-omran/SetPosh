@@ -1,4 +1,4 @@
-﻿using Core.Schema;
+﻿using Core.Schema.EntitySchema;
 using System;
 using System.Collections.Generic;
 using System.Linq;

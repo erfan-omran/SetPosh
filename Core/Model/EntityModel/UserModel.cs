@@ -1,9 +1,9 @@
 ﻿using DataBase;
 using System.Data;
 
-namespace Core.Model
+namespace Core.Model.EntityModel
 {
-    public class UserModel : BaseModel
+    public class UserModel : BaseEntityModel
     {
         public UserTypeModel UserType { get; set; } = new UserTypeModel();
         public string UName { get; set; } = string.Empty;
@@ -24,8 +24,7 @@ namespace Core.Model
             UEmail = dr[nameof(UEmail)].ConvertToString();
             UTel = dr[nameof(UTel)].ConvertToString();
             UPass = dr[nameof(UPass)].ConvertToString();
-
-            base.InitBaseModel(dr);
+            base.InitBaseEntityModel(dr);
         }
     }
 }

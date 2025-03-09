@@ -12,6 +12,7 @@ namespace DataBase.Enum
         Comment,
         Demand,
         DemandDetail,
+        DemandStatus,
         Log_Exception,
         Product,
         ProductCategory,

@@ -1,16 +1,9 @@
 ﻿using DataBase.Columns;
 using DataBase.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Core.Schema
+namespace Core.Schema.EntitySchema
 {
-    public class UserSchema : BaseSchema
+    public class UserSchema : BaseEntitySchema
     {
         public SIDColumn UTSID { get; private set; }
         public StringColumn UName { get; private set; }
@@ -22,7 +15,7 @@ namespace Core.Schema
 
         public UserSchema()
         {
-            EntityName = TableEnum.User.ToString();
+            EntityName = TableEnum.User.ConvertToString();
             PersianName = "کاربر";
             TableName = $"[{EntityName}]";
 

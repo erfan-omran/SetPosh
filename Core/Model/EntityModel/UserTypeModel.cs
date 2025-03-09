@@ -1,8 +1,8 @@
 ﻿using System.Data;
 
-namespace Core.Model
+namespace Core.Model.EntityModel
 {
-    public class UserTypeModel : BaseModel
+    public class UserTypeModel : BaseEntityModel
     {
         public string UTName { get; set; } = string.Empty;
         public string UTDescription { get; set; } = string.Empty;
@@ -11,7 +11,7 @@ namespace Core.Model
         {
             UTName = dr[nameof(UTName)].ConvertToString();
             UTDescription = dr[nameof(UTDescription)].ConvertToString();
-            base.InitBaseModel(dr);
+            base.InitBaseEntityModel(dr);
         }
     }
 }
