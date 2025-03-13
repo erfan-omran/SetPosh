@@ -1,27 +1,31 @@
-using Core.Model;
 using DataBase;
-using DataBase.Enum;
 using Microsoft.AspNetCore.Mvc;
-using SetPosh.Models;
 using System.Data;
 using System.Diagnostics;
-using Core;
-using Service;
+using SetPosh.Models;
+using Core.Model;
+using Service.Service;
 
 namespace SetPosh.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly UserService _UserService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserService UserService)
         {
+            _UserService = UserService;
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            QueryBuilder qb = _UserService.GetWithRelatedEntities();
+            string query = qb.CreateQuery();
+            DataTable dt = await DBConnection.GetDataTableAsync(query);
+            List<UserModel> userList = _UserService.MapDTToModel(dt);
+            return View(userList);
         }
 
         public IActionResult Privacy()

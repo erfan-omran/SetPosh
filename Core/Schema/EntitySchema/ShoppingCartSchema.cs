@@ -1,12 +1,13 @@
 ﻿using DataBase.Columns;
 using DataBase.Enum;
 
-namespace Core.Schema.EntitySchema
+namespace Core.Schema
 {
     public class ShoppingCartSchema : BaseEntitySchema
     {
         public SIDColumn USID { get; private set; }
-        public BoolColumn PName { get; private set; }
+        public BoolColumn IsActive { get; private set; }
+        public BoolColumn Confirmed { get; private set; }
         public ShoppingCartSchema()
         {
             EntityName = TableEnum.ShoppingCart.ConvertToString();
@@ -17,7 +18,8 @@ namespace Core.Schema.EntitySchema
                 clm.SetTable(TableEnum.ShoppingCart);
 
             USID = new SIDColumn(nameof(USID), "کاربر", TableEnum.ShoppingCart);
-            PName = new BoolColumn(nameof(PName), "تکمیل شده", TableEnum.ShoppingCart);
+            IsActive = new BoolColumn(nameof(IsActive), "فعال", TableEnum.ShoppingCart);
+            Confirmed = new BoolColumn(nameof(Confirmed), "تکمیل شده", TableEnum.ShoppingCart);
         }
     }
 }

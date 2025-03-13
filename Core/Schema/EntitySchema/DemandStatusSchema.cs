@@ -1,7 +1,7 @@
 ﻿using DataBase.Columns;
 using DataBase.Enum;
 
-namespace Core.Schema.EntitySchema
+namespace Core.Schema
 {
     public class DemandStatusSchema : BaseEntitySchema
     {

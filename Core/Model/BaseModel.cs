@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using DataBase;
+using System.Data.SqlClient;
 
 namespace Core.Model
 {
@@ -13,6 +13,8 @@ namespace Core.Model
         public long LastModifiedUSID { get; set; } = default;
         //public Date LastModifiedDate { get; set; } = default;
         //public Time LastModifiedTime { get; set; } = default;
+        public List<SqlParameter> Parameters = new List<SqlParameter>();
+
         public void InitBaseModel(DataRow dr)
         {
             CreationUSID = dr[nameof(CreationUSID)].ConvertToLong();
@@ -21,6 +23,31 @@ namespace Core.Model
             LastModifiedUSID = dr[nameof(LastModifiedUSID)].ConvertToLong();
             //LastModifiedDate = dr[nameof(LastModifiedDate)].ConvertToDateTime();
             //LastModifiedTime = dr[nameof(LastModifiedTime)].ConvertToDateTime();
+        }
+        //-------------
+        public void SaveCreationParameters()
+        {
+            Parameters.Add(new SqlParameter("@" + nameof(CreationUSID), CreationUSID));
+            //Parameters.Add(new SqlParameter("@" + nameof(CreationDate), CreationDate));
+            //Parameters.Add(new SqlParameter("@" + nameof(CreationTime), CreationTime));
+        }
+        public void SaveModificationParameters()
+        {
+            Parameters.Add(new SqlParameter("@" + nameof(LastModifiedUSID), LastModifiedUSID));
+            //Parameters.Add(new SqlParameter("@" + nameof(LastModifiedDate), LastModifiedDate));
+            //Parameters.Add(new SqlParameter("@" + nameof(LastModifiedTime), LastModifiedTime));
+        }
+        public void SaveBlockedParameter(long SID = -1)
+        {
+            if (SID > 0)
+                Parameters.Add(new SqlParameter("@" + nameof(SID), SID));
+            Parameters.Add(new SqlParameter("@" + nameof(Blocked), Blocked));
+        }
+        public void SaveDeletedParameter(long SID = -1)
+        {
+            if (SID > 0)
+                Parameters.Add(new SqlParameter("@" + nameof(SID), SID));
+            Parameters.Add(new SqlParameter("@" + nameof(Deleted), Deleted));
         }
     }
 }

@@ -5,27 +5,28 @@ using Microsoft.Extensions.Configuration;
 
 namespace DataBase
 {
-    public class DBConnection
+    public static class DBConnection
     {
-        private string ConnectionStr { get; set; } = string.Empty;
-        public DBConnection()
+        private static string _setPoshConnectionString = "";
+
+        //public DBConnection(string configuration)
+        //{
+        //    _setPoshConnectionString = configuration;
+        //}
+        //public DBConnection(IConfiguration configuration)
+        //{
+        //    _setPoshConnectionString = configuration.GetConnectionString("SetPoshConnection");
+        //}
+        public static void InitConnectionStr(string configuration)
         {
-            // بارگذاری تنظیمات از appsettings.json
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()) // تنظیم مسیر
-                .AddJsonFile("appsettings.json") // افزودن فایل appsettings.json
-                .Build();
-
-            // دسترسی به رشته اتصال
-            ConnectionStr = configuration.GetConnectionString("SetPosh");
+            _setPoshConnectionString = configuration ?? "";
         }
-
-        public DataTable GetDataTable(string query, List<SqlParameter>? parameters = null)
+        public static async Task<DataTable> GetDataTableAsync(string query, List<SqlParameter>? parameters = null)
         {
             DataTable dataTable = new DataTable();
             try
             {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
                 {
                     using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
                     {
@@ -35,9 +36,7 @@ namespace DataBase
                         {
                             cmd.Parameters.AddRange(parameters.ToArray());
                         }
-                        // باز کردن اتصال
-                        if (sqlConnection.State == ConnectionState.Closed)
-                            sqlConnection.Open();
+                        await sqlConnection.OpenAsync();
                         using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(cmd))
                         {
                             sqlDataAdapter.Fill(dataTable);
@@ -45,131 +44,137 @@ namespace DataBase
                     }
                 }
             }
-            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
-
+            catch (Exception ex)
+            {
+                LogException(ex, query, parameters);
+            }
             return dataTable;
         }
-        public DataRow? GetDataRow(string query, List<SqlParameter>? parameters = null)
+        public static async Task<DataRow> GetDataRowAsync(string query, List<SqlParameter>? parameters = null)
+        {
+            DataTable dataTable = await GetDataTableAsync(query, parameters);
+            return dataTable.Rows.Count > 0 ? dataTable.Rows[0] : new DataTable().Rows[0];
+        }
+        public static async Task<T?> GetFirstValueAsync<T>(string query, List<SqlParameter>? parameters = null)
         {
             try
             {
-                SqlConnection sqlconnection = new SqlConnection(ConnectionStr);
-                SqlCommand cmd = new SqlCommand();
-                cmd.CommandText = query;
-                if (parameters != null && parameters.Count > 0)
-                    for (int i = 0; i < parameters.Count; i++)
-                        cmd.Parameters.Add(parameters[i]);
-                cmd.CommandTimeout = 300;
-                cmd.CommandType = CommandType.Text;
-                cmd.Connection = sqlconnection;
-                DataTable dataTable = new DataTable();
-                if (sqlconnection.State == ConnectionState.Closed)
-                    sqlconnection.Open();
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(cmd);
-                sqlDataAdapter.Fill(dataTable);
-                sqlDataAdapter.Dispose();
-                sqlconnection.Close();
-                if (dataTable.Rows.Count > 0)
-                    return dataTable.Rows[0];
-                return null;
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, sqlConnection))
+                    {
+                        cmd.CommandTimeout = 300;
+                        cmd.CommandType = CommandType.Text;
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters.ToArray());
+                        }
+                        await sqlConnection.OpenAsync();
+                        object? result = await cmd.ExecuteScalarAsync();
+                        return result is DBNull ? default : (T?)result;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                ExecLogExceptionProcedure(ex, query, parameters);
-                throw;
+                LogException(ex, query, parameters);
+                return default;
             }
         }
-        public string? GetFirstValue(string query, List<SqlParameter>? parameters = null)
-        {
-            try
-            {
-                SqlConnection sqlconnection = new SqlConnection(ConnectionStr);
-                SqlCommand cmd = new SqlCommand();
-                cmd.Parameters.Clear();
-                cmd.CommandText = query;
-                if (parameters != null && parameters.Count > 0)
-                    for (int i = 0; i < parameters.Count; i++)
-                        cmd.Parameters.Add(parameters[i]);
-                cmd.CommandTimeout = 300;
-                cmd.CommandType = CommandType.Text;
-                cmd.Connection = sqlconnection;
-                DataTable dataTable = new DataTable();
-                if (sqlconnection.State == ConnectionState.Closed)
-                    sqlconnection.Open();
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(cmd);
-                sqlDataAdapter.Fill(dataTable);
-                sqlDataAdapter.Dispose();
-                sqlconnection.Close();
-                if (dataTable.Rows.Count > 0)
-                    return dataTable.Rows[0][0].ToString();
-                return "";
-            }
-            catch (Exception ex) { ExecLogExceptionProcedure(ex, query, parameters); }
-
-            return null;
-        }
-        //----------------------------------------------------------------------------------------------
-        public long ExecProcedure(string procedureName, List<SqlParameter> parameters)
+        //-----------------------------------------------
+        public static async Task<bool> ExecProcedureAsync(string procedureName, List<SqlParameter> parameters)
         {
             try
             {
                 // ایجاد اتصال به دیتابیس
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionStr))
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand
                     {
-                        CommandTimeout = 180, // تایم‌اوت 180 ثانیه
+                        CommandTimeout = 300,
                         Connection = sqlConnection,
                         CommandType = CommandType.StoredProcedure,
                         CommandText = procedureName
                     };
 
-                    // افزودن پارامترها به فرمان SQL
                     if (parameters != null && parameters.Count > 0)
                     {
-                        //cmd.Parameters.Clear();
                         cmd.Parameters.AddRange(parameters.ToArray());
                     }
-                    // باز کردن اتصال
-                    if (sqlConnection.State == ConnectionState.Closed)
-                        sqlConnection.Open();
-                    cmd.ExecuteNonQuery();
 
-                    // اگر پروسیجر مربوط به افزودن است و نیاز به برگشتن SID دارد
-                    if (procedureName.Contains(".Add") && !procedureName.Contains("Log_"))
+                    if (sqlConnection.State == ConnectionState.Closed)
+                        await sqlConnection.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public static async Task<bool> ExecuteTransactionProcedureAsync(List<(string ProcedureName, List<SqlParameter>? Parameters)> procedures)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+                {
+                    await sqlConnection.OpenAsync();
+
+                    using (SqlTransaction transaction = sqlConnection.BeginTransaction())
                     {
-                        // اطمینان از وجود پارامتر SID
-                        if (cmd.Parameters.Contains("@SID"))
+                        try
                         {
-                            object SID = cmd.Parameters["@SID"].Value;
-                            return SID is long ? (long)SID : -1; // برگشت SID یا -1 اگر SID به درستی دریافت نشد
+                            foreach (var procedure in procedures)
+                            {
+                                using (SqlCommand cmd = new SqlCommand(procedure.ProcedureName, sqlConnection, transaction))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.CommandTimeout = 300;
+
+                                    if (procedure.Parameters != null && procedure.Parameters.Count > 0)
+                                    {
+                                        cmd.Parameters.AddRange(procedure.Parameters.ToArray());
+                                    }
+                                    await cmd.ExecuteNonQueryAsync();
+                                }
+                            }
+                            await transaction.CommitAsync();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            await LogException(ex, "ExecuteTransactionAsync (Procedures)", null);
+                            return false;
                         }
                     }
                 }
-                return -1; // در صورتی که پروسیجر نتیجه‌ای نداشته باشد
             }
             catch (Exception ex)
             {
-                ExecLogExceptionProcedure(ex, "ExecProcedure Func", parameters);
-                throw;// پرتاب مجدد استثنا
+                await LogException(ex, "ExecuteTransactionAsync (Connection Error - Procedures)", null);
+                return false;
             }
         }
-        public bool ExecLogExceptionProcedure(Exception ex, string query, List<SqlParameter>? parameters = null)
+        public static async Task<bool> LogException(Exception ex, string query, List<SqlParameter>? parameters = null)
         {
-            string parameterDetails = parameters != null
-                    ? string.Join(", ", parameters.Select(p => $"{p.ParameterName}={p.Value}"))
-                    : "No parameters";
+            string parameterDetails = "";
+            if (parameters != null)
+                parameterDetails = string.Join(", ", parameters.Select(p => $"{p.ParameterName}={p.Value}"));
+            else
+                parameterDetails = "No parameters";
 
             List<SqlParameter> logParams = new List<SqlParameter>
-                {
-                    new SqlParameter("@Query", query + " | Parameters: " + parameterDetails),
-                    new SqlParameter("@Exception", ex.Message)
-                };
-            long result = ExecProcedure("[Log_Exception.Add]", logParams);
+            {
+                new SqlParameter("@Query", query + " | Parameters: " + parameterDetails),
+                new SqlParameter("@Exception", ex.Message)
+            };
+            bool result = await ExecProcedureAsync("[Log_Exception.Add]", logParams);
 
-            return result >= 0;
+            return result;
         }
-        //----------------------------------------------------------------------------------------------
-
     }
 }
+

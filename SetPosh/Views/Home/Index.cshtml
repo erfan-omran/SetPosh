@@ -1,8 +1,64 @@
-﻿@{
+﻿@using System.Data;
+@using Core;
+@using Core.Model;
+@*@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+</div>*@
+
+
+@model List<UserModel>
+
+<table>
+    <thead>
+        <tr>
+            <th>شناسه</th>
+            <th>نام کاربری</th>
+            <th>نام</th>
+            <th>نام خانوادگی</th>
+            <th>ایمیل</th>
+            <th>تلفن</th>
+            <th>رمزعبور</th>
+            <th>مسدود شده</th>
+            <th>حذف شده</th>
+            <th>کاربر سازنده</th>
+            @*<th>روز ساخت</th>
+            <th>زمان ساخت</th>*@
+            <th>اخرین تغییر دهنده</th>
+            <@*th>تاریخ اخرین تغییر</th>
+            <th>زمان اخرین تغییر</th>*@
+            <th>شناسه نوع</th>
+            <th>نام نوع</th>
+            <th>توضیح نوع</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (UserModel Model in Model)
+        {
+            <tr>
+                <td>@Model.SID</td>
+                <td>@Model.UName</td>
+                <td>@Model.UFirstName</td>
+                <td>@Model.ULastName</td>
+                <td>@Model.UEmail</td>
+                <td>@Model.UTel</td>
+                <td>@Model.UPass</td>
+                <td>@Model.Blocked</td>
+                <td>@Model.Deleted</td>
+                <td>@Model.CreationUSID</td>
+                @*<td>@Model.CreationDate</td>*@
+                @*<td>@Model.CreationTime</td>*@
+                <td>@Model.LastModifiedUSID</td>
+                @*<td>@Model.LastModifiedDate</td>*@
+                @*<td>@Model.LastModifiedTime</td>*@
+                <td>@Model.UserType.SID</td>
+                <td>@Model.UserType.UTName</td>
+                <td>@Model.UserType.UTDescription</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,10 +1,13 @@
 ﻿using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 
-namespace Core.Model.EntityModel
+namespace Core.Model
 {
     public class DemandModel : BaseEntityModel
     {
-        public DimandStatusModel DimandStatus { get; set; } = new DimandStatusModel();
+        public DemandStatusModel DimandStatus { get; set; } = new DemandStatusModel();
+        public ShoppingCartModel ShoppingCart { get; set; } = new ShoppingCartModel();
         public UserModel User { get; set; } = new UserModel();
         //public string DeliveryDate { get; set; } = string.Empty;
         public bool Confirmed { get; set; } = default;
@@ -12,12 +15,41 @@ namespace Core.Model.EntityModel
         public DemandModel() { }
         public DemandModel(DataRow dr)
         {
-            DimandStatus = new DimandStatusModel(dr);
+            DimandStatus = new DemandStatusModel(dr);
+            ShoppingCart = new ShoppingCartModel(dr);
             User = new UserModel(dr);
 
             //DeliveryDate = dr[nameof(Confirmed)].ConvertToDateTime();
             Confirmed = dr[nameof(Confirmed)].ConvertToBool();
             base.InitBaseEntityModel(dr);
+        }
+        //-------------
+        public void SaveAddParameters()
+        {
+            SaveMainParameters(true);
+            SaveBlockedParameter();
+            SaveDeletedParameter();
+            SaveCreationParameters();
+            SaveModificationParameters();
+        }
+        public void SaveEditParameters()
+        {
+            SaveMainParameters(false);
+            SaveBlockedParameter();
+            SaveDeletedParameter();
+            SaveModificationParameters();
+        }
+        public void SaveMainParameters(bool IsAdd)
+        {
+            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.Demand.SID.EngName, SID);
+            if (IsAdd)
+                SIDParam.Direction = System.Data.ParameterDirection.Output;
+            Parameters.Add(SIDParam);
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.SCSID.EngName), ShoppingCart.SID));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.DSSID.EngName), DimandStatus.SID));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.USID.EngName), User.SID));
+            //Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.DeliveryDate.EngName), DeliveryDate));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.Confirmed.EngName), Confirmed));
         }
     }
 }

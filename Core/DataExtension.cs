@@ -82,7 +82,11 @@
             }
             return defaultValue;
         }
-
+        //----------------------
+        public static string SetSingleQuotes(this string value)
+        {
+            return $"'{value}'";
+        }
     }
 
 }

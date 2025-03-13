@@ -40,6 +40,63 @@ namespace DataBase
         }
         #endregion
 
+        #region Condition Functions
+        public static string EqualCondition(string columnName, string value)
+        {
+            return $"{columnName} = '{value}'";
+        }
+
+        public static string GreaterThanCondition(string columnName, string value)
+        {
+            return $"{columnName} > '{value}'";
+        }
+
+        public static string LessThanCondition(string columnName, string value)
+        {
+            return $"{columnName} < '{value}'";
+        }
+
+        public static string GreaterThanOrEqualCondition(string columnName, string value)
+        {
+            return $"{columnName} >= '{value}'";
+        }
+
+        public static string LessThanOrEqualCondition(string columnName, string value)
+        {
+            return $"{columnName} <= '{value}'";
+        }
+
+        public static string NotEqualCondition(string columnName, string value)
+        {
+            return $"{columnName} != '{value}'";
+        }
+
+        public static string LikeConditionContains(string columnName, string value)
+        {
+            return $"{columnName} LIKE '%{value}%'";
+        }
+
+        public static string LikeConditionStartsWith(string columnName, string value)
+        {
+            return $"{columnName} LIKE '{value}%'";
+        }
+
+        public static string LikeConditionEndsWith(string columnName, string value)
+        {
+            return $"{columnName} LIKE '%{value}'";
+        }
+
+        public static string InCondition(string columnName, params string[] values)
+        {
+            return $"{columnName} IN ({string.Join(", ", values.Select(v => $"'{v}'"))})";
+        }
+
+        public static string BetweenCondition(string columnName, string startValue, string endValue)
+        {
+            return $"{columnName} BETWEEN '{startValue}' AND '{endValue}'";
+        }
+        #endregion
+
         #region Mathematical Functions
         public static string Abs(string expression)
         {

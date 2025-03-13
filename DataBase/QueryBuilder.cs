@@ -1,5 +1,4 @@
-﻿using DataBase.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,10 +20,10 @@ namespace DataBase
         {
             this.TableName = tableName;
         }
-        public void SetTable(TableEnum table)
-        {
-            this.TableName = '[' + table.ToString() + ']';
-        }
+        //public void SetTable(TableEnum table)
+        //{
+        //    this.TableName = '[' + table.ToString() + ']';
+        //}
         public void AddWith(string WithName, string Query)
         {
             WithList.Add($"{WithName} AS ({Query})");
@@ -37,6 +36,14 @@ namespace DataBase
         {
             ColumnList.Add(columnName);
         }
+        public void AddColumns(params string[] columnNames)
+        {
+            ColumnList.AddRange(columnNames);
+        }
+        public void AddColumns(List<string> columnNames)
+        {
+            ColumnList.AddRange(columnNames);
+        }
 
         public void AddJoin(string joinType, string table, string onCondition, string aliasName = "")
         {
@@ -45,65 +52,85 @@ namespace DataBase
             else
                 JoinClauseList.Add($"{joinType} JOIN {table} AS {aliasName} ON {onCondition}");
         }
+        public void AddJoin(string joinType, string table, Action<QueryBuilder> configureQB, string aliasName = "")
+        {
+            QueryBuilder tempQueryBuilder = new QueryBuilder();
+            configureQB(tempQueryBuilder);
+            if (aliasName == "")
+                JoinClauseList.Add($"{joinType} JOIN {table} ON ({string.Join(" AND ", tempQueryBuilder.ConditionList)})");
+            else
+                JoinClauseList.Add($"{joinType} JOIN {table} AS {aliasName} ON ({string.Join(" AND ", tempQueryBuilder.ConditionList)})");
+        }
+
         public void AddInnerJoin(string table, string onCondition, string aliasName = "") => AddJoin("INNER", table, onCondition, aliasName);
+        public void AddInnerJoin(string table, Action<QueryBuilder> qb, string aliasName = "") => AddJoin("INNER", table, qb, aliasName);
+
         public void AddLeftJoin(string table, string onCondition, string aliasName = "") => AddJoin("LEFT", table, onCondition, aliasName);
+        public void AddLeftJoin(string table, Action<QueryBuilder> qb, string aliasName = "") => AddJoin("LEFT", table, qb, aliasName);
+
         public void AddRightJoin(string table, string onCondition, string aliasName = "") => AddJoin("RIGHT", table, onCondition, aliasName);
+        public void AddRightJoin(string table, Action<QueryBuilder> qb, string aliasName = "") => AddJoin("RIGHT", table, qb, aliasName);
+
         public void AddFullJoin(string table, string onCondition, string aliasName = "") => AddJoin("Full", table, onCondition, aliasName);
+        public void AddFullJoin(string table, Action<QueryBuilder> qb, string aliasName = "") => AddJoin("FULL", table, qb, aliasName);
 
         public void AddCondition(string condition)
         {
             ConditionList.Add(condition);
         }
-        public void AddEqualCondition(string columnName, string value)
+        public void AddEqualCondition(string columnName, object value)
         {
-            ConditionList.Add($"{columnName} = '{value}'");
+            ConditionList.Add($"{columnName} = {value}");
         }
-        public void AddGreaterThanCondition(string columnName, string value)
+        public void AddGreaterThanCondition(string columnName, object value)
         {
-            ConditionList.Add($"{columnName} > '{value}'");
+            ConditionList.Add($"{columnName} > {value}");
         }
-        public void AddLessThanCondition(string columnName, string value)
+        public void AddLessThanCondition(string columnName, object value)
         {
-            ConditionList.Add($"{columnName} < '{value}'");
+            ConditionList.Add($"{columnName} < {value}");
         }
-        public void AddGreaterThanOrEqualCondition(string columnName, string value)
+        public void AddGreaterThanOrEqualCondition(string columnName, object value)
         {
             ConditionList.Add($"{columnName} >= '{value}'");
         }
-        public void AddLessThanOrEqualCondition(string columnName, string value)
+        public void AddLessThanOrEqualCondition(string columnName, object value)
         {
             ConditionList.Add($"{columnName} <= '{value}'");
         }
-        public void AddNotEqualCondition(string columnName, string value)
+        public void AddNotEqualCondition(string columnName, object value)
         {
             ConditionList.Add($"{columnName} != '{value}'");
         }
-        public void AddLikeConditionContains(string columnName, string value)
+        public void AddLikeConditionContains(string columnName, object value)
         {
             ConditionList.Add($"{columnName} LIKE '%{value}%'");
         }
-        public void AddLikeConditionStartsWith(string columnName, string value)
+        public void AddLikeConditionStartsWith(string columnName, object value)
         {
             ConditionList.Add($"{columnName} LIKE '{value}%'");
         }
-        public void AddLikeConditionEndsWith(string columnName, string value)
+        public void AddLikeConditionEndsWith(string columnName, object value)
         {
             ConditionList.Add($"{columnName} LIKE '%{value}'");
         }
+
         public void AddInCondition(string columnName, IEnumerable<object> values)
         {
-            var valueString = string.Join(",", values.Select(v =>
-                v is string ? $"'{v}'" : v.ToString()));  // برای stringها تک کوتیشن و برای بقیه مقادیر مستقیم
-            ConditionList.Add($"{columnName} IN ({valueString})");
+            ConditionList.Add($"{columnName} IN ({string.Join(",", values)})");
+        }
+        public void AddInCondition(string columnName,params object[] values)
+        {
+            ConditionList.Add($"{columnName} IN ({string.Join(",", values)})");
         }
         public void AddInCondition(string columnName, string valueString)
         {
             string[] values = valueString.Split(',');
             AddInCondition(columnName, values);
         }
-        public void AddBetweenCondition(string columnName, string value1, string value2)
+        public void AddBetweenCondition(string columnName, object value1, object value2)
         {
-            ConditionList.Add($"{columnName} BETWEEN '{value1}' AND '{value2}'");
+            ConditionList.Add($"{columnName} BETWEEN {value1} AND {value2}");
         }
 
         public void AddGroupBy(string column)

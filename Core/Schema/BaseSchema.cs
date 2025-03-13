@@ -16,7 +16,7 @@ namespace Core.Schema
         public SIDColumn LastModifiedUSID { get; set; }
         public DateColumn LastModifiedDate { get; set; }
         public TimeColumn LastModifiedTime { get; set; }
-        public List<BaseColumn> BaseColumns = new List<BaseColumn>();
+        protected List<BaseColumn> BaseColumns = new List<BaseColumn>();
 
         public BaseSchema()
         {

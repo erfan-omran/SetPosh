@@ -1,4 +1,12 @@
+﻿using DataBase;
+using Service.Service;
+
 var builder = WebApplication.CreateBuilder(args);
+
+string connectionString = builder.Configuration.GetConnectionString("SetPoshConnection") ?? "";
+DBConnection.InitConnectionStr(connectionString);  // Set ConnectionStr
+
+builder.Services.AddSingleton<UserService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

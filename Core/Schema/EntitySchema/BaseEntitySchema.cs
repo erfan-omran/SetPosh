@@ -5,13 +5,13 @@ namespace Core.Schema
 {
     public class BaseEntitySchema : BaseSchema
     {
-        public LongColumn ID { get; set; }
+        public LongColumn SID { get; set; }
 
         public BaseEntitySchema()
         {
-            ID = new LongColumn(nameof(ID), "شناسه", TableEnum.None);
+            SID = new LongColumn(nameof(SID), "شناسه", TableEnum.None);
 
-            BaseColumns.AddRange(new List<BaseColumn> { ID });
+            BaseColumns.AddRange(new List<BaseColumn> { SID });
         }
     }
 }

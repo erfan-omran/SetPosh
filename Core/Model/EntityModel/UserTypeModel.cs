@@ -1,17 +1,44 @@
 ﻿using System.Data;
+using System.Data.SqlClient;
 
-namespace Core.Model.EntityModel
+namespace Core.Model
 {
     public class UserTypeModel : BaseEntityModel
     {
         public string UTName { get; set; } = string.Empty;
         public string UTDescription { get; set; } = string.Empty;
+
         public UserTypeModel() { }
         public UserTypeModel(DataRow dr)
         {
             UTName = dr[nameof(UTName)].ConvertToString();
             UTDescription = dr[nameof(UTDescription)].ConvertToString();
             base.InitBaseEntityModel(dr);
+        }
+        //-------------
+        public void SaveAddParameters()
+        {
+            SaveMainParameters(true);
+            SaveBlockedParameter();
+            SaveDeletedParameter();
+            SaveCreationParameters();
+            SaveModificationParameters();
+        }
+        public void SaveEditParameters()
+        {
+            SaveMainParameters(false);
+            SaveBlockedParameter();
+            SaveDeletedParameter();
+            SaveModificationParameters();
+        }
+        public void SaveMainParameters(bool IsAdd)
+        {
+            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.UserType.SID.EngName, SID);
+            if (IsAdd)
+                SIDParam.Direction = System.Data.ParameterDirection.Output;
+            Parameters.Add(SIDParam);
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTName.EngName), UTName));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTDescription .EngName), UTDescription ));
         }
     }
 }
