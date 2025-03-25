@@ -50,10 +50,17 @@ namespace DataBase
             }
             return dataTable;
         }
-        public static async Task<DataRow> GetDataRowAsync(string query, List<SqlParameter>? parameters = null)
+        public static async Task<DataRow?> GetDataRowAsync(QueryBuilder qb, List<SqlParameter>? parameters = null)
+        {
+            qb.SetTop(1);
+            string query = qb.CreateQuery();
+            DataRow? row = await GetDataRowAsync(query, parameters);
+            return row;
+        }
+        public static async Task<DataRow?> GetDataRowAsync(string query, List<SqlParameter>? parameters = null)
         {
             DataTable dataTable = await GetDataTableAsync(query, parameters);
-            return dataTable.Rows.Count > 0 ? dataTable.Rows[0] : new DataTable().Rows[0];
+            return dataTable.Rows.Count > 0 ? dataTable.Rows[0] : null;
         }
         public static async Task<T?> GetFirstValueAsync<T>(string query, List<SqlParameter>? parameters = null)
         {
@@ -86,7 +93,6 @@ namespace DataBase
         {
             try
             {
-                // ایجاد اتصال به دیتابیس
                 using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand
@@ -99,19 +105,20 @@ namespace DataBase
 
                     if (parameters != null && parameters.Count > 0)
                     {
+                        cmd.Parameters.Clear();
                         cmd.Parameters.AddRange(parameters.ToArray());
                     }
 
                     if (sqlConnection.State == ConnectionState.Closed)
                         await sqlConnection.OpenAsync();
 
-                    await cmd.ExecuteNonQueryAsync();
-                    return true;
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    return rowsAffected > 0;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                return false;
+                throw new Exception(ex.Message);
             }
         }
         public static async Task<bool> ExecuteTransactionProcedureAsync(List<(string ProcedureName, List<SqlParameter>? Parameters)> procedures)

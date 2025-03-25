@@ -1,8 +1,10 @@
 ﻿using Core;
 using Core.Model;
 using DataBase;
+using Microsoft.AspNetCore.Http;
 using Service.ServiceInterface;
 using System.Data;
+using System.Security.Claims;
 
 namespace Service.Service
 {
@@ -73,6 +75,7 @@ namespace Service.Service
 
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
             UserModel user = new UserModel(dr);
+            //user.UserType = new UserTypeModel(dr);
 
             return user;
         }
@@ -101,6 +104,22 @@ namespace Service.Service
                 list.Add(User);
             }
             return list;
+        }
+        //------------------------------------------
+        public ClaimsPrincipal CreateCookie(UserModel UserModel)
+        {
+            // اگر کاربر پیدا شد، Claims تعریف می‌شود
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, UserModel.UName), // نام کاربر
+                new Claim(ClaimTypes.NameIdentifier, UserModel.SID.ToString()), // شناسه کاربر
+                new Claim(ClaimTypes.Role, UserModel.UserType.SID.ToString()), // نقش کاربر
+                new Claim(nameof(UserModel.UTel), UserModel.UTel) // شماره تلفن (دلخواه)
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "SetPoshCookie");// ایجاد ClaimsIdentity (نماینده اطلاعات هویتی)
+            ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);// ایجاد ClaimsPrincipal (نماینده کاربر)
+            return claimsPrincipal;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Core.Model
@@ -10,21 +11,26 @@ namespace Core.Model
         public string UFirstName { get; set; } = string.Empty;
         public string ULastName { get; set; } = string.Empty;
         public string UEmail { get; set; } = string.Empty;
+        [Required(ErrorMessage = "شماره تلفن نمیتواند خالی باشد")]
         public string UTel { get; set; } = string.Empty;
+        [Required(ErrorMessage = "رمز کاربری نمیتواند خالی باشد")]
         public string UPass { get; set; } = string.Empty;
 
         public UserModel() { }
-        public UserModel(DataRow dr)
+        public UserModel(DataRow dr) : this(dr, false) { }
+        public UserModel(DataRow dr, bool isNested)
         {
-            UserType = new UserTypeModel(dr);
+            UserType = new UserTypeModel(dr, isNested);
+            UserType.SID = dr.GetValueOfLongColumn(Dictionary.User.UTSID.EngName);
 
-            UName = dr[nameof(UName)].ConvertToString();
-            UFirstName = dr[nameof(UFirstName)].ConvertToString();
-            ULastName = dr[nameof(ULastName)].ConvertToString();
-            UEmail = dr[nameof(UEmail)].ConvertToString();
-            UTel = dr[nameof(UTel)].ConvertToString();
-            UPass = dr[nameof(UPass)].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            UName = dr.GetValueOfStringColumn(Dictionary.User.UName.EngName);
+            UFirstName = dr.GetValueOfStringColumn(Dictionary.User.UFirstName.EngName);
+            ULastName = dr.GetValueOfStringColumn(Dictionary.User.ULastName.EngName);
+            UEmail = dr.GetValueOfStringColumn(Dictionary.User.UEmail.EngName);
+            UTel = dr.GetValueOfStringColumn(Dictionary.User.UTel.EngName);
+            UPass = dr.GetValueOfStringColumn(Dictionary.User.UPass.EngName);
+            if (isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -33,7 +39,6 @@ namespace Core.Model
             SaveBlockedParameter();
             SaveDeletedParameter();
             SaveCreationParameters();
-            SaveModificationParameters();
         }
         public void SaveEditParameters()
         {
@@ -44,17 +49,15 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.User.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UTSID.EngName), UserType.SID));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UName.EngName), UName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UFirstName.EngName), UFirstName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.ULastName.EngName), ULastName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UEmail.EngName), UEmail));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UTel.EngName), UTel));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.User.UPass.EngName), UPass));
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.User.SID.EngName, SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UTSID.EngName, UserType.SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UName.EngName, UName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UFirstName.EngName, UFirstName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.ULastName.EngName, ULastName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UEmail.EngName, UEmail));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UTel.EngName, UTel));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UPass.EngName, UPass));
         }
     }
 }

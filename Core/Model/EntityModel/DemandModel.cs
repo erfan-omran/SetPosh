@@ -9,7 +9,7 @@ namespace Core.Model
         public DemandStatusModel DimandStatus { get; set; } = new DemandStatusModel();
         public ShoppingCartModel ShoppingCart { get; set; } = new ShoppingCartModel();
         public UserModel User { get; set; } = new UserModel();
-        //public string DeliveryDate { get; set; } = string.Empty;
+        public PersianDate DeliveryDate { get; set; } = PersianDate.Now;
         public bool Confirmed { get; set; } = default;
 
         public DemandModel() { }
@@ -19,7 +19,7 @@ namespace Core.Model
             ShoppingCart = new ShoppingCartModel(dr);
             User = new UserModel(dr);
 
-            //DeliveryDate = dr[nameof(Confirmed)].ConvertToDateTime();
+            DeliveryDate = new PersianDate(dr[nameof(DeliveryDate)].ConvertToString());
             Confirmed = dr[nameof(Confirmed)].ConvertToBool();
             base.InitBaseEntityModel(dr);
         }
@@ -48,7 +48,7 @@ namespace Core.Model
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.SCSID.EngName), ShoppingCart.SID));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.DSSID.EngName), DimandStatus.SID));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.USID.EngName), User.SID));
-            //Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.DeliveryDate.EngName), DeliveryDate));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.DeliveryDate.EngName), DeliveryDate));   
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Demand.Confirmed.EngName), Confirmed));
         }
     }

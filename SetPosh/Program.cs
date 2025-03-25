@@ -1,4 +1,5 @@
 ﻿using DataBase;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Service.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,16 +9,21 @@ DBConnection.InitConnectionStr(connectionString);  // Set ConnectionStr
 
 builder.Services.AddSingleton<UserService>();
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.LoginPath = "/Home/Login"; // مسیر صفحه لاگین
+        options.AccessDeniedPath = "/Home/Error"; // مسیر دسترسی غیرمجاز
+    });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -26,10 +32,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();// فعال کردن Middleware برای احراز هویت
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Login}/{id?}");
 
 app.Run();

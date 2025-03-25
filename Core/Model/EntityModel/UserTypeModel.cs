@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Xml.Linq;
 
 namespace Core.Model
 {
@@ -9,11 +10,13 @@ namespace Core.Model
         public string UTDescription { get; set; } = string.Empty;
 
         public UserTypeModel() { }
-        public UserTypeModel(DataRow dr)
+        public UserTypeModel(DataRow dr) : this(dr, false) { }
+        public UserTypeModel(DataRow dr, bool isNested)
         {
-            UTName = dr[nameof(UTName)].ConvertToString();
-            UTDescription = dr[nameof(UTDescription)].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            UTName = dr.GetValueOfStringColumn(nameof(UTName));
+            UTDescription = dr.GetValueOfStringColumn(nameof(UTDescription));
+            if (isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -38,7 +41,7 @@ namespace Core.Model
                 SIDParam.Direction = System.Data.ParameterDirection.Output;
             Parameters.Add(SIDParam);
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTName.EngName), UTName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTDescription .EngName), UTDescription ));
+            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTDescription.EngName), UTDescription));
         }
     }
 }

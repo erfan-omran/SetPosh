@@ -1,0 +1,33 @@
+﻿@model string
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطا</title>
+    <style>
+        body {
+            font-family: Tahoma, Geneva, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .error-container {
+            background-color: #f2dede;
+            padding: 20px;
+            border-radius: 5px;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h2>متاسفانه خطایی پیش آمده است.</h2>
+        <p>@Model</p>
+        <p><a href="/">بازگشت به صفحه اصلی</a></p>
+    </div>
+</body>
+</html>

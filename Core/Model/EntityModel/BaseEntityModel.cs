@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Xml.Linq;
 
 namespace Core.Model
 {
@@ -8,7 +9,7 @@ namespace Core.Model
         public long SID { get; set; } = default;
         public void InitBaseEntityModel(DataRow dr)
         {
-            SID = dr[nameof(SID)].ConvertToLong();
+            SID = dr.GetValueOfLongColumn(nameof(SID));
             InitBaseModel(dr);
         }
     }
