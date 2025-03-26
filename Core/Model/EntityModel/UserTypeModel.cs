@@ -15,7 +15,7 @@ namespace Core.Model
         {
             UTName = dr.GetValueOfStringColumn(nameof(UTName));
             UTDescription = dr.GetValueOfStringColumn(nameof(UTDescription));
-            if (isNested)
+            if (!isNested)
                 base.InitBaseEntityModel(dr);
         }
         //-------------

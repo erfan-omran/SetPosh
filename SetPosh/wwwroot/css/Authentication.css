@@ -1,0 +1,114 @@
+@font-face {
+    font-family: 'Vazir';
+    src: url('/font/Vazirmatn-Regular.woff2') format('woff2'),
+         url('/font/Vazirmatn-Regular.woff') format('woff'),
+         url('/font/Vazirmatn-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('/font/Vazirmatn-Bold.woff2') format('woff2'), 
+         url('/font/Vazirmatn-Bold.woff') format('woff'), 
+         url('/font/Vazirmatn-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+
+body {
+    font-family: Vazir, sans-serif;
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    direction: rtl;
+}
+
+.authentication_container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+
+.form_group {
+    margin-bottom: 20px;
+}
+
+    .form_group label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+    }
+
+.btn_primary:hover {
+    background-color: #45a049;
+}
+
+.form_control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    transition: border-color 0.3s ease;
+    font-family: Vazir, sans-serif;
+}
+
+    .form_control:focus {
+        border-color: #4caf50;
+        outline: none;
+    }
+
+.validation_message {
+    color: #dc3545;
+    font-size: small;
+}
+
+.btn_primary {
+    background-color: #4caf50;
+    border: none;
+    color: #fff;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    font-family: Vazir, sans-serif;
+}
+
+.alert_danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+p {
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+}
+
+    p a {
+        color: #4caf50;
+        text-decoration: none;
+    }
+
+        p a:hover {
+            text-decoration: underline;
+        }

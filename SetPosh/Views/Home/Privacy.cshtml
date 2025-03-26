@@ -3,4 +3,28 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Tel : @(User.FindFirst(nameof(UserModel.UTel))?.Value)</p>
+<p style="background:gray;">@(User.Identity?.Name ?? "Anonymous")</p>
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+
+    <p style="background:green;">Authenticated</p>
+}
+else
+{
+    <p style="background:red;"> not Authenticated</p>
+
+}
+
+<ul>
+    @foreach (var item in User.Claims)
+    {
+        <li>@item</li>
+    }
+</ul>
+
+<ul>
+    @foreach (var item in User.Claims)
+    {
+        <li>@item.Type : @item.Value</li>
+    }
+</ul>

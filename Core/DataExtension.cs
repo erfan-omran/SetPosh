@@ -128,13 +128,13 @@ namespace Core
         public static PersianDate GetValueOfPersianDateColumn(this DataRow dr, string columnName, string defaultValue = "0000/00/00")
         {
             if (dr.HasColumn(columnName))
-                return new PersianDate(dr[nameof(columnName)].ConvertToString());
+                return new PersianDate(dr[columnName].ConvertToString());
             return new PersianDate(defaultValue);
         }
         public static PersianTime GetValueOfPersianTimeColumn(this DataRow dr, string columnName, string defaultValue = "00:00:00")
         {
             if (dr.HasColumn(columnName))
-                return new PersianTime(dr[nameof(columnName)].ConvertToString());
+                return new PersianTime(dr[columnName].ConvertToString());
             return new PersianTime(defaultValue);
         }
         //----------------------

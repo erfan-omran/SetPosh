@@ -1,6 +1,7 @@
 ﻿using DataBase;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Service.Service;
+using SetPosh;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,19 +12,33 @@ builder.Services.AddSingleton<UserService>();
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+builder.Services.AddAuthentication(Settings.AuthCookieName)
+    .AddCookie(
+    Settings.AuthCookieName,
+    options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromDays(14);
-        options.LoginPath = "/Home/Login"; // مسیر صفحه لاگین
-        options.AccessDeniedPath = "/Home/Error"; // مسیر دسترسی غیرمجاز
-    });
+        //options.Cookie.SameSite = SameSiteMode.None;
+        //options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+        //options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.LoginPath = Settings.LoginPath;
+        options.AccessDeniedPath = Settings.AccessDeniedPath;
+        options.Cookie.Name = Settings.AuthCookieName;
+        //options.Cookie.HttpOnly = false;
+    }
+);
+builder.Services.AddAuthorization(
+    option =>
+    {
+        option.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "1"));//To do : Create an enum for UserType
+    }
+);
+
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler(Settings.ErrorPath);
     app.UseHsts();
 }
 
@@ -32,11 +47,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();// فعال کردن Middleware برای احراز هویت
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

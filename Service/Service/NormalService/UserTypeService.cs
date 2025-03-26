@@ -12,8 +12,10 @@ namespace Service.Service
         {
             Dictionary.UserType.SID.FullDBName,
             Dictionary.UserType.UTName.FullDBName,
-            Dictionary.UserType.UTDescription.FullDBName,
-
+            Dictionary.UserType.UTDescription.FullDBName
+        };
+        public static List<string> DefaultColumns= new List<string>()
+        {
             Dictionary.UserType.Blocked.FullDBName,
             Dictionary.UserType.Deleted.FullDBName,
 
@@ -76,6 +78,7 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.UserType.TableName);
             return qb;
         }

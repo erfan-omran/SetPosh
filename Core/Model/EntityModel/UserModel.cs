@@ -11,16 +11,16 @@ namespace Core.Model
         public string UFirstName { get; set; } = string.Empty;
         public string ULastName { get; set; } = string.Empty;
         public string UEmail { get; set; } = string.Empty;
-        [Required(ErrorMessage = "شماره تلفن نمیتواند خالی باشد")]
+        [Required]
         public string UTel { get; set; } = string.Empty;
-        [Required(ErrorMessage = "رمز کاربری نمیتواند خالی باشد")]
+        [Required]
         public string UPass { get; set; } = string.Empty;
 
         public UserModel() { }
         public UserModel(DataRow dr) : this(dr, false) { }
         public UserModel(DataRow dr, bool isNested)
         {
-            UserType = new UserTypeModel(dr, isNested);
+            UserType = new UserTypeModel(dr, !isNested);
             UserType.SID = dr.GetValueOfLongColumn(Dictionary.User.UTSID.EngName);
 
             UName = dr.GetValueOfStringColumn(Dictionary.User.UName.EngName);
@@ -29,7 +29,7 @@ namespace Core.Model
             UEmail = dr.GetValueOfStringColumn(Dictionary.User.UEmail.EngName);
             UTel = dr.GetValueOfStringColumn(Dictionary.User.UTel.EngName);
             UPass = dr.GetValueOfStringColumn(Dictionary.User.UPass.EngName);
-            if (isNested)
+            if (!isNested)
                 base.InitBaseEntityModel(dr);
         }
         //-------------

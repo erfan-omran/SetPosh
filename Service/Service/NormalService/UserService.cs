@@ -1,7 +1,7 @@
 ﻿using Core;
 using Core.Model;
 using DataBase;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Authentication;
 using Service.ServiceInterface;
 using System.Data;
 using System.Security.Claims;
@@ -19,8 +19,10 @@ namespace Service.Service
             Dictionary.User.ULastName.FullDBName,
             Dictionary.User.UEmail.FullDBName,
             Dictionary.User.UTel.FullDBName,
-            Dictionary.User.UPass.FullDBName,
-
+            Dictionary.User.UPass.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.User.Blocked.FullDBName,
             Dictionary.User.Deleted.FullDBName,
 
@@ -84,6 +86,7 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.User.TableName);
             return qb;
         }
@@ -106,20 +109,28 @@ namespace Service.Service
             return list;
         }
         //------------------------------------------
-        public ClaimsPrincipal CreateCookie(UserModel UserModel)
+        public async Task<DataRow> Login(UserModel userModel)
         {
-            // اگر کاربر پیدا شد، Claims تعریف می‌شود
-            var claims = new List<Claim>
+            QueryBuilder qb = GetSimple();
+            qb.AddEqualCondition(Dictionary.User.UTel.FullDBName, userModel.UTel.SetSingleQuotes());
+            qb.AddEqualCondition(Dictionary.User.UPass.FullDBName, userModel.UPass.SetSingleQuotes());
+            DataRow dr = await DBConnection.GetDataRowAsync(qb);
+            return dr;
+        }
+        public ClaimsPrincipal CreateCookie(UserModel userModel, string cookieName)
+        {
+            List<Claim> Claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, UserModel.UName), // نام کاربر
-                new Claim(ClaimTypes.NameIdentifier, UserModel.SID.ToString()), // شناسه کاربر
-                new Claim(ClaimTypes.Role, UserModel.UserType.SID.ToString()), // نقش کاربر
-                new Claim(nameof(UserModel.UTel), UserModel.UTel) // شماره تلفن (دلخواه)
+                new Claim(ClaimTypes.Name, userModel.UName),
+                new Claim(ClaimTypes.NameIdentifier, userModel.SID.ConvertToString()),
+                new Claim(ClaimTypes.Role, userModel.UserType.SID.ConvertToString()),
+                new Claim(nameof(userModel.UTel), userModel.UTel)
             };
 
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "SetPoshCookie");// ایجاد ClaimsIdentity (نماینده اطلاعات هویتی)
-            ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);// ایجاد ClaimsPrincipal (نماینده کاربر)
-            return claimsPrincipal;
+            ClaimsIdentity Identity = new ClaimsIdentity(Claims, cookieName);// ایجاد ClaimsIdentity (نماینده اطلاعات هویتی)
+            ClaimsPrincipal Principal = new ClaimsPrincipal(Identity);// ایجاد ClaimsPrincipal (نماینده کاربر)
+            return Principal;
         }
+        //------------------------------------------
     }
 }

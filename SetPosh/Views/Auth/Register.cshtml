@@ -1,0 +1,82 @@
+﻿@model Tuple<UserModel, string>
+@{
+    UserModel UserModel = Model.Item1;
+    string ReturnURL = Model.Item2;
+}
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/Authentication.css" />
+    <title>ثبت نام</title>
+</head>
+<body>
+    <div class="authentication_container">
+        <h2>ثبت نام</h2>
+        <form id="RegisterForm" asp-controller="Auth" asp-action="Register" method="post">
+            <div class="form_group">
+                <label for="UTel">شماره تلفن</label>
+                <input value="@(UserModel.UTel)" type="text" id="UTel" name="@nameof(UserModel.UTel)" class="form_control" placeholder="09000000000">
+                <span class="validation_message" id="UTelValidation"></span>
+            </div>
+            <div class="form_group">
+                <label for="UPass">رمز عبور</label>
+                <input type="password" id="UPass" name="@nameof(UserModel.UPass)" class="form_control" placeholder="XXX">
+                <span class="validation_message" id="UPassValidation"></span>
+            </div>
+            <div class="form_group">
+                <label for="UPassRepeat">تکرار رمز عبور</label>
+                <input type="password" id="UPassRepeat" class="form_control" placeholder="XXX">
+                <span class="validation_message" id="UPassRepeatValidation"></span>
+            </div>
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert_danger">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+            <button id="SubmitBtn" type="submit" class="btn_primary">ثبت نام</button>
+            <p>
+                <a asp-controller="Auth" asp-action="Login">قبلاً حساب کاربری دارید؟ وارد شوید</a>
+            </p>
+        </form>
+    </div>
+    <script src="~/js/site.js"></script>
+    <script>
+        document.getElementById('SubmitBtn').addEventListener('click', function (e) {
+            debugger;
+            e.preventDefault();
+            let IsValid = true;
+            const UTelField = document.getElementById('UTel');
+            const UPassField = document.getElementById('UPass');
+            const UPassRepeatField = document.getElementById('UPassRepeat');
+
+            const UTelValidation = document.getElementById('UTelValidation');
+            const UPassValidation = document.getElementById('UPassValidation');
+            const UPassRepeatValidation = document.getElementById('UPassRepeatValidation');
+
+            if (IsNullOrEmpty(UTelField.value)) {
+                UTelValidation.textContent = 'لطفا شماره تلفن را وارد کنید.';
+                IsValid = false;
+            }
+            else { UTelValidation.textContent = ''; }
+
+            if (IsNullOrEmpty(UPassField.value)) {
+                UPassValidation.textContent = 'لطفا رمزعبور را وارد کنید.';
+                IsValid = false;
+            }
+            else { UPassValidation.textContent = ''; }
+
+            if (UPassRepeatField.value !== UPassField.value) {
+                UPassRepeatValidation.textContent = 'رمزعبور با تکرارش متابقت ندارد';
+                IsValid = false;
+            }
+            else { UPassRepeatValidation.textContent = ''; }
+
+            if (isValid) {
+                document.getElementById('RegisterForm').submit();
+            }
+        });
+    </script>
+</body>
+</html>
