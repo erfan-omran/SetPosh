@@ -36,10 +36,8 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.UserType.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.UserType.SID.EngName, SID));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTName.EngName), UTName));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTDescription.EngName), UTDescription));
         }

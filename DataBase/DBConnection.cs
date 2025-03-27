@@ -112,8 +112,8 @@ namespace DataBase
                     if (sqlConnection.State == ConnectionState.Closed)
                         await sqlConnection.OpenAsync();
 
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    return rowsAffected > 0;
+                    await cmd.ExecuteNonQueryAsync();
+                    return true;
                 }
             }
             catch(Exception ex)

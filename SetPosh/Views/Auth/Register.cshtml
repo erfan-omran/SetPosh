@@ -16,12 +16,12 @@
         <form id="RegisterForm" asp-controller="Auth" asp-action="Register" method="post">
             <div class="form_group">
                 <label for="UTel">شماره تلفن</label>
-                <input value="@(UserModel.UTel)" type="text" id="UTel" name="@nameof(UserModel.UTel)" class="form_control" placeholder="09000000000">
+                <input value="@(UserModel.UTel)" type="text" id="UTel" name="@nameof(UserModel.UTel)" class="form_control" placeholder="09XXXXXXXXX" autocomplete="username">
                 <span class="validation_message" id="UTelValidation"></span>
             </div>
             <div class="form_group">
                 <label for="UPass">رمز عبور</label>
-                <input type="password" id="UPass" name="@nameof(UserModel.UPass)" class="form_control" placeholder="XXX">
+                <input type="password" id="UPass" name="@nameof(UserModel.UPass)" class="form_control" placeholder="XXX" autocomplete="current-password">
                 <span class="validation_message" id="UPassValidation"></span>
             </div>
             <div class="form_group">
@@ -73,7 +73,7 @@
             }
             else { UPassRepeatValidation.textContent = ''; }
 
-            if (isValid) {
+            if (IsValid) {
                 document.getElementById('RegisterForm').submit();
             }
         });

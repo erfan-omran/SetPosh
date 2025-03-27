@@ -38,14 +38,14 @@ namespace Service.Service
         public async Task<bool> AddAsync(UserModel entity)
         {
             entity.SaveAddParameters();
-            bool Added = await DBConnection.ExecProcedureAsync("[User.Add]", entity.Parameters);
-            return Added;
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Add]", entity.Parameters);
+            return Ans;
         }
         public async Task<bool> EditAsync(UserModel entity)
         {
             entity.SaveEditParameters();
-            bool Edited = await DBConnection.ExecProcedureAsync("[User.Edit]", entity.Parameters);
-            return Edited;
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Edit]", entity.Parameters);
+            return Ans;
         }
         public async Task BlockAsync(long SID)
         {
@@ -130,6 +130,15 @@ namespace Service.Service
             ClaimsIdentity Identity = new ClaimsIdentity(Claims, cookieName);// ایجاد ClaimsIdentity (نماینده اطلاعات هویتی)
             ClaimsPrincipal Principal = new ClaimsPrincipal(Identity);// ایجاد ClaimsPrincipal (نماینده کاربر)
             return Principal;
+        }
+        public string GenerateRandomUsername()
+        {
+            Random random = new Random();
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            int randomNumber = random.Next(1000, 9999);
+
+            string username = $"{timestamp}{randomNumber}";
+            return username;
         }
         //------------------------------------------
     }

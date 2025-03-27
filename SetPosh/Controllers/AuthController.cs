@@ -1,4 +1,5 @@
 ﻿using Core.Model;
+using DataBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Service.Service;
@@ -27,7 +28,7 @@ namespace SetPosh.Controllers
         public async Task<IActionResult> Login(UserModel userModel, string? returnURL = "")
         {
             if (string.IsNullOrEmpty(returnURL))
-                returnURL = Url.Content("/Home/Privacy");
+                returnURL = Url.Content(Settings.DefaultReturnUrl);
             try
             {
                 if (!ModelState.IsValid)
@@ -54,7 +55,7 @@ namespace SetPosh.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error : {ex}";
+                ViewBag.ErrorMessage = $"{ex.Message}";
                 return View(new Tuple<UserModel, string>(userModel, returnURL));
                 //return RedirectToAction("Error", new { message = "خطای پایگاه داده: " + ex.Message });
             }
@@ -64,37 +65,49 @@ namespace SetPosh.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(Settings.AuthCookieName);
-            return LocalRedirect("/Home/Index");
+            return LocalRedirect($"/Home/{nameof(HomeController.Index)}");
         }
-        
+
         public IActionResult Register(string? ReturnURL = "")
         {
             ReturnURL ??= Url.Content("~/");
-            return View(new Tuple<UserModel, string>(new UserModel(), ReturnURL)); // ارسال تاپل به ویو
+            return View(new Tuple<UserModel, string>(new UserModel(), ReturnURL));
         }
 
         [HttpPost]
-        public IActionResult Register(UserModel model, string? ReturnURL = "")
+        public async Task<IActionResult> Register(UserModel userModel, string? returnURL = "")
         {
-            if (string.IsNullOrEmpty(ReturnURL))
-                ReturnURL = Url.Content("/Home/Privacy");
-            if (ModelState.IsValid)
+            if (string.IsNullOrEmpty(returnURL))
+                returnURL = Url.Content(Settings.DefaultReturnUrl);
+
+            try
             {
+                if (!ModelState.IsValid)
+                    return View(new Tuple<UserModel, string>(userModel, returnURL));
 
-                // بررسی صحت اطلاعات و ثبت‌نام در دیتابیس
-                // به عنوان مثال، ذخیره‌سازی داده‌ها در دیتابیس
+                userModel.UserType.SID = 5;//To do : Create an enum for UserType
+                userModel.UName = _userService.GenerateRandomUsername();
 
-                // فرض کنید نام کاربر و رمز عبور را ذخیره کرده‌ایم
-                // شما باید این بخش را با کد خودتان برای ذخیره‌سازی دیتابیس کامل کنید
+                bool Ans = false;
+                try { Ans = await _userService.AddAsync(userModel); }
+                catch (Exception ex)
+                {
+                    ViewBag.ErrorMessage = $"{ex.Message}";//پیام دیتابیس
+                    return View(new Tuple<UserModel, string>(userModel, returnURL));
+                }
 
-                // نمایش پیامی مبنی بر موفقیت
-                TempData["SuccessMessage"] = "ثبت نام با موفقیت انجام شد!";
-                return RedirectToAction("Login"); // هدایت به صفحه ورود بعد از ثبت‌نام موفق
+                if (Ans) { return RedirectToAction(nameof(AuthController.Login)); }
+                else
+                {
+                    ViewBag.ErrorMessage = "عملیات با مشکل مواجه شد. لطفاً دوباره تلاش کنید";
+                    return View(new Tuple<UserModel, string>(userModel, returnURL));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // در صورتی که اطلاعات وارد شده معتبر نباشد
-                return View(new Tuple<UserModel, string>(model, ReturnURL));
+                DBConnection.LogException(ex, "");
+                ViewBag.ErrorMessage = "عملیات با مشکل مواجه شد. لطفاً دوباره تلاش کنید";
+                return View(new Tuple<UserModel, string>(userModel, returnURL));
             }
         }
     }

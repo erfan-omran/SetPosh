@@ -1,4 +1,6 @@
-﻿namespace SetPosh
+﻿using SetPosh.Controllers;
+
+namespace SetPosh
 {
     public class Settings
     {
@@ -8,5 +10,7 @@
         public const string LoginPath = "/Auth/Login";
         public const string AccessDeniedPath = "/Auth/Error";
         public const string ErrorPath = "/Home/Error";
+
+        public const string DefaultReturnUrl = $"/Home/{nameof(HomeController.Index)}";
     }
 }

@@ -23,7 +23,7 @@ namespace SetPosh.Controllers
             return View(message);
         }
 
-        [Authorize("Admin")]
+        //[Authorize("Admin")]
         public IActionResult Privacy()
         {
             return View();
