@@ -13,15 +13,18 @@ namespace Core.Model
         public string PDescription { get; set; } = string.Empty;
 
         public ProductModel() { }
-        public ProductModel(DataRow dr)
+        public ProductModel(DataRow dr) : this(dr, false) { }
+        public ProductModel(DataRow dr, bool isNested)
         {
-            ProductCategory = new ProductCategoryModel(dr);
+            ProductCategory = new ProductCategoryModel(dr, !isNested);
+            ProductCategory.SID = dr.GetValueOfLongColumn(Dictionary.Product.PCSID.EngName);
 
-            PName = dr[nameof(PName)].ConvertToString();
-            PPrice = dr[nameof(PPrice)].ConvertToDecimal();
-            PCount = dr[nameof(PCount)].ConvertToLong();
-            PDescription = dr[nameof(PDescription)].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            PName = dr.GetValueOfStringColumn(Dictionary.Product.PName.EngName);
+            PPrice = dr.GetValueOfDecimalColumn(Dictionary.Product.PPrice.EngName);
+            PCount = dr.GetValueOfLongColumn(Dictionary.Product.PCount.EngName);
+            PDescription = dr.GetValueOfStringColumn(Dictionary.Product.PDescription.EngName);
+            if (!isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()

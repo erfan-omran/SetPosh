@@ -11,14 +11,18 @@ namespace Core.Model
         public string CDescription { get; set; } = string.Empty;
 
         public CommentModel() { }
-        public CommentModel(DataRow dr)
+        public CommentModel(DataRow dr) : this(dr, false) { }
+        public CommentModel(DataRow dr, bool isNested)
         {
-            User = new UserModel(dr);
-            Product = new ProductModel(dr);
+            User = new UserModel(dr, !isNested);
+            User.SID = dr.GetValueOfLongColumn(Dictionary.Comment.USID.EngName);
+            Product = new ProductModel(dr, !isNested);
+            Product.SID = dr.GetValueOfLongColumn(Dictionary.Comment.PSID.EngName);
 
-            CRate = dr[CRate].ConvertToShort();
-            CDescription = dr[CDescription].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            CRate = dr.GetValueOfShortColumn(Dictionary.Comment.CRate.EngName);
+            CDescription = dr.GetValueOfStringColumn(Dictionary.Comment.CDescription.EngName);
+            if (!isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()

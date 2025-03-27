@@ -89,6 +89,12 @@ namespace Core
                 return dr[columnName].ConvertToString();
             return defaultValue;
         }
+        public static short GetValueOfShortColumn(this DataRow dr, string columnName, short defaultValue = 0)
+        {
+            if (dr.HasColumn(columnName))
+                return dr[columnName].ConvertToShort();
+            return defaultValue;
+        }
         public static int GetValueOfIntColumn(this DataRow dr, string columnName, int defaultValue = 0)
         {
             if (dr.HasColumn(columnName))

@@ -6,18 +6,17 @@ namespace Core.Model
 {
     public class ProductCategoryModel : BaseEntityModel
     {
-        public ProductCategoryModel ProductCategory { get; set; } = new ProductCategoryModel();
         public string PCName { get; set; } = string.Empty;
         public string PCDescription { get; set; } = string.Empty;
 
         public ProductCategoryModel() { }
-        public ProductCategoryModel(DataRow dr)
+        public ProductCategoryModel(DataRow dr) : this(dr, false) { }
+        public ProductCategoryModel(DataRow dr, bool isNested)
         {
-            ProductCategory = new ProductCategoryModel(dr);
-
-            PCName = dr[nameof(PCName)].ConvertToString();
-            PCDescription = dr[nameof(PCDescription)].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            PCName = dr.GetValueOfStringColumn(Dictionary.ProductCategory.PCName.EngName);
+            PCDescription = dr.GetValueOfStringColumn(Dictionary.ProductCategory.PCDescription.EngName);
+            if (!isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -41,7 +40,7 @@ namespace Core.Model
             if (IsAdd)
                 SIDParam.Direction = System.Data.ParameterDirection.Output;
             Parameters.Add(SIDParam);
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCSID.EngName), ProductCategory.SID));
+            //Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCSID.EngName), ProductCategory.SID));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCName.EngName), PCName));
             Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCDescription.EngName), PCDescription));
         }

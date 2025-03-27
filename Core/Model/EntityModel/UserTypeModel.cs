@@ -10,13 +10,13 @@ namespace Core.Model
         public string UTDescription { get; set; } = string.Empty;
 
         public UserTypeModel() { }
-        public UserTypeModel(DataRow dr) : this(dr, false) { }
-        public UserTypeModel(DataRow dr, bool isNested)
+        public UserTypeModel(DataRow DR) : this(DR, false) { }
+        public UserTypeModel(DataRow DR, bool IsNested)
         {
-            UTName = dr.GetValueOfStringColumn(nameof(UTName));
-            UTDescription = dr.GetValueOfStringColumn(nameof(UTDescription));
-            if (!isNested)
-                base.InitBaseEntityModel(dr);
+            UTName = DR.GetValueOfStringColumn(nameof(UTName));
+            UTDescription = DR.GetValueOfStringColumn(nameof(UTDescription));
+            if (!IsNested)
+                base.InitBaseEntityModel(DR);
         }
         //-------------
         public void SaveAddParameters()

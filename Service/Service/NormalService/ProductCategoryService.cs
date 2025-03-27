@@ -11,7 +11,7 @@ namespace Service.Service
         public static List<string> MainColumns = new List<string>()
         {
             Dictionary.ProductCategory.SID.FullDBName,
-            Dictionary.ProductCategory.PCSID.FullDBName,
+            //Dictionary.ProductCategory.PCSID.FullDBName,
             Dictionary.ProductCategory.PCName.FullDBName,
             Dictionary.ProductCategory.PCDescription.FullDBName,
 
@@ -84,7 +84,7 @@ namespace Service.Service
         {
             QueryBuilder qb = GetSimple();
             qb.AddColumns(ProductCategoryService.MainColumns);
-            qb.AddLeftJoin(Dictionary.ProductCategory.TableName, qb => { qb.AddEqualCondition(Dictionary.ProductCategory.SID.FullDBName, Dictionary.ProductCategory.PCSID.FullDBName); });
+            //qb.AddLeftJoin(Dictionary.ProductCategory.TableName, qb => { qb.AddEqualCondition(Dictionary.ProductCategory.SID.FullDBName, Dictionary.ProductCategory.PCSID.FullDBName); });
             return qb;
         }
         //------------------------------------------

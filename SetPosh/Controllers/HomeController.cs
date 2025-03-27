@@ -1,21 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Service;
 using Microsoft.AspNetCore.Authorization;
+using DataBase;
+using System.Data;
+using Core.Model;
 
 namespace SetPosh.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly UserService _userService;
+        private readonly ProductCategoryService _productCategoryService;
+        private readonly ProductService _productService;
 
-        public HomeController(UserService userService)
+        public HomeController(ProductService ProductService, ProductCategoryService ProductCategoryService)
         {
-            _userService = userService;
+            _productService = ProductService;
+            _productCategoryService = ProductCategoryService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            try
+            {
+                QueryBuilder PCQB = _productCategoryService.GetSimple();
+                string PCQuery = PCQB.CreateQuery();
+                DataTable PCDT = await DBConnection.GetDataTableAsync(PCQuery);
+                List<ProductCategoryModel> PCList = _productCategoryService.MapDTToModel(PCDT);
+                //-------------------
+                QueryBuilder ProductQB = _productService.GetSimple();
+                string ProductQuery = ProductQB.CreateQuery();
+                DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);
+                List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT);
+                //-------------------
+                return View(new Tuple<List<ProductModel>, List<ProductCategoryModel>>(ProductList,PCList));
+            }
+            catch (Exception ex)
+            {
+                DBConnection.LogException(ex, "");
+                throw;
+            }
         }
 
         public IActionResult Error(string message)

@@ -1,0 +1,342 @@
+body {
+    font-family: "IRANSans", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    direction: rtl;
+}
+
+.header {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 24px;
+}
+
+/*صفحه مشاهده کالا --------------*/
+.product-view {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.product-image {
+    flex: 1;
+    max-width: 300px;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+    .product-image .main-image {
+        width: 100%;
+        height: auto;
+        transition: transform 0.2s ease-out;
+        transform-origin: center center;
+    }
+
+.product-description {
+    flex: 2;
+    text-align: center;
+}
+
+    .product-description .product-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .product-description p {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.8;
+    }
+
+.product-info {
+    flex: 1;
+    max-width: 300px;
+    text-align: center;
+    background-color: #f8f8f8;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    .product-info .product-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .product-info .product-rating {
+        font-size: 18px;
+        color: #ffcc00;
+        margin-bottom: 15px;
+    }
+
+    .product-info .add-to-cart {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+        .product-info .add-to-cart:hover {
+            background-color: #218838;
+        }
+
+/*بخش کالاهای مشابه --------------*/
+.related-products {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+    .related-products h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+.related-products-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+}
+
+.related-product {
+    flex: 0 0 180px;
+    max-width: 180px;
+    background: #fff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+    .related-product img {
+        width: 100%;
+        height: 200px;
+        object-fit: fill;
+        border-radius: 8px;
+        display: block;
+        background-color: #f5f5f5;
+    }
+
+    .related-product p {
+        margin: 10px 0 0;
+        font-size: 14px;
+        color: #333;
+    }
+
+/*بخش نظرات --------------*/
+.product-comments {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+    .product-comments h2 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .comment-form textarea {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        font-family: 'Vazir', Arial, sans-serif;
+        color: #555;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        resize: vertical;
+        min-height: 150px;
+        line-height: 1.6;
+        background-color: #fafafa;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
+    }
+
+.rating {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+    .rating span {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+.stars-container {
+    display: flex;
+    justify-content: center;
+}
+
+.stars {
+    display: flex;
+    direction: rtl;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.star {
+    font-size: 50px !important;
+    color: #ddd !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+    .star.filled {
+        color: #ffcc00 !important;
+    }
+
+    .star:hover {
+        transform: scale(1.2) !important;
+        color: #ffcc00 !important;
+    }
+
+
+.rating select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #555;
+}
+
+/* دکمه ارسال */
+.comment-form button {
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .comment-form button:hover {
+        background-color: #218838;
+    }
+
+/* نمایش نظرات */
+.comments-list {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+    .comments-list p {
+        font-size: 18px;
+        text-align: center;
+        color: #777;
+    }
+
+
+
+.comment-item {
+    margin-bottom: 15px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .comment-item .comment-author {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .comment-item .comment-rating {
+        font-size: 18px;
+        color: #ffcc00;
+        margin-top: 5px;
+    }
+
+    .comment-item .comment-text {
+        font-size: 16px;
+        color: #555;
+        margin-top: 10px;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+
+
+
+
+/* واکنش‌گرا برای سایز متوسط */
+@media screen and (max-width: 768px) {
+    .related-product {
+        flex: 0 0 calc(100% / 3 - 16px); /* تقسیم به 3 ستون */
+        max-width: calc(100% / 3 - 16px);
+    }
+
+        .related-product img {
+            height: 150px; /* کاهش ارتفاع در سایزهای متوسط */
+        }
+
+        .related-product p {
+            font-size: 13px; /* کمی کوچک‌تر کردن متن */
+        }
+}
+
+/* واکنش‌گرا برای موبایل کوچک */
+@media screen and (max-width: 480px) {
+    .related-product {
+        flex: 0 0 calc(100% / 2 - 10px); /* تقسیم به 2 ستون */
+        max-width: calc(100% / 2 - 10px);
+    }
+
+        .related-product img {
+            height: 120px; /* کاهش ارتفاع در سایزهای کوچک‌تر */
+        }
+
+        .related-product p {
+            font-size: 12px; /* کوچک‌تر کردن متن */
+        }
+}

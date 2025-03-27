@@ -1,3 +1,102 @@
-﻿@{
-    Layout = "_Layout";
+﻿@model Tuple<List<ProductModel>,List<ProductCategoryModel>>
+
+@{
+    ViewData["Title"] = "خانه";
+    List<ProductModel> Products = Model.Item1;
+    List<ProductCategoryModel> ProductCategories = Model.Item2;
 }
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @*<meta name="theme-color" content="#00ffbb" />*@
+    <title>فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="~/css/Index.css">
+    <link rel="icon" href="Default.png" type="image/x-icon">
+</head>
+<body>
+
+    <header>
+        <div class="logo">لوگو</div>
+        <div class="search_bar">
+            <i class="search_icon">🔍</i>
+            <input type="text" placeholder="جستجو در فروشگاه..." />
+        </div>
+
+        <div class="icons">
+            <button>ورود/ثبت‌نام</button>
+            <button>سبد خرید</button>
+            <button>اعلان‌ها</button>
+        </div>
+    </header>
+
+    <section class="banner">
+        <div class="slider">
+            <div class="slides">
+                <img src="~/Image/download.jpeg" alt="Slide 1" class="slide" draggable="false">
+                <img src="~/Image/download.jpeg" alt="Slide 2" class="slide" draggable="false">
+                <img src="~/Image/download.jpeg" alt="Slide 3" class="slide" draggable="false">
+            </div>
+            <div class="nav_dots">
+                <span class="dot" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+            </div>
+            <button class="next" onclick="changeSlide(-1)">&#10094;</button>
+            <button class="prev" onclick="changeSlide(1)">&#10095;</button>
+        </div>
+    </section>
+
+    <section class="categories">
+        <h2>دسته‌بندی‌ها</h2>
+        <div class="category_list">
+            @*<div class="category">کالای دیجیتال</div>
+            <div class="category">مد و پوشاک</div>
+            <div class="category">زیبایی و سلامت</div>
+            <div class="category">خانه و آشپزخانه</div>
+            <div class="category">ورزش و سفر</div>*@
+            @foreach (ProductCategoryModel category in ProductCategories)
+            {
+                <div sid="@category.SID" class="category">@category.PCName</div>
+            }
+        </div>
+
+    </section>
+
+    <div class="products">
+        <div class="product-list">
+            @*<div class="product">
+                <img src="Default.png" alt="Product 1" class="product-image" />
+                <div class="product_details">
+                    <h3>کالا ۱</h3>
+                    <p>جزئیات کالا ۱...</p>
+                </div>
+            </div>
+            <div class="product">
+                <img src="download.jpeg" alt="Product 2" class="product-image" />
+                <div class="product_details">
+                    <h3>کالا ۲</h3>
+                    <p>جزئیات کالا ۲...</p>
+                </div>
+            </div>*@
+            <!-- محصولات دیگر... -->
+            @foreach (ProductModel product in Products)
+            {
+                <div class="product">
+                    <img src="~/Image/download.jpeg" alt="Product 2" class="product-image" />
+                    <div class="product_details">
+                        <h3>@product.PName</h3>
+                        <p>@product.PDescription</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <footer>
+        <p>کلیه حقوق محفوظ است © فروشگاه آنلاین</p>
+    </footer>
+    <script src="~/js/Index.js"></script>
+</body>
+</html>

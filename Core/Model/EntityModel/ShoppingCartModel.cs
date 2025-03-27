@@ -11,13 +11,16 @@ namespace Core.Model
         public bool Confirmed { get; set; } = default;
 
         public ShoppingCartModel() { }
-        public ShoppingCartModel(DataRow dr)
+        public ShoppingCartModel(DataRow dr) : this(dr, false) { }
+        public ShoppingCartModel(DataRow dr, bool isNested)
         {
-            User = new UserModel(dr);
+            User = new UserModel(dr, !isNested);
+            User.SID = dr.GetValueOfLongColumn(Dictionary.ShoppingCart.USID.EngName);
 
-            IsActive = dr[nameof(IsActive)].ConvertToBool();
-            Confirmed = dr[nameof(Confirmed)].ConvertToBool();
-            base.InitBaseEntityModel(dr);
+            IsActive = dr.GetValueOfBoolColumn(Dictionary.ShoppingCart.IsActive.EngName);
+            Confirmed = dr.GetValueOfBoolColumn(Dictionary.ShoppingCart.Confirmed.EngName);
+            if (!isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()

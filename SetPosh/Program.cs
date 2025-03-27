@@ -9,6 +9,8 @@ string connectionString = builder.Configuration.GetConnectionString("SetPoshConn
 DBConnection.InitConnectionStr(connectionString);  // Set ConnectionStr
 
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<ProductCategoryService>();
+builder.Services.AddSingleton<ProductService>();
 
 builder.Services.AddControllersWithViews();
 

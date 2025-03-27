@@ -9,11 +9,13 @@ namespace Core.Model
         public string DSDescription { get; set; } = string.Empty;
 
         public DemandStatusModel() { }
-        public DemandStatusModel(DataRow dr)
+        public DemandStatusModel(DataRow dr) : this(dr, false) { }
+        public DemandStatusModel(DataRow dr, bool isNested)
         {
-            DSName = dr[nameof(DSName)].ConvertToString();
-            DSDescription = dr[nameof(DSDescription)].ConvertToString();
-            base.InitBaseEntityModel(dr);
+            DSName = dr.GetValueOfStringColumn(Dictionary.DemandStatus.DSName.EngName);
+            DSDescription = dr.GetValueOfStringColumn(Dictionary.DemandStatus.DSDescription.EngName);
+            if (!isNested)
+                base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
