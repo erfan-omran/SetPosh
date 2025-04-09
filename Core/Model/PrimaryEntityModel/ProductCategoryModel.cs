@@ -10,13 +10,11 @@ namespace Core.Model
         public string PCDescription { get; set; } = string.Empty;
 
         public ProductCategoryModel() { }
-        public ProductCategoryModel(DataRow dr) : this(dr, false) { }
-        public ProductCategoryModel(DataRow dr, bool isNested)
+        public ProductCategoryModel(DataRow dr)
         {
             PCName = dr.GetValueOfStringColumn(Dictionary.ProductCategory.PCName.EngName);
             PCDescription = dr.GetValueOfStringColumn(Dictionary.ProductCategory.PCDescription.EngName);
-            if (!isNested)
-                base.InitBaseEntityModel(dr);
+            base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -36,13 +34,10 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.ProductCategory.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
-            //Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCSID.EngName), ProductCategory.SID));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCName.EngName), PCName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ProductCategory.PCDescription.EngName), PCDescription));
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.ProductCategory.SID.EngName, SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ProductCategory.PCName.EngName, PCName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ProductCategory.PCDescription.EngName, PCDescription));
         }
     }
 }

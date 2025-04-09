@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class DemandStatusService : IBaseNormalService<DemandStatusModel>
     {
@@ -12,8 +12,10 @@ namespace Service.Service
         {
             Dictionary.DemandStatus.SID.FullDBName,
             Dictionary.DemandStatus.DSName.FullDBName,
-            Dictionary.DemandStatus.DSDescription.FullDBName,
-
+            Dictionary.DemandStatus.DSDescription.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.DemandStatus.Blocked.FullDBName,
             Dictionary.DemandStatus.Deleted.FullDBName,
 
@@ -51,7 +53,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[DemandStatus.Delete]", DemandStatus.Parameters);
         }
         //------------------------------------------
-        public async Task<DemandStatusModel> GetSimpleModelAsync(long SID)
+        public async Task<DemandStatusModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.DemandStatus.SID.FullDBName, SID);
@@ -76,6 +78,7 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.DemandStatus.TableName);
             return qb;
         }

@@ -39,8 +39,8 @@ namespace Core
         }
         private void InitModel(string year, string month, string day)
         {
-            if (year.Length != 4 || month.Length != 2 || day.Length != 2)
-                throw new ArgumentException("فرمت تاریخ اشتباه است");
+            //if (year.Length != 4 || month.Length != 2 || day.Length != 2)
+                //throw new ArgumentException("فرمت تاریخ اشتباه است");
 
             int Year = year.ConvertToInt();
             int Month = month.ConvertToInt();

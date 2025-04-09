@@ -95,13 +95,6 @@ h2 {
     font-family: Vazir, sans-serif;
 }
 
-.alert_danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
-    border-radius: 5px;
-}
-
 p {
     text-align: center;
     font-size: 14px;

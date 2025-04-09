@@ -11,7 +11,7 @@ namespace Service.ServiceInterface
         public Task BlockAsync(long SID);
         public Task DeleteAsync(long SID);
         //------------------------------------------
-        public Task<T> GetSimpleModelAsync(long SID);
+        public Task<T> GetModelSimpleAsync(long SID);
         public Task<T> GetModelWithRelatedEntitiesAsync(long SID);
 
         public QueryBuilder GetSimple();

@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class DemandDetailService : IBasePartService<DemandDetailModel>
     {
@@ -14,8 +14,10 @@ namespace Service.Service
             Dictionary.DemandDetail.DSID.FullDBName,
             Dictionary.DemandDetail.PSID.FullDBName,
             Dictionary.DemandDetail.DDCount.FullDBName,
-            Dictionary.DemandDetail.DDPrice.FullDBName,
-
+            Dictionary.DemandDetail.DDPrice.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.DemandDetail.Blocked.FullDBName,
             Dictionary.DemandDetail.Deleted.FullDBName,
 
@@ -53,7 +55,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[DemandDetail.Delete]", DemandDetail.Parameters);
         }
         //------------------------------------------
-        public async Task<DemandDetailModel> GetSimpleModelAsync(long SID)
+        public async Task<DemandDetailModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.DemandDetail.ID.FullDBName, SID);
@@ -67,9 +69,11 @@ namespace Service.Service
         {
             QueryBuilder qb = GetWithRelatedEntities();
             qb.AddEqualCondition(Dictionary.DemandDetail.ID.FullDBName, SID);
-
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
+
             DemandDetailModel DemandDetail = new DemandDetailModel(dr);
+            DemandDetail.Demand = new DemandModel(dr);
+            DemandDetail.Product = new ProductModel(dr);
 
             return DemandDetail;
         }
@@ -78,13 +82,14 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.DemandDetail.TableName);
             return qb;
         }
         public QueryBuilder GetWithRelatedEntities()
         {
             QueryBuilder qb = GetSimple();
-            qb.AddColumns(ShoppingCartService.MainColumns);
+            qb.AddColumns(DemandService.MainColumns);
             qb.AddColumns(ProductService.MainColumns);
 
             qb.AddLeftJoin(Dictionary.Demand.TableName, qb => { qb.AddEqualCondition(Dictionary.Demand.SID.FullDBName, Dictionary.DemandDetail.DSID.FullDBName); });

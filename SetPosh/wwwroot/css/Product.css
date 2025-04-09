@@ -1,4 +1,4 @@
-body {
+/*body {
     font-family: "IRANSans", Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -13,9 +13,9 @@ body {
     padding: 15px 0;
     font-size: 24px;
 }
-
+*/
 /*صفحه مشاهده کالا --------------*/
-.product-view {
+.product_view {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -26,7 +26,7 @@ body {
     gap: 20px;
 }
 
-.product-image {
+.product_image {
     flex: 1;
     max-width: 300px;
     text-align: center;
@@ -35,55 +35,56 @@ body {
     cursor: pointer;
 }
 
-    .product-image .main-image {
+    .product_image .main_image {
         width: 100%;
         height: auto;
         transition: transform 0.2s ease-out;
         transform-origin: center center;
     }
 
-.product-description {
+.product_description {
     flex: 2;
     text-align: center;
 }
 
-    .product-description .product-name {
+    .product_description .product_name {
         font-size: 24px;
         font-weight: bold;
         color: #333;
         margin-bottom: 10px;
     }
 
-    .product-description p {
+    .product_description p {
         font-size: 16px;
         color: #666;
         line-height: 1.8;
     }
 
-.product-info {
+.product_info {
     flex: 1;
     max-width: 300px;
     text-align: center;
     background-color: #f8f8f8;
-    padding: 15px;
+    padding: 15px 30px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-    .product-info .product-price {
+    .product_info .product_price {
         font-size: 20px;
         font-weight: bold;
         color: #333;
         margin-bottom: 10px;
     }
 
-    .product-info .product-rating {
+    .product_info .product_rating {
         font-size: 18px;
         color: #ffcc00;
         margin-bottom: 15px;
     }
 
-    .product-info .add-to-cart {
+    .product_info .product_non_existent,
+    .product_info .add_to_cart {
         padding: 10px 20px;
         background-color: #28a745;
         color: #fff;
@@ -93,12 +94,15 @@ body {
         font-size: 16px;
     }
 
-        .product-info .add-to-cart:hover {
+        .product_info .add_to_cart:hover {
             background-color: #218838;
         }
 
+    .product_info .product_non_existent {
+        background-color: #55555589;
+    }
 /*بخش کالاهای مشابه --------------*/
-.related-products {
+.related_products {
     margin-top: 50px;
     padding: 20px;
     background-color: #f9f9f9;
@@ -109,13 +113,13 @@ body {
     text-align: center;
 }
 
-    .related-products h2 {
+    .related_products h2 {
         font-size: 1.5rem;
         margin-bottom: 20px;
         color: #333;
     }
 
-.related-products-container {
+.related_products_container {
     display: flex;
     gap: 16px;
     overflow-x: auto;
@@ -124,7 +128,7 @@ body {
     scrollbar-width: thin;
 }
 
-.related-product {
+.related_product {
     flex: 0 0 180px;
     max-width: 180px;
     background: #fff;
@@ -135,7 +139,7 @@ body {
     box-sizing: border-box;
 }
 
-    .related-product img {
+    .related_product img {
         width: 100%;
         height: 200px;
         object-fit: fill;
@@ -144,14 +148,14 @@ body {
         background-color: #f5f5f5;
     }
 
-    .related-product p {
+    .related_product p {
         margin: 10px 0 0;
         font-size: 14px;
         color: #333;
     }
 
 /*بخش نظرات --------------*/
-.product-comments {
+.product_comments {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
@@ -162,20 +166,20 @@ body {
     margin-top: 50px;
 }
 
-    .product-comments h2 {
+    .product_comments h2 {
         text-align: center;
         font-size: 24px;
         margin-bottom: 20px;
         color: #333;
     }
 
-.comment-form {
+.comment_form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-    .comment-form textarea {
+    .comment_form textarea {
         width: 100%;
         padding: 12px;
         font-size: 18px;
@@ -203,7 +207,7 @@ body {
         font-weight: bold;
     }
 
-.stars-container {
+.stars_container {
     display: flex;
     justify-content: center;
 }
@@ -221,14 +225,14 @@ body {
     transition: color 0.2s ease, transform 0.2s ease !important;
 }
 
-    .star.filled {
-        color: #ffcc00 !important;
-    }
+.star_filled {
+    color: #ffcc00 !important;
+}
 
-    .star:hover {
-        transform: scale(1.2) !important;
-        color: #ffcc00 !important;
-    }
+.star:hover {
+    transform: scale(1.2) !important;
+    color: #ffcc00 !important;
+}
 
 
 .rating select {
@@ -240,7 +244,7 @@ body {
 }
 
 /* دکمه ارسال */
-.comment-form button {
+.comment_form button {
     padding: 12px;
     background-color: #28a745;
     color: white;
@@ -251,12 +255,12 @@ body {
     transition: background-color 0.3s ease;
 }
 
-    .comment-form button:hover {
+    .comment_form button:hover {
         background-color: #218838;
     }
 
 /* نمایش نظرات */
-.comments-list {
+.comments_list {
     margin-top: 30px;
     padding: 20px;
     background-color: #fff;
@@ -264,7 +268,7 @@ body {
     border-radius: 10px;
 }
 
-    .comments-list p {
+    .comments_list p {
         font-size: 18px;
         text-align: center;
         color: #777;
@@ -272,7 +276,7 @@ body {
 
 
 
-.comment-item {
+.comment_item {
     margin-bottom: 15px;
     padding: 20px;
     background-color: #fff;
@@ -281,7 +285,7 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-    .comment-item .comment-author {
+    .comment_item .comment_author {
         font-size: 18px;
         font-weight: bold;
         color: #333;
@@ -290,13 +294,13 @@ body {
         align-items: center;
     }
 
-    .comment-item .comment-rating {
+    .comment_item .comment_rating {
         font-size: 18px;
         color: #ffcc00;
         margin-top: 5px;
     }
 
-    .comment-item .comment-text {
+    .comment_item .comment_text {
         font-size: 16px;
         color: #555;
         margin-top: 10px;
@@ -311,32 +315,112 @@ body {
 
 /* واکنش‌گرا برای سایز متوسط */
 @media screen and (max-width: 768px) {
-    .related-product {
+    .related_product {
         flex: 0 0 calc(100% / 3 - 16px); /* تقسیم به 3 ستون */
         max-width: calc(100% / 3 - 16px);
     }
 
-        .related-product img {
+        .related_product img {
             height: 150px; /* کاهش ارتفاع در سایزهای متوسط */
         }
 
-        .related-product p {
+        .related_product p {
             font-size: 13px; /* کمی کوچک‌تر کردن متن */
         }
+
+    .product_info {
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        max-width: 100vw;
+        margin: 0;
+        right: 0;
+        border-radius: 0;
+    }
 }
 
 /* واکنش‌گرا برای موبایل کوچک */
 @media screen and (max-width: 480px) {
-    .related-product {
+    .related_product {
         flex: 0 0 calc(100% / 2 - 10px); /* تقسیم به 2 ستون */
         max-width: calc(100% / 2 - 10px);
     }
 
-        .related-product img {
+        .related_product img {
             height: 120px; /* کاهش ارتفاع در سایزهای کوچک‌تر */
         }
 
-        .related-product p {
+        .related_product p {
             font-size: 12px; /* کوچک‌تر کردن متن */
         }
+}
+
+
+.cart_action {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+    .cart_action button {
+        cursor: pointer;
+    }
+
+.quantity_container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #f8f8f8;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+/*-----------*/
+.dots_loader {
+    display: inline-flex;
+    gap: 3px;
+    font-size: 24px;
+    color: #888;
+    align-items: center;
+    justify-content: center;
+}
+
+    .dots_loader span {
+        animation: blink 1.2s infinite;
+    }
+
+        .dots_loader span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dots_loader span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+.hidden {
+    display: none;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.2;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.2;
+    }
+}
+
+.quantity {
+    font-size: 20px;
+    font-weight: bold;
 }

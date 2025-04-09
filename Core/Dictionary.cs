@@ -10,6 +10,7 @@ namespace Core
         public static DemandStatusSchema DemandStatus = new DemandStatusSchema();
         public static ProductSchema Product = new ProductSchema();
         public static ProductCategorySchema ProductCategory = new ProductCategorySchema();
+        public static ProductImageSchema ProductImage = new ProductImageSchema();
         public static ShoppingCartSchema ShoppingCart = new ShoppingCartSchema();
         public static ShoppingCartDetailSchema ShoppingCartDetail = new ShoppingCartDetailSchema();
         public static UserSchema User = new UserSchema();

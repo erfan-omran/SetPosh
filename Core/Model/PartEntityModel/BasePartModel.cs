@@ -2,13 +2,12 @@
 
 namespace Core.Model
 {
-    public class BasePartModel : BaseModel
+    public class BasePartModel
     {
         public long ID { get; set; } = default;
         public void InitBasePartModel(DataRow dr)
         {
-            ID = dr[nameof(ID)].ConvertToLong();
-            InitBaseModel(dr);
+            ID = dr.GetValueOfLongColumn(nameof(ID));
         }
     }
 }

@@ -10,13 +10,11 @@ namespace Core.Model
         public string UTDescription { get; set; } = string.Empty;
 
         public UserTypeModel() { }
-        public UserTypeModel(DataRow DR) : this(DR, false) { }
-        public UserTypeModel(DataRow DR, bool IsNested)
+        public UserTypeModel(DataRow dr)
         {
-            UTName = DR.GetValueOfStringColumn(nameof(UTName));
-            UTDescription = DR.GetValueOfStringColumn(nameof(UTDescription));
-            if (!IsNested)
-                base.InitBaseEntityModel(DR);
+            UTName = dr.GetValueOfStringColumn(nameof(UTName));
+            UTDescription = dr.GetValueOfStringColumn(nameof(UTDescription));
+            base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -38,8 +36,8 @@ namespace Core.Model
         {
             if (!IsAdd)
                 Parameters.Add(new SqlParameter("@" + Dictionary.UserType.SID.EngName, SID));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTName.EngName), UTName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.UserType.UTDescription.EngName), UTDescription));
+            Parameters.Add(new SqlParameter("@" + Dictionary.UserType.UTName.EngName, UTName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.UserType.UTDescription.EngName, UTDescription));
         }
     }
 }

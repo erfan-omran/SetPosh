@@ -286,6 +286,10 @@ namespace DataBase
         {
             return $"COALESCE({string.Join(", ", expressions)})";
         }
+        public static string IsNull(string expression1, object expression2)
+        {
+            return $"IsNull({expression1}, {expression2})";
+        }
         public static string NullIf(string expression1, string expression2)
         {
             return $"NULLIF({expression1}, {expression2})";

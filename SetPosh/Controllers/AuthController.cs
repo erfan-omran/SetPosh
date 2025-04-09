@@ -1,8 +1,9 @@
-﻿using Core.Model;
+﻿using Core.Enum;
+using Core.Model;
 using DataBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Service.Service;
+using Service;
 using System.Data;
 using System.Security.Claims;
 
@@ -11,7 +12,6 @@ namespace SetPosh.Controllers
     public class AuthController : Controller
     {
         private readonly UserService _userService;
-
         public AuthController(UserService userService)
         {
             _userService = userService;
@@ -85,7 +85,7 @@ namespace SetPosh.Controllers
                 if (!ModelState.IsValid)
                     return View(new Tuple<UserModel, string>(userModel, returnURL));
 
-                userModel.UserType.SID = 5;//To do : Create an enum for UserType
+                userModel.UserType.SID = (int)UserTypeEnum.Normal;
                 userModel.UName = _userService.GenerateRandomUsername();
 
                 bool Ans = false;

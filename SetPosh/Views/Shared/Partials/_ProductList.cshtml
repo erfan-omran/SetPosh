@@ -1,0 +1,25 @@
+﻿@model List<ProductModel>
+@{
+    List<ProductModel> Products = Model;
+}
+@if (Products.Count <= 0)
+{
+    <p>محصولی یافت نشد.</p>
+}
+else
+{
+    <div class="product-list">
+        @foreach (ProductModel product in Products)
+        {
+            ProductImageModel? MainImg = product.ProductImages.FirstOrDefault(img => img.IsMain == true);
+
+            <a class="product" href="@Url.Action("ProductDetails", "Product", new { PSID = product.SID })" target="_blank">
+                <img src="~/Image/ProductImage/@(MainImg?.ImgName ?? "NoPhoto.jpg")" alt="Product 2" class="product-image" />
+                <div class="product_details">
+                    <h3>@product.PName</h3>
+                    <p>@product.PDescription</p>
+                </div>
+            </a>
+        }
+    </div>
+}

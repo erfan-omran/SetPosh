@@ -24,17 +24,25 @@ namespace DataBase
         //{
         //    this.TableName = '[' + table.ToString() + ']';
         //}
-        public void AddWith(string WithName, string Query)
+        public void AddWith(string Query, string WithName)
         {
             WithList.Add($"{WithName} AS ({Query})");
+        }
+        public void AddWith(QueryBuilder qb, string WithName)
+        {
+            string query = qb.CreateQuery();
+            WithList.Add($"{WithName} AS ({query})");
         }
         public void SetTop(long count)
         {
             TopCount = count;
         }
-        public void AddColumn(string columnName)
+        public void AddColumn(string columnName, string aliasName = "")
         {
-            ColumnList.Add(columnName);
+            if (aliasName == "")
+                ColumnList.Add(columnName);
+            else
+                ColumnList.Add(columnName + " AS " + aliasName);
         }
         public void AddColumns(params string[] columnNames)
         {
@@ -102,7 +110,7 @@ namespace DataBase
         {
             ConditionList.Add($"{columnName} != '{value}'");
         }
-        public void AddLikeConditionContains(string columnName, object value)
+        public void AddLikeCondition(string columnName, object value)
         {
             ConditionList.Add($"{columnName} LIKE '%{value}%'");
         }
@@ -119,7 +127,7 @@ namespace DataBase
         {
             ConditionList.Add($"{columnName} IN ({string.Join(",", values)})");
         }
-        public void AddInCondition(string columnName,params object[] values)
+        public void AddInCondition(string columnName, params object[] values)
         {
             ConditionList.Add($"{columnName} IN ({string.Join(",", values)})");
         }
@@ -133,16 +141,25 @@ namespace DataBase
             ConditionList.Add($"{columnName} BETWEEN {value1} AND {value2}");
         }
 
-        public void AddGroupBy(string column)
+        public void AddGroupBy(string columnName)
         {
-            GroupByList.Add(column);
+            GroupByList.Add(columnName);
+        }
+        public void AddGroupBy(params string[] columnNames)
+        {
+            GroupByList.AddRange(columnNames);
+        }
+        public void AddGroupBy(List<string> columnNames)
+        {
+            GroupByList.AddRange(columnNames);
         }
         public void AddHaving(string condition)
         {
             HavingList.Add(condition);
         }
-        public void AddOrderBy(string column, string direction = "ASC")
+        public void AddOrderBy(string column, bool IsASC = true)
         {
+            string direction = IsASC ? "ASC" : "DESC";
             OrderByList.Add($"{column} {direction}");
         }
 

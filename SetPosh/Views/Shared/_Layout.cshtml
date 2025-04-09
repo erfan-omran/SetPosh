@@ -1,70 +1,92 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using SetPosh.Controllers;
+<!DOCTYPE html>
+<html lang="fa">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SetPosh</title>
-    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SetPosh.styles.css" asp-append-version="true" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @*<link rel="icon" href="~/Image/download.jpeg" type="image/x-icon">*@
+    <link rel="stylesheet" href="~/css/Global.css">
+    <title>@ViewData["Title"]</title>
+    @RenderSection("Links", false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SetPosh</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-
-                        @if (User.Identity?.IsAuthenticated ?? false)
-                        {
-                            <li class="nav-item">
-                                <form asp-controller="Auth" asp-action="Logout" method="post" style="display: inline;">
-                                    <button type="submit" class="" style="padding: 0;">Logout</button>
-                                </form>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark">
-                                    @("Hello " + User.Identity.Name)
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SetPosh - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <div class="logo">
+            <a href="/">
+                <img src="~/Image/BrandLogo.jpg" />
+            </a>
         </div>
+        <div class="search_bar">
+            <i class="search_icon">🔍</i>
+            <input type="text" id="@(Settings.MainSearchInputID)" name="searchText" placeholder="جستجو در فروشگاه..." autocomplete="off" />
+        </div>
+
+        <div class="icons">
+            @if (!(User.Identity?.IsAuthenticated ?? false))
+            {
+                <a class="login_btn" asp-controller="Auth" asp-action="@(nameof(AuthController.Login))">ورود/ثبت‌نام</a>
+            }
+            else
+            {
+                <form title="خروج" style="display:inline-block;" asp-controller="Auth" asp-action="@(nameof(AuthController.Logout))" method="post">
+                    <button class="header_btn" type="submit">
+                        <svg viewBox="0 0 24 24" fill="Red">
+                            <path d="M12.9999 2C10.2385 2 7.99991 4.23858 7.99991 7C7.99991 7.55228 8.44762 8 8.99991 8C9.55219 8 9.99991 7.55228 9.99991 7C9.99991 5.34315 11.3431 4 12.9999 4H16.9999C18.6568 4 19.9999 5.34315 19.9999 7V17C19.9999 18.6569 18.6568 20 16.9999 20H12.9999C11.3431 20 9.99991 18.6569 9.99991 17C9.99991 16.4477 9.55219 16 8.99991 16C8.44762 16 7.99991 16.4477 7.99991 17C7.99991 19.7614 10.2385 22 12.9999 22H16.9999C19.7613 22 21.9999 19.7614 21.9999 17V7C21.9999 4.23858 19.7613 2 16.9999 2H12.9999Z" fill="#000000" />
+                            <path d="M13.9999 11C14.5522 11 14.9999 11.4477 14.9999 12C14.9999 12.5523 14.5522 13 13.9999 13V11Z" fill="#000000" />
+                            <path d="M5.71783 11C5.80685 10.8902 5.89214 10.7837 5.97282 10.682C6.21831 10.3723 6.42615 10.1004 6.57291 9.90549C6.64636 9.80795 6.70468 9.72946 6.74495 9.67492L6.79152 9.61162L6.804 9.59454L6.80842 9.58848C6.80846 9.58842 6.80892 9.58778 5.99991 9L6.80842 9.58848C7.13304 9.14167 7.0345 8.51561 6.58769 8.19098C6.14091 7.86637 5.51558 7.9654 5.19094 8.41215L5.18812 8.41602L5.17788 8.43002L5.13612 8.48679C5.09918 8.53682 5.04456 8.61033 4.97516 8.7025C4.83623 8.88702 4.63874 9.14542 4.40567 9.43937C3.93443 10.0337 3.33759 10.7481 2.7928 11.2929L2.08569 12L2.7928 12.7071C3.33759 13.2519 3.93443 13.9663 4.40567 14.5606C4.63874 14.8546 4.83623 15.113 4.97516 15.2975C5.04456 15.3897 5.09918 15.4632 5.13612 15.5132L5.17788 15.57L5.18812 15.584L5.19045 15.5872C5.51509 16.0339 6.14091 16.1336 6.58769 15.809C7.0345 15.4844 7.13355 14.859 6.80892 14.4122L5.99991 15C6.80892 14.4122 6.80897 14.4123 6.80892 14.4122L6.804 14.4055L6.79152 14.3884L6.74495 14.3251C6.70468 14.2705 6.64636 14.1921 6.57291 14.0945C6.42615 13.8996 6.21831 13.6277 5.97282 13.318C5.89214 13.2163 5.80685 13.1098 5.71783 13H13.9999V11H5.71783Z" fill="#000000" />
+                        </svg>
+                    </button>
+                </form>
+                <button title="سبد خرید" class="header_btn">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M4.5 5H18.2768C19.0446 5 19.526 5.82948 19.1451 6.49614L16.5758 10.9923C16.2198 11.6154 15.5571 12 14.8394 12H8M8 12L6.45625 14.47C6.03997 15.136 6.51881 16 7.30425 16H18M8 12L4.05279 4.10557C3.714 3.428 3.02148 3 2.26393 3H2M8 20C8 20.5523 7.55228 21 7 21C6.44772 21 6 20.5523 6 20C6 19.4477 6.44772 19 7 19C7.55228 19 8 19.4477 8 20ZM18 20C18 20.5523 17.5523 21 17 21C16.4477 21 16 20.5523 16 20C16 19.4477 16.4477 19 17 19C17.5523 19 18 19.4477 18 20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <button title="اعلان" class="header_btn">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M9.00195 17H5.60636C4.34793 17 3.71872 17 3.58633 16.9023C3.4376 16.7925 3.40126 16.7277 3.38515 16.5436C3.37082 16.3797 3.75646 15.7486 4.52776 14.4866C5.32411 13.1835 6.00031 11.2862 6.00031 8.6C6.00031 7.11479 6.63245 5.69041 7.75766 4.6402C8.88288 3.59 10.409 3 12.0003 3C13.5916 3 15.1177 3.59 16.2429 4.6402C17.3682 5.69041 18.0003 7.11479 18.0003 8.6C18.0003 11.2862 18.6765 13.1835 19.4729 14.4866C20.2441 15.7486 20.6298 16.3797 20.6155 16.5436C20.5994 16.7277 20.563 16.7925 20.4143 16.9023C20.2819 17 19.6527 17 18.3943 17H15.0003M9.00195 17L9.00031 18C9.00031 19.6569 10.3435 21 12.0003 21C13.6572 21 15.0003 19.6569 15.0003 18V17M9.00195 17H15.0003" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            }
+        </div>
+    </header>
+
+    <main id="MainTag">
+        @RenderBody();
+    </main>
+
+    <footer>
+        <p>کلیه حقوق محفوظ است © فروشگاه آنلاین</p>
     </footer>
-    <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/Global.js"></script>
+    <script src="~/js/jquery.js"></script>
+    @RenderSection("Scripts" , false)
+    <script>
+        $(document).ready(function () {
+            $("#@(Settings.MainSearchInputID)").on("keydown", function (e) {
+                if (e.key === "Enter") { // بررسی کلید Enter
+                    e.preventDefault(); // جلوگیری از ارسال فرم معمولی
+
+                    var searchText = $("#@(Settings.MainSearchInputID)").val(); // مقدار سرچ
+
+                    $.ajax({
+                        url: "/Product/ProductList", // آدرس اکشن
+                        type: "GET",
+                        data: { searchText: searchText }, // ارسال مقدار سرچ به کنترلر
+                        beforeSend: function () {
+                            $("#products").html("<p>در حال جستوجو...</p>");
+                        },
+                        success: function (response) {
+                            $("#MainTag").html(response); // نمایش نتایج در بخش لیست محصولات
+                        },
+                        error: function () {
+                            alert("مشکلی در جستجو پیش آمده است!");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

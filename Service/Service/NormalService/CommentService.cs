@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class CommentService : IBaseNormalService<CommentModel>
     {
@@ -14,8 +14,10 @@ namespace Service.Service
             Dictionary.Comment.USID.FullDBName,
             Dictionary.Comment.PSID.FullDBName,
             Dictionary.Comment.CRate.FullDBName,
-            Dictionary.Comment.CDescription.FullDBName,
-
+            Dictionary.Comment.CDescription.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.Comment.Blocked.FullDBName,
             Dictionary.Comment.Deleted.FullDBName,
 
@@ -53,7 +55,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
         }
         //------------------------------------------
-        public async Task<CommentModel> GetSimpleModelAsync(long SID)
+        public async Task<CommentModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.Comment.SID.FullDBName, SID);
@@ -67,17 +69,34 @@ namespace Service.Service
         {
             QueryBuilder qb = GetWithRelatedEntities();
             qb.AddEqualCondition(Dictionary.Comment.SID.FullDBName, SID);
-
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
+
             CommentModel Comment = new CommentModel(dr);
+            Comment.User = new UserModel(dr);
+            Comment.Product = new ProductModel(dr);
 
             return Comment;
+        }
+        public async Task<List<CommentModel>> GetProductCommentsAsync(long SID)
+        {
+            QueryBuilder qb = GetWithRelatedEntities();
+            qb.AddEqualCondition(Dictionary.Comment.PSID.FullDBName, SID);
+            qb.AddEqualCondition(Dictionary.Comment.Blocked.FullDBName, 0);
+            qb.AddEqualCondition(Dictionary.Comment.Deleted.FullDBName, 0);
+
+            qb.AddOrderBy(Dictionary.Comment.CreationDate.FullDBName, false);
+            qb.AddOrderBy(Dictionary.Comment.CreationTime.FullDBName, false);
+
+            DataTable dt = await DBConnection.GetDataTableAsync(qb.CreateQuery());
+            List<CommentModel> Comments = MapDTToModel(dt);
+            return Comments;
         }
 
         public QueryBuilder GetSimple()
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.Comment.TableName);
             return qb;
         }
@@ -98,6 +117,8 @@ namespace Service.Service
             foreach (DataRow dr in dt.Rows)
             {
                 CommentModel Comment = new CommentModel(dr);
+                Comment.User = new UserModel(dr);
+                Comment.Product = new ProductModel(dr);
                 list.Add(Comment);
             }
             return list;

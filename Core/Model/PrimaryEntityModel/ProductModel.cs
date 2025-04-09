@@ -6,25 +6,27 @@ namespace Core.Model
 {
     public class ProductModel : BaseEntityModel
     {
-        public ProductCategoryModel ProductCategory { get; set; } = new ProductCategoryModel();
+        public long PCSID { get; set; } = default;
         public string PName { get; set; } = string.Empty;
         public decimal PPrice { get; set; } = default;
         public long PCount { get; set; } = default;
         public string PDescription { get; set; } = string.Empty;
 
-        public ProductModel() { }
-        public ProductModel(DataRow dr) : this(dr, false) { }
-        public ProductModel(DataRow dr, bool isNested)
-        {
-            ProductCategory = new ProductCategoryModel(dr, !isNested);
-            ProductCategory.SID = dr.GetValueOfLongColumn(Dictionary.Product.PCSID.EngName);
+        public ProductCategoryModel ProductCategory { get; set; } = new ProductCategoryModel();
+        public decimal RateAVG { get; set; } = 0;
 
+        public List<ProductImageModel> ProductImages = new List<ProductImageModel>();
+        public List<CommentModel> ProductComments = new List<CommentModel>();
+
+        public ProductModel() { }
+        public ProductModel(DataRow dr)
+        {
+            PCSID = dr.GetValueOfLongColumn(Dictionary.Product.PCSID.EngName);
             PName = dr.GetValueOfStringColumn(Dictionary.Product.PName.EngName);
             PPrice = dr.GetValueOfDecimalColumn(Dictionary.Product.PPrice.EngName);
             PCount = dr.GetValueOfLongColumn(Dictionary.Product.PCount.EngName);
             PDescription = dr.GetValueOfStringColumn(Dictionary.Product.PDescription.EngName);
-            if (!isNested)
-                base.InitBaseEntityModel(dr);
+            base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -44,15 +46,13 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.Product.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Product.PCSID.EngName), ProductCategory.SID));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Product.PName.EngName), PName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Product.PPrice.EngName), PPrice));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Product.PCount.EngName), PCount));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.Product.PDescription.EngName), PDescription));
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.Product.SID.EngName, SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.Product.PCSID.EngName, PCSID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.Product.PName.EngName, PName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.Product.PPrice.EngName, PPrice));
+            Parameters.Add(new SqlParameter("@" + Dictionary.Product.PCount.EngName, PCount));
+            Parameters.Add(new SqlParameter("@" + Dictionary.Product.PDescription.EngName, PDescription));
         }
     }
 }

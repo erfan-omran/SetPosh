@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class ProductCategoryService : IBaseNormalService<ProductCategoryModel>
     {
@@ -13,8 +13,10 @@ namespace Service.Service
             Dictionary.ProductCategory.SID.FullDBName,
             //Dictionary.ProductCategory.PCSID.FullDBName,
             Dictionary.ProductCategory.PCName.FullDBName,
-            Dictionary.ProductCategory.PCDescription.FullDBName,
-
+            Dictionary.ProductCategory.PCDescription.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.ProductCategory.Blocked.FullDBName,
             Dictionary.ProductCategory.Deleted.FullDBName,
 
@@ -52,7 +54,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[ProductCategory.Delete]", ProductCategory.Parameters);
         }
         //------------------------------------------
-        public async Task<ProductCategoryModel> GetSimpleModelAsync(long SID)
+        public async Task<ProductCategoryModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.ProductCategory.SID.FullDBName, SID);
@@ -77,13 +79,14 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.ProductCategory.TableName);
             return qb;
         }
         public QueryBuilder GetWithRelatedEntities()
         {
             QueryBuilder qb = GetSimple();
-            qb.AddColumns(ProductCategoryService.MainColumns);
+            //qb.AddColumns(ProductCategoryService.MainColumns);
             //qb.AddLeftJoin(Dictionary.ProductCategory.TableName, qb => { qb.AddEqualCondition(Dictionary.ProductCategory.SID.FullDBName, Dictionary.ProductCategory.PCSID.FullDBName); });
             return qb;
         }

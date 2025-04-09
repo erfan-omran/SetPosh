@@ -1,5 +1,5 @@
 ﻿using DataBase;
-using Service.Service;
+using Service;
 using SetPosh;
 using System.Security.Claims;
 
@@ -8,11 +8,22 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = builder.Configuration.GetConnectionString("SetPoshConnection") ?? "";
 DBConnection.InitConnectionStr(connectionString);  // Set ConnectionStr
 
-builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<ProductCategoryService>();
+builder.Services.AddSingleton<CommentService>();
+builder.Services.AddSingleton<DemandService>();
+builder.Services.AddSingleton<DemandDetailService>();
+builder.Services.AddSingleton<DemandStatusService>();
 builder.Services.AddSingleton<ProductService>();
+builder.Services.AddSingleton<ProductCategoryService>();
+builder.Services.AddSingleton<ShoppingCartService>();
+builder.Services.AddSingleton<ShoppingCartDetailService>();
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<UserTypeService>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
 
 builder.Services.AddAuthentication(Settings.AuthCookieName)
     .AddCookie(
@@ -34,7 +45,6 @@ builder.Services.AddAuthorization(
         option.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "1"));//To do : Create an enum for UserType
     }
 );
-
 
 var app = builder.Build();
 

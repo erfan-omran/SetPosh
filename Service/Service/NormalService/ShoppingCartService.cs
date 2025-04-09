@@ -3,8 +3,9 @@ using Core.Model;
 using DataBase;
 using Service.ServiceInterface;
 using System.Data;
+using System.Data.SqlClient;
 
-namespace Service.Service
+namespace Service
 {
     public class ShoppingCartService : IBaseNormalService<ShoppingCartModel>
     {
@@ -13,8 +14,10 @@ namespace Service.Service
             Dictionary.ShoppingCart.SID.FullDBName,
             Dictionary.ShoppingCart.USID.FullDBName,
             Dictionary.ShoppingCart.IsActive.FullDBName,
-            Dictionary.ShoppingCart.Confirmed.FullDBName,
-
+            Dictionary.ShoppingCart.Confirmed.FullDBName
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.ShoppingCart.Blocked.FullDBName,
             Dictionary.ShoppingCart.Deleted.FullDBName,
 
@@ -52,7 +55,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[ShoppingCart.Delete]", ShoppingCart.Parameters);
         }
         //------------------------------------------
-        public async Task<ShoppingCartModel> GetSimpleModelAsync(long SID)
+        public async Task<ShoppingCartModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.ShoppingCart.SID.FullDBName, SID);
@@ -69,6 +72,7 @@ namespace Service.Service
 
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
             ShoppingCartModel ShoppingCart = new ShoppingCartModel(dr);
+            ShoppingCart.User = new UserModel(dr);
 
             return ShoppingCart;
         }
@@ -77,6 +81,7 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.ShoppingCart.TableName);
             return qb;
         }
@@ -97,6 +102,24 @@ namespace Service.Service
                 list.Add(ShoppingCart);
             }
             return list;
+        }
+        //------------------------------------------
+        public async Task<long> ChangeSCDCount(long USID, long PSID, bool IsIncrease)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@" + Dictionary.ShoppingCart.USID.EngName, USID),
+                new SqlParameter("@" + Dictionary.ShoppingCartDetail.PSID.EngName, PSID),
+                new SqlParameter("@CurrentUSID", USID),
+                new SqlParameter("@CurrentDate", PersianDate.Now.ConvertToString()),
+                new SqlParameter("@CurrentTime", PersianTime.Now.ConvertToString())
+            };
+            long Ans = -1;
+            if (IsIncrease)
+                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.IncreaseSCDCount]", parameters, "ItemsInCart");
+            else
+                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.DecreaseSCDCount]", parameters, "ItemsInCart");
+            return Ans;
         }
     }
 }

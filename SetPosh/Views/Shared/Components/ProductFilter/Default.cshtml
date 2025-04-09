@@ -1,0 +1,122 @@
+﻿@using System.Security.Claims;
+@using Core.Enum;
+@using Core;
+@model Tuple<List<ProductCategoryModel>>
+@{
+    List<ProductCategoryModel> Categories = Model.Item1;
+}
+
+<style>
+    #filterForm {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        background-color: #f8f9fa; /* پس‌زمینه ملایم */
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        align-items: center;
+    }
+
+        #filterForm select,
+        #filterForm input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+            #filterForm input:focus,
+            #filterForm select:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            }
+
+        #filterForm label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #filterForm button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+            #filterForm button:hover {
+                background-color: #0056b3;
+            }
+
+    /* تنظیمات ریسپانسیو برای موبایل */
+    @@media (max-width: 768px) {
+        #filterForm {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+            #filterForm select,
+            #filterForm input {
+                width: 100%;
+            }
+
+            #filterForm button {
+                width: 100%;
+            }
+    }
+</style>
+
+<form id="filterForm">
+    <!-- فیلتر دسته‌بندی -->
+    <select id="category" name="category">
+        <option value="">دسته‌بندی را انتخاب کنید</option>
+        @foreach (var category in Categories)
+        {
+            <option value="@category.SID">@category.PCName</option>
+        }
+    </select>
+
+    <!-- فیلتر قیمت -->
+    <input type="number" id="minPrice" name="minPrice" placeholder="حداقل قیمت" value="0" />
+    <input type="number" id="maxPrice" name="maxPrice" placeholder="حداکثر قیمت" value="@Decimal.MaxValue" />
+
+    <!-- فیلتر فقط کالاهای موجود -->
+    <label>موجود:</label>
+    <select id="inStock">
+        <option value="-1">همه</option>
+        <option value="1">باشد</option>
+        <option value="0">نباشد</option>
+    </select>
+
+    <!-- فیلتر اضافی برای ادمین -->
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        string? UserType = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (UserType != null)
+        {
+            if (UserType.ConvertToInt() == (int)UserTypeEnum.Admin)
+            {
+                <label>فعال:</label>
+                <select id="isActive">
+                    <option value="-1">همه</option>
+                    <option value="1">باشد</option>
+                    <option value="0">نباشد</option>
+                </select>
+
+            }
+        }
+    }
+
+    <button type="submit">اعمال فیلترها</button>
+</form>

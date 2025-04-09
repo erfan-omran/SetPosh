@@ -9,13 +9,11 @@ namespace Core.Model
         public string DSDescription { get; set; } = string.Empty;
 
         public DemandStatusModel() { }
-        public DemandStatusModel(DataRow dr) : this(dr, false) { }
-        public DemandStatusModel(DataRow dr, bool isNested)
+        public DemandStatusModel(DataRow dr)
         {
             DSName = dr.GetValueOfStringColumn(Dictionary.DemandStatus.DSName.EngName);
             DSDescription = dr.GetValueOfStringColumn(Dictionary.DemandStatus.DSDescription.EngName);
-            if (!isNested)
-                base.InitBaseEntityModel(dr);
+            base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -35,12 +33,10 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.DemandStatus.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.DemandStatus.DSName.EngName), DSName));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.DemandStatus.DSDescription.EngName), DSDescription));
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.DemandStatus.SID.EngName, SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.DemandStatus.DSName.EngName, DSName));
+            Parameters.Add(new SqlParameter("@" + Dictionary.DemandStatus.DSDescription.EngName, DSDescription));
         }
     }
 }

@@ -1,0 +1,298 @@
+﻿@using SetPosh.Controllers;
+@model Tuple<ProductModel, List<ProductModel>, long>
+@{
+    ProductModel MainProduct = Model.Item1;
+    List<ProductModel> RelatedProducts = Model.Item2;
+    long UserProductCount = Model.Item3;
+
+    Layout = "_Layout";
+    ViewData["Title"] = $"{MainProduct.PName} - مشاهده کالا";
+}
+
+<!-- Main Content -->
+<main class="product_view">
+
+    <!-- Product Image Section -->
+    <section class="product_image">
+        <img src="~/Image/ProductImage/@(MainProduct.ProductImages.FirstOrDefault(img => img.IsMain)?.ImgName ?? "NoPhoto.jpg")" alt="@MainProduct.PName" class="main_image" draggable="false">
+    </section>
+
+    <!-- Product Description Section -->
+    <section class="product_description">
+        <h2 class="product_name">@MainProduct.PName</h2>
+        <p>@MainProduct.PDescription</p>
+    </section>
+
+    <!-- Product Info Section -->
+    <section class="product_info">
+        <p class="product_price">قیمت: @MainProduct.PPrice.ToString("N0") تومان</p>
+        <div class="product_rating">
+            <span>
+                @if (MainProduct.ProductComments.Count > 0)
+                {
+                    <span style="color:#00a049;">@(((MainProduct.RateAVG / 5) * 100).ToString("N0") + "%")</span>
+                    <span style="color:#81858b;">رضایت از کالا</span>
+                }
+            </span>
+        </div>
+        <div id="CartAction" class="cart_action">
+            <div id="AddToCartForm" class="@(UserProductCount > 0 ? "hidden" : "")">
+                <button type="submit" class="add_to_cart @(MainProduct.PCount > 0 ? "" : "hidden")" id="AddProductBtn">افزودن به سبد خرید</button>
+                <button class="product_non_existent @(MainProduct.PCount > 0 ? "hidden" : "")" id="AddProductBtn">موجود نیست</button>
+            </div>
+
+            <div id="QuantityContainer" class="quantity_container @(UserProductCount > 0 ? "" : "hidden")">
+                <button id="DecreaseBtn" class="decrease_btn">
+                    <div id="DecreaseBtnMainIco" class="@(UserProductCount > 1 ? "" : "hidden")">
+                        ➖
+                    </div>
+                    <div id="DecreaseBtnSvgIco" class="@(UserProductCount > 1 ? "hidden" : "")">
+                        <svg viewBox="0 0 24 24" fill="#ff0000" stroke="#ff0000" style="width: 20px;height: 20px;">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+                            <g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /> </g>
+                        </svg>
+                    </div>
+                </button>
+                <span class="quantity">
+                    <span id="LoaderContainer" class="dots_loader hidden">
+                        <span>.</span>
+                        <span>.</span>
+                        <span>.</span>
+                    </span>
+                    <label id="PCount">@UserProductCount</label>
+                </span>
+                <button id="IncreaseBtn" class="increase_btn">➕</button>
+            </div>
+        </div>
+        <div id="ProductMessage" class="alert_danger hidden"></div>
+    </section>
+
+    <!-- Related Products Section -->
+    <section class="related_products">
+        <h2>کالاهای مشابه</h2>
+        <div class="related_products_container">
+            @if (RelatedProducts.Count > 0)
+            {
+                @foreach (var item in RelatedProducts)
+                {
+                    var img = item.ProductImages.FirstOrDefault(x => x.IsMain)?.ImgName ?? "NoPhoto.jpg";
+                    <div class="related_product">
+                        <a href="@Url.Action(nameof(ProductController.ProductDetails), "Product", new { PSID = item.SID })">
+                            <img src="~/Image/ProductImage/@img" alt="@item.PName" draggable="false" />
+                            <p>@item.PName</p>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>کالای مرتبطی وجود ندارد</p>
+            }
+        </div>
+    </section>
+
+    <!-- بخش نظرات کاربران -->
+    <section class="product_comments">
+        <h2>نظرات کاربران</h2>
+        <div class="comment_form">
+            <textarea id="Comment" placeholder="نظر خود را بنویسید..." required></textarea>
+            <div class="rating">
+                <span>امتیاز:</span>
+                <div class="stars_container">
+                    <div class="stars">
+                        <span class="star star_filled">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                    </div>
+                </div>
+            </div>
+            <button id="SendComment">ارسال نظر</button>
+            <div id="CommentMessage" class="alert_danger hidden"></div>
+        </div>
+        <div id="CommentList" class="comments_list">
+            @if (MainProduct.ProductComments.Count > 0)
+            {
+                foreach (CommentModel comment in MainProduct.ProductComments)
+                {
+                    <div class="comment_item">
+                        <div class="comment_author">
+                            @comment.User.UName
+                            <div class="comment_rating">
+                                @for (int i = 0; i < comment.CRate; i++)
+                                {
+                                    <span>&#9733;</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="comment_text">@comment.CDescription</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p id="EmptyCommentsList">هنوز نظری ثبت نشده است.</p>
+            }
+        </div>
+    </section>
+
+</main>
+
+<input type="hidden" id="PSID" value="@MainProduct.SID" />
+<input type="hidden" name="returnURL" value="@Context.Request.Path" />
+
+@section Links {
+    <link rel="stylesheet" href="~/css/Product.css">
+ }
+@section Scripts {
+    <script src="~/js/Product.js"></script>
+    <script>
+        const CartElm = document.getElementById("CartAction");
+        const ProductMessageElm = document.getElementById("ProductMessage");
+        const LoaderContainerElm = document.getElementById("LoaderContainer");
+        const QuantityContainerElm = document.getElementById("QuantityContainer");
+
+        const AddProductBtn = document.getElementById("AddProductBtn");
+        const IncreaseBtn = document.getElementById("IncreaseBtn");
+        const DecreaseBtn = document.getElementById("DecreaseBtn");
+
+        const AddToCartFormElm = document.getElementById("AddToCartForm");
+        const DecreaseBtnMainIcoElm = document.getElementById("DecreaseBtnMainIco");
+        const DecreaseBtnSvgIcoElm = document.getElementById("DecreaseBtnSvgIco");
+
+        const PSID = document.getElementById("PSID").value;
+        const PCountElm = document.getElementById("PCount");
+        //---------------------------------
+        AddProductBtn.addEventListener("click", () => {
+            SendChangeCountAjax("@(Url.Action(nameof(ShoppingCartController.AddToCart), "ShoppingCart"))", PSID);
+        });
+        DecreaseBtn.addEventListener("click", () => {
+            SendChangeCountAjax("@(Url.Action(nameof(ShoppingCartController.DecreaseSCDCount), "ShoppingCart"))", PSID);
+        });
+        IncreaseBtn.addEventListener("click", () => {
+            SendChangeCountAjax("@(Url.Action(nameof(ShoppingCartController.IncreaseSCDCount), "ShoppingCart"))", PSID);
+        });
+
+        function UpdateQuantityDisplay(count = "0") {
+            AddToCartFormElm.classList.add("hidden");
+            QuantityContainerElm.classList.remove("hidden");
+            DecreaseBtnMainIcoElm.classList.remove("hidden");
+            DecreaseBtnSvgIcoElm.classList.add("hidden");
+
+            if (count == "0") {
+                AddToCartFormElm.classList.remove("hidden");
+                QuantityContainerElm.classList.add("hidden");
+            }
+            else if (count == "1") {
+                DecreaseBtnMainIcoElm.classList.add("hidden");
+                DecreaseBtnSvgIcoElm.classList.remove("hidden");
+            }
+
+            PCountElm.textContent = count;
+        }
+        function SendChangeCountAjax(RouteUrl, ProductSID) {
+            $.ajax({
+                url: RouteUrl,
+                type: "POST",
+                data: {
+                    PSID: ProductSID,
+                },
+                beforeSend: function () {
+                    ShowLoadingAndHideElement(PCountElm, LoaderContainerElm);
+                    HideMessage(ProductMessageElm);
+                },
+                success: function (response) {
+                    debugger;
+                    HideLoadingAndShowElement(PCountElm, LoaderContainerElm);
+                    if (!response.success) {
+                        ShowMessage(ProductMessageElm, response.message, false);
+                        return;
+                    }
+
+                    UpdateQuantityDisplay(response.SCDCount);
+                },
+                error: function () {
+                    debugger;
+                    UpdateQuantityDisplay();
+                    ShowMessage(ProductMessageElm, "مشکلی در ارسال درخواست پیش آمده است", false);
+                }
+            });
+        }
+        //-------------------------------------------
+        const CommentListElm = document.getElementById("CommentList");
+        const SendCommentElm = document.getElementById("SendComment");
+        const EmptyCommentsListElm = document.getElementById("EmptyCommentsList");
+        const CommentTextElm = document.getElementById("Comment");
+        const StarsElms = document.getElementsByClassName("star");
+        const CommentMessageElm = document.getElementById("CommentMessage");
+
+
+        SendCommentElm.addEventListener("click", () => {
+
+            let Rate = 0;
+            if (IsNullOrEmpty(CommentTextElm.value)) {
+                ShowMessage(CommentMessageElm, "لطفا متن نظر را پر کنید", false);
+                return;
+            }
+            for (var i = 0; i < StarsElms.length; i++) {
+                let CurrentStart = StarsElms[i];
+                if (CurrentStart.classList.contains('star_filled')) {
+                    Rate++;
+                }
+            }
+            if (Rate == 0) {
+                ShowMessage(CommentMessageElm, "لطفا امتیاز را وارد کنید", false);
+                return;
+            }
+            $.ajax({
+                url: "@(Url.Action(nameof(CommentController.AddComment), "Comment"))",
+                type: "POST",
+                data: {
+                    PSID: PSID,
+                    Rate: Rate,
+                    CommentText: CommentTextElm.value
+                },
+                beforeSend: function () {
+                    //ShowLoadingAndHideElement();
+                    HideMessage(CommentMessageElm);
+                },
+                success: function (response) {
+                    debugger;
+                    //HideLoadingAndShowElement();
+
+                    if (!response.Success) {
+                        ShowMessage(CommentMessageElm, response.Message, false);
+                        return;
+                    }
+
+                    const commentHTML = `
+                                            <div class="comment_item">
+                                                <div class="comment_author">
+                                                            ${response.UserName}
+                                                                    <div class="comment_rating">${'&#9733; '.repeat(Rate)}</div>
+                                                </div>
+                                                <div class="comment_text">${CommentTextElm.value}</div>
+                                            </div>
+                                        `;
+
+                    if (EmptyCommentsListElm)
+                        EmptyCommentsListElm.innerHTML = '';
+
+                    CommentListElm.insertAdjacentHTML('afterbegin', commentHTML);
+                    CommentTextElm.value = "";
+                    //RateElm.value = "0";
+                    UpdateStars(1);
+                },
+                error: function (Message, xhr, status, error) {
+                    console.error("Error Details:", xhr.responseText);
+                    console.error("Status:", status);
+                    console.error("Error:", error);
+                    ShowMessage(CommentMessageElm, Message, false);
+                }
+
+            });
+        });
+    </script>
+ }

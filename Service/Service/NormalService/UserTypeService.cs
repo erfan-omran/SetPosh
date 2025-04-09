@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class UserTypeService : IBaseNormalService<UserTypeModel>
     {
@@ -53,7 +53,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[UserType.Delete]", UserType.Parameters);
         }
         //------------------------------------------
-        public async Task<UserTypeModel> GetSimpleModelAsync(long SID)
+        public async Task<UserTypeModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.UserType.SID.FullDBName, SID);

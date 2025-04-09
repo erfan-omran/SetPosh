@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Service.Service;
-using Microsoft.AspNetCore.Authorization;
 using DataBase;
 using System.Data;
 using Core.Model;
+using Service;
 
 namespace SetPosh.Controllers
 {
@@ -11,7 +10,6 @@ namespace SetPosh.Controllers
     {
         private readonly ProductCategoryService _productCategoryService;
         private readonly ProductService _productService;
-
         public HomeController(ProductService ProductService, ProductCategoryService ProductCategoryService)
         {
             _productService = ProductService;
@@ -27,12 +25,12 @@ namespace SetPosh.Controllers
                 DataTable PCDT = await DBConnection.GetDataTableAsync(PCQuery);
                 List<ProductCategoryModel> PCList = _productCategoryService.MapDTToModel(PCDT);
                 //-------------------
-                QueryBuilder ProductQB = _productService.GetSimple();
+                QueryBuilder ProductQB = _productService.GetWithMainImage();
                 string ProductQuery = ProductQB.CreateQuery();
                 DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);
-                List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT);
+                List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT, true);
                 //-------------------
-                return View(new Tuple<List<ProductModel>, List<ProductCategoryModel>>(ProductList,PCList));
+                return View(new Tuple<List<ProductModel>, List<ProductCategoryModel>>(ProductList, PCList));
             }
             catch (Exception ex)
             {

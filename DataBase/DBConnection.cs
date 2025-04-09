@@ -78,14 +78,15 @@ namespace DataBase
                         }
                         await sqlConnection.OpenAsync();
                         object? result = await cmd.ExecuteScalarAsync();
-                        return result is DBNull ? default : (T?)result;
+                        return /*result is null || result is DBNull ? default :*/ (T?)result;
                     }
                 }
             }
             catch (Exception ex)
             {
                 LogException(ex, query, parameters);
-                return default;
+                //return default;
+                throw new Exception(ex.Message);
             }
         }
         //-----------------------------------------------
@@ -116,12 +117,146 @@ namespace DataBase
                     return true;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-        public static async Task<bool> ExecuteTransactionProcedureAsync(List<(string ProcedureName, List<SqlParameter>? Parameters)> procedures)
+        public static async Task<bool> ExecTransactionProcedureAsync(string procedureName, List<SqlParameter>? parameters = null)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+                {
+                    await sqlConnection.OpenAsync();
+
+                    using (SqlTransaction transaction = sqlConnection.BeginTransaction())
+                    {
+                        try
+                        {
+                            using (SqlCommand cmd = new SqlCommand(procedureName, sqlConnection, transaction))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.CommandTimeout = 300;
+
+                                if (parameters != null && parameters.Count > 0)
+                                {
+                                    cmd.Parameters.Clear();
+                                    cmd.Parameters.AddRange(parameters.ToArray());
+                                }
+
+                                await cmd.ExecuteNonQueryAsync();
+                            }
+
+                            await transaction.CommitAsync();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            await LogException(ex, "ExecTransactionProcedureAsync (Single Procedure)", null);
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex, "ExecTransactionProcedureAsync (Connection Error - Single Procedure)", null);
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public static async Task<T> ExecProcedureAsync<T>(string procedureName, List<SqlParameter> parameters, string OutputParamName)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+                {
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        CommandTimeout = 300,
+                        Connection = sqlConnection,
+                        CommandType = CommandType.StoredProcedure,
+                        CommandText = procedureName
+                    };
+
+                    if (parameters != null && parameters.Count > 0)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.AddRange(parameters.ToArray());
+                    }
+
+                    SqlParameter outputParam = new SqlParameter("@" + OutputParamName, typeof(T).ToSqlDbType())
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(outputParam);
+
+                    if (sqlConnection.State == ConnectionState.Closed)
+                        await sqlConnection.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+                    return (T)Convert.ChangeType(outputParam.Value, typeof(T));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static async Task<T> ExecTransactionProcedureAsync<T>(string procedureName, List<SqlParameter> parameters, string OutputParamName)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+                {
+                    await sqlConnection.OpenAsync();
+
+                    using (SqlTransaction transaction = sqlConnection.BeginTransaction())
+                    {
+                        try
+                        {
+                            using (SqlCommand cmd = new SqlCommand(procedureName, sqlConnection, transaction))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.CommandTimeout = 300;
+
+                                if (parameters != null && parameters.Count > 0)
+                                {
+                                    cmd.Parameters.Clear();
+                                    cmd.Parameters.AddRange(parameters.ToArray());
+                                }
+                                SqlParameter outputParam = new SqlParameter("@" + OutputParamName, typeof(T).ToSqlDbType())
+                                {
+                                    Direction = ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(outputParam);
+
+                                await cmd.ExecuteNonQueryAsync();
+
+                                await transaction.CommitAsync();
+                                return (T)Convert.ChangeType(outputParam.Value, typeof(T));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            await LogException(ex, "ExecTransactionProcedureAsync (Single Procedure)", null);
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex, "ExecTransactionProcedureAsync (Connection Error - Single Procedure)", null);
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public static async Task<bool> ExecTransactionProcedureAsync(List<(string ProcedureName, List<SqlParameter>? Parameters)> procedures)
         {
             try
             {
@@ -167,6 +302,10 @@ namespace DataBase
         }
         public static async Task<bool> LogException(Exception ex, string query, List<SqlParameter>? parameters = null)
         {
+            return await LogException(ex.Message, query, parameters);
+        }
+        public static async Task<bool> LogException(string errorMessage, string query, List<SqlParameter>? parameters = null)
+        {
             string parameterDetails = "";
             if (parameters != null)
                 parameterDetails = string.Join(", ", parameters.Select(p => $"{p.ParameterName}={p.Value}"));
@@ -176,11 +315,25 @@ namespace DataBase
             List<SqlParameter> logParams = new List<SqlParameter>
             {
                 new SqlParameter("@Query", query + " | Parameters: " + parameterDetails),
-                new SqlParameter("@Exception", ex.Message)
+                new SqlParameter("@Exception", errorMessage)
             };
             bool result = await ExecProcedureAsync("[Log_Exception.Add]", logParams);
 
             return result;
+        }
+
+        //---------------------
+        private static SqlDbType ToSqlDbType(this Type type)
+        {
+            if (type == typeof(int)) return SqlDbType.Int;
+            if (type == typeof(long)) return SqlDbType.BigInt;
+            if (type == typeof(string)) return SqlDbType.NVarChar;
+            if (type == typeof(bool)) return SqlDbType.Bit;
+            if (type == typeof(DateTime)) return SqlDbType.DateTime;
+            if (type == typeof(float)) return SqlDbType.Float;
+            if (type == typeof(double)) return SqlDbType.Float;
+            if (type == typeof(decimal)) return SqlDbType.Decimal;
+            throw new ArgumentException("Unsupported type");
         }
     }
 }

@@ -1,0 +1,51 @@
+﻿@using SetPosh.Controllers;
+@model string
+
+@await Component.InvokeAsync("ProductFilter")
+
+<div id="products">
+    @*@await Html.PartialAsync(Settings.PartialPathProductList, Model)*@
+</div>
+
+<script>
+    $(document).ready(function () {
+        // ارسال فرم با استفاده از Ajax
+        $("#filterForm").on("submit", function (e) {
+            e.preventDefault(); // جلوگیری از ارسال فرم به صورت پیش‌فرض
+            console.log("Step 1");
+            debugger;
+            // گرفتن مقادیر فرم
+            var searchText = $("#@(Settings.MainSearchInputID)").val();
+            var PCSID = $("#category").val();
+            var minPrice = $("#minPrice").val();
+            var maxPrice = $("#maxPrice").val();
+            var inStock = $("#inStock").val();
+            var isActive = $("#isActive").val();
+            debugger;
+            // ارسال درخواست Ajax
+            $.ajax({
+                url: "@Url.Action(nameof(ProductController._ProductList), "Product")",
+                type: "GET",
+                data: {
+                    searchText: searchText,
+                    PCSID: PCSID,
+                    minPrice: minPrice,
+                    maxPrice: maxPrice,
+                    inStock: inStock,
+                    isActive: isActive
+                },
+                beforeSend: function () {
+                    console.log("Step 2");
+                    $("#products").html("<p>در حال بارگذاری...</p>");
+                },
+                success: function (response) {
+                    $("#products").html(response); // نمایش نتایج فیلتر شده
+                },
+                error: function () {
+                    $("#products").html("<p>خطا در دریافت اطلاعات</p>");
+                }
+            });
+            console.log("Step 3");
+        });
+    });
+</script>

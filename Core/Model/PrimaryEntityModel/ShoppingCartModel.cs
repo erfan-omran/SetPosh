@@ -6,21 +6,19 @@ namespace Core.Model
 {
     public class ShoppingCartModel : BaseEntityModel
     {
-        public UserModel User { get; set; } = new UserModel();
+        public long USID { get; set; } = default;
         public bool IsActive { get; set; } = default;
         public bool Confirmed { get; set; } = default;
 
-        public ShoppingCartModel() { }
-        public ShoppingCartModel(DataRow dr) : this(dr, false) { }
-        public ShoppingCartModel(DataRow dr, bool isNested)
-        {
-            User = new UserModel(dr, !isNested);
-            User.SID = dr.GetValueOfLongColumn(Dictionary.ShoppingCart.USID.EngName);
+        public UserModel User { get; set; } = new UserModel();
 
+        public ShoppingCartModel() { }
+        public ShoppingCartModel(DataRow dr)
+        {
+            USID = dr.GetValueOfLongColumn(Dictionary.ShoppingCart.USID.EngName);
             IsActive = dr.GetValueOfBoolColumn(Dictionary.ShoppingCart.IsActive.EngName);
             Confirmed = dr.GetValueOfBoolColumn(Dictionary.ShoppingCart.Confirmed.EngName);
-            if (!isNested)
-                base.InitBaseEntityModel(dr);
+            base.InitBaseEntityModel(dr);
         }
         //-------------
         public void SaveAddParameters()
@@ -29,7 +27,6 @@ namespace Core.Model
             SaveBlockedParameter();
             SaveDeletedParameter();
             SaveCreationParameters();
-            SaveModificationParameters();
         }
         public void SaveEditParameters()
         {
@@ -40,13 +37,11 @@ namespace Core.Model
         }
         public void SaveMainParameters(bool IsAdd)
         {
-            SqlParameter SIDParam = new SqlParameter("@" + Dictionary.ShoppingCart.SID.EngName, SID);
-            if (IsAdd)
-                SIDParam.Direction = System.Data.ParameterDirection.Output;
-            Parameters.Add(SIDParam);
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ShoppingCart.USID.EngName), User.SID));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ShoppingCart.IsActive.EngName), IsActive));
-            Parameters.Add(new SqlParameter("@" + nameof(Dictionary.ShoppingCart.Confirmed.EngName), Confirmed));
+            if (!IsAdd)
+                Parameters.Add(new SqlParameter("@" + Dictionary.ShoppingCart.SID.EngName, SID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ShoppingCart.USID.EngName, USID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ShoppingCart.IsActive.EngName, IsActive));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ShoppingCart.Confirmed.EngName, Confirmed));
         }
     }
 }

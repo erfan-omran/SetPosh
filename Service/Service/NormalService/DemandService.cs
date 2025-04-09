@@ -4,7 +4,7 @@ using DataBase;
 using Service.ServiceInterface;
 using System.Data;
 
-namespace Service.Service
+namespace Service
 {
     public class DemandService : IBaseNormalService<DemandModel>
     {
@@ -16,7 +16,9 @@ namespace Service.Service
             Dictionary.Demand.USID.FullDBName,
             Dictionary.Demand.DeliveryDate.FullDBName,
             Dictionary.Demand.Confirmed.FullDBName,
-
+        };
+        public static List<string> DefaultColumns = new List<string>()
+        {
             Dictionary.Demand.Blocked.FullDBName,
             Dictionary.Demand.Deleted.FullDBName,
 
@@ -54,7 +56,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[Demand.Delete]", Demand.Parameters);
         }
         //------------------------------------------
-        public async Task<DemandModel> GetSimpleModelAsync(long SID)
+        public async Task<DemandModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.Demand.SID.FullDBName, SID);
@@ -68,9 +70,12 @@ namespace Service.Service
         {
             QueryBuilder qb = GetWithRelatedEntities();
             qb.AddEqualCondition(Dictionary.Demand.SID.FullDBName, SID);
-
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
+
             DemandModel Demand = new DemandModel(dr);
+            Demand.ShoppingCart = new ShoppingCartModel(dr);
+            Demand.DemandStatus = new DemandStatusModel(dr);
+            Demand.User = new UserModel(dr);
 
             return Demand;
         }
@@ -79,6 +84,7 @@ namespace Service.Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
+            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.Demand.TableName);
             return qb;
         }

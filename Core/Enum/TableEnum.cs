@@ -11,6 +11,7 @@ namespace DataBase.Enum
         Log_Exception,
         Product,
         ProductCategory,
+        ProductImage,
         ShoppingCart,
         ShoppingCartDetail,
         User,

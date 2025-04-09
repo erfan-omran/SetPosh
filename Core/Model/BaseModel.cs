@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
 
 namespace Core.Model
 {
@@ -9,11 +8,11 @@ namespace Core.Model
         public bool Blocked { get; set; } = default;
         public bool Deleted { get; set; } = default;
         public long CreationUSID { get; set; } = default;
-        public PersianDate CreationDate { get; set; } = new PersianDate();
-        public PersianTime CreationTime { get; set; } = new PersianTime();
+        public PersianDate CreationDate { get; set; } = PersianDate.Now;
+        public PersianTime CreationTime { get; set; } = PersianTime.Now;
         public long LastModifiedUSID { get; set; } = default;
-        public PersianDate LastModifiedDate { get; set; } = new PersianDate();
-        public PersianTime LastModifiedTime { get; set; } = new PersianTime();
+        public PersianDate LastModifiedDate { get; set; } = PersianDate.Now;
+        public PersianTime LastModifiedTime { get; set; } = PersianTime.Now;
         public List<SqlParameter> Parameters = new List<SqlParameter>();
 
         public void InitBaseModel(DataRow dr)
@@ -35,15 +34,15 @@ namespace Core.Model
         //-------------
         public void SaveCreationParameters()
         {
-            Parameters.Add(new SqlParameter("@" + nameof(CreationUSID), CreationUSID));
-            Parameters.Add(new SqlParameter("@" + nameof(CreationDate), CreationDate.ToString()));
-            Parameters.Add(new SqlParameter("@" + nameof(CreationTime), CreationTime.ToString()));
+            Parameters.Add(new SqlParameter("@CurrentUSID", CreationUSID));
+            Parameters.Add(new SqlParameter("@CurrentDate", CreationDate.ConvertToString()));
+            Parameters.Add(new SqlParameter("@CurrentTime", CreationTime.ConvertToString()));
         }
         public void SaveModificationParameters()
         {
-            Parameters.Add(new SqlParameter("@" + nameof(LastModifiedUSID), LastModifiedUSID));
-            Parameters.Add(new SqlParameter("@" + nameof(LastModifiedDate), LastModifiedDate.ToString()));
-            Parameters.Add(new SqlParameter("@" + nameof(LastModifiedTime), LastModifiedTime.ToString()));
+            Parameters.Add(new SqlParameter("@CurrentUSID", LastModifiedUSID));
+            Parameters.Add(new SqlParameter("@CurrentDate", LastModifiedDate.ConvertToString()));
+            Parameters.Add(new SqlParameter("@CurrentTime", LastModifiedTime.ConvertToString()));
         }
         public void SaveBlockedParameter(long SID = -1)
         {

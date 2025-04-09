@@ -6,7 +6,7 @@ using Service.ServiceInterface;
 using System.Data;
 using System.Security.Claims;
 
-namespace Service.Service
+namespace Service
 {
     public class UserService : IBaseNormalService<UserModel>
     {
@@ -60,7 +60,7 @@ namespace Service.Service
             await DBConnection.ExecProcedureAsync("[User.Delete]", user.Parameters);
         }
         //------------------------------------------
-        public async Task<UserModel> GetSimpleModelAsync(long SID)
+        public async Task<UserModel> GetModelSimpleAsync(long SID)
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.User.SID.FullDBName, SID);
@@ -74,10 +74,10 @@ namespace Service.Service
         {
             QueryBuilder qb = GetWithRelatedEntities();
             qb.AddEqualCondition(Dictionary.User.SID.FullDBName, SID);
-
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
+
             UserModel user = new UserModel(dr);
-            //user.UserType = new UserTypeModel(dr);
+            user.UserType = new UserTypeModel(dr);
 
             return user;
         }
