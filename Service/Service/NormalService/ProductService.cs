@@ -151,7 +151,7 @@ namespace Service
 
             return Products;
         }
-        public async Task<List<ProductModel>> GetProductsWithFilter(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isBlocked)
+        public async Task<List<ProductModel>> GetProductsWithFilter(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isBlocked, int? isDeleted)
         {
             QueryBuilder ProductQB = GetWithMainImage();
 
@@ -163,9 +163,14 @@ namespace Service
                 ProductQB.AddGreaterThanOrEqualCondition(Dictionary.Product.PPrice.FullDBName, minPrice);
             if (maxPrice.HasValue)
                 ProductQB.AddLessThanOrEqualCondition(Dictionary.Product.PPrice.FullDBName, maxPrice);
-            //inStock ToDo
+            if (inStock == 0)
+                ProductQB.AddLessThanOrEqualCondition(Dictionary.Product.PCount.FullDBName, 0);
+            else if(inStock == 1)
+                ProductQB.AddGreaterThanCondition(Dictionary.Product.PCount.FullDBName, 0);
             if (isBlocked >= 0)
                 ProductQB.AddEqualCondition(Dictionary.Product.Blocked.FullDBName, isBlocked);
+            if (isDeleted >= 0)
+                ProductQB.AddEqualCondition(Dictionary.Product.Deleted.FullDBName, isDeleted);
 
             string ProductQuery = ProductQB.CreateQuery();
             DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);

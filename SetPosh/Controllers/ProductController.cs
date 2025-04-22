@@ -35,12 +35,12 @@ namespace SetPosh.Controllers
 
         public IActionResult ProductList(string searchText, string? PCSID)
         {
-            return View(new Tuple<string, string>(searchText, PCSID));
+            return View(new Tuple<string, string?>(searchText, PCSID));
         }
 
-        public async Task<IActionResult> _ProductList(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isActive)
+        public async Task<IActionResult> _ProductList(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isBlocked, int? isDeleted)
         {
-            List<ProductModel> ProductList = await _productService.GetProductsWithFilter(searchText, PCSID, minPrice, maxPrice, inStock, isActive);
+            List<ProductModel> ProductList = await _productService.GetProductsWithFilter(searchText, PCSID, minPrice, maxPrice, inStock, isBlocked, isDeleted);
 
             return View(Settings.PartialPathProductList, ProductList);
         }

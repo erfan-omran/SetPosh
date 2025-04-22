@@ -87,7 +87,7 @@
         }
 
     .filter_select, .filter_input {
-            width: 100%;
+        width: 100%;
         padding: 10px 12px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius);
@@ -145,16 +145,16 @@
 
     /* حالت تاریک */
     /*@@media (prefers-color-scheme: dark) {
-        .filter_container {
-            --primary-color: #3a86ff;
-            --secondary-color: #adb5bd;
-            --bg-color: #2d3748;
-            --border-color: #4a5568;
-            --text-color: #f8f9fa;
-            --hover-color: #4a5568;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-    }*/
+                .filter_container {
+                    --primary-color: #3a86ff;
+                    --secondary-color: #adb5bd;
+                    --bg-color: #2d3748;
+                    --border-color: #4a5568;
+                    --text-color: #f8f9fa;
+                    --hover-color: #4a5568;
+                    --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                }
+            }*/
 
     /* واکنش‌گرایی */
     @@media (max-width: 768px) {
@@ -171,7 +171,6 @@
             display: none;
         }
     }
-
 
 </style>
 
@@ -226,9 +225,9 @@
                 وضعیت موجودی
             </label>
             <select id="inStock" class="filter_select">
-                <option value="-1">همه محصولات</option>
-                <option value="1">فقط موجود</option>
-                <option value="0">فقط ناموجود</option>
+                <option value="-1">همه</option>
+                <option value="1">باشد</option>
+                <option value="0">نباشد</option>
             </select>
         </div>
 
@@ -243,12 +242,26 @@
                         <svg viewBox="0 0 24 24" width="16" height="16">
                             <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17H13V7H11V17Z" />
                         </svg>
-                        وضعیت فعال
+                        وضعیت مسدود
                     </label>
-                    <select id="isActive" class="filter_select">
-                        <option value="-1">همه وضعیت‌ها</option>
-                        <option value="1">فقط فعال</option>
-                        <option value="0">فقط غیرفعال</option>
+                    <select id="isBlocked" class="filter_select">
+                        <option value="-1">همه</option>
+                        <option value="1">باشد</option>
+                        <option value="0">نباشد</option>
+                    </select>
+                </div>
+
+                <div class="filter_group">
+                    <label class="filter_label">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                        </svg>
+                        وضعیت حذف
+                    </label>
+                    <select id="isDeleted" class="filter_select">
+                        <option value="-1">همه</option>
+                        <option value="1">باشد</option>
+                        <option value="0">نباشد</option>
                     </select>
                 </div>
             }
@@ -263,45 +276,49 @@
     </form>
 </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // پاک کردن فیلترها
-            //document.getElementById('.clear_filters').addEventListener('click', function () {
-                //document.getElementById('filterForm').reset();
-                // اعمال فیلترهای خالی
-                //document.getElementById('ProductFilterSubmitBtn').click();
-            //});
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // پاک کردن فیلترها
+        //document.getElementById('.clear_filters').addEventListener('click', function () {
+        //document.getElementById('filterForm').reset();
+        // اعمال فیلترهای خالی
+        //document.getElementById('ProductFilterSubmitBtn').click();
+        //});
 
-            // اعتبارسنجی محدوده قیمت
-            document.getElementById('filterForm').addEventListener('submit', function (e) {
-                const minPrice = parseFloat(document.getElementById('minPrice').value);
-                const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+        // اعتبارسنجی محدوده قیمت
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
+            const minPrice = parseFloat(document.getElementById('minPrice').value);
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value);
 
-                if (minPrice > maxPrice) {
-                    e.preventDefault();
-                    alert('حداقل قیمت نمی‌تواند از حداکثر قیمت بیشتر باشد');
-                    document.getElementById('minPrice').focus();
-                }
-            });
-        });
-
-        let ClearFilterBtn = document.getElementById('ClearFilters');
-        ClearFilterBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById("filterForm").reset();
-
-            let Category = document.getElementById('category');
-            let MinPrice = document.getElementById('minPrice');
-            let MaxPrice = document.getElementById('maxPrice');
-            let InStock = document.getElementById('inStock');
-            let IsActive = document.getElementById('isActive');
-
-            Category.value = -1;
-            MinPrice.value = "";
-            MaxPrice.value = "";
-            InStock.value = -1;
-            if (IsActive) {//چون ممکنه کاربر ادمین نباشه این المنت رو چک میکنیم که وجود دارد یا خیر
-                IsActive.value = -1;
+            if (minPrice > maxPrice) {
+                e.preventDefault();
+                alert('حداقل قیمت نمی‌تواند از حداکثر قیمت بیشتر باشد');
+                document.getElementById('minPrice').focus();
             }
         });
-    </script>
+    });
+
+    let ClearFilterBtn = document.getElementById('ClearFilters');
+    ClearFilterBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById("filterForm").reset();
+
+        let Category = document.getElementById('category');
+        let MinPrice = document.getElementById('minPrice');
+        let MaxPrice = document.getElementById('maxPrice');
+        let InStock = document.getElementById('inStock');
+        let IsBlocked = document.getElementById('isBlocked');
+        let IsDeleted = document.getElementById('isDeleted');
+
+        Category.value = -1;
+        MinPrice.value = "";
+        MaxPrice.value = "";
+        InStock.value = -1;
+        if (IsBlocked) {//چون ممکنه کاربر ادمین نباشه این المنت رو چک میکنیم که وجود دارد یا خیر
+            IsBlocked.value = -1;
+        }
+        if (IsDeleted) {//چون ممکنه کاربر ادمین نباشه این المنت رو چک میکنیم که وجود دارد یا خیر
+            IsDeleted.value = -1;
+        }
+    });
+</script>

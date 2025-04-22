@@ -44,7 +44,7 @@
             color: #dc3545;
         }
     </style>
-        @*<style>
+    @*<style>
         body {
             background-color: white;
         }
@@ -90,7 +90,8 @@
                 var minPrice = $("#minPrice").val();
                 var maxPrice = $("#maxPrice").val();
                 var inStock = $("#inStock").val();
-                var isActive = $("#isActive").val();
+                var isBlocked = $("#isBlocked").val();
+                var isDeleted = $("#isDeleted").val();
                 debugger;
 
                 $.ajax({
@@ -102,7 +103,8 @@
                         minPrice: minPrice,
                         maxPrice: maxPrice,
                         inStock: inStock,
-                        isActive: isActive
+                        isBlocked: isBlocked,
+                        isDeleted: isDeleted
                     },
                     beforeSend: function () {
                         ShowLoader("Products");

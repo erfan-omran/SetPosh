@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service;
 using System.Data;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace SetPosh.Controllers
 {
@@ -33,6 +34,12 @@ namespace SetPosh.Controllers
             {
                 if (!ModelState.IsValid)
                     return View(new Tuple<UserModel, string>(userModel, returnURL));
+
+                if (!Regex.IsMatch(userModel.UTel, "09(1[0-9]|3[1-9]|2[1-9])-?[0-9]{3}-?[0-9]{4}"))
+                {
+                    ViewBag.ErrorMessage = "شماره تلفن اشتباه است";
+                    return View(new Tuple<UserModel, string>(userModel, returnURL));
+                }
 
                 DataRow dr = await _userService.Login(userModel);
                 if (dr != null)
