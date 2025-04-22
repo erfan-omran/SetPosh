@@ -1,14 +1,24 @@
-* {
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     user-select: none;
 }
 
+/*@supports (height:100cqh) {
+    :root {
+        --cqh-full: 100cqh;
+        --cqw-full: 100cqw;
+    }
+}*/
+
 body {
-    font-family: Vazir , 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /*width: 100vw;*/
+    *width: calc(100vw - 14px);
+    height: 100vh;
     direction: rtl;
     background-color: #f7f9fc;
+    font-family: Vazir, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 header {
@@ -52,13 +62,24 @@ header {
             }
 
         header .search_bar .search_icon {
-            position: absolute;
-            left: 15px;
+            left: 0;
             top: 50%;
-            transform: translateY(-50%);
+            width: 40px;
+            height: 100%;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
             font-size: 20px;
+            position: absolute;
             color: #007bff;
+            background-color: #ffcc00;
+            transform: translateY(-50%);
+            transition: .3s;
         }
+
+            header .search_bar .search_icon:hover {
+                background-color: #fdb14d;
+            }
 
     header .icons .login_btn,
     header .icons .header_btn {
@@ -109,7 +130,7 @@ footer {
         }
 
         header .search_bar {
-            width: 100%;
+            /*width: 100%;*/
             margin: 10px 0;
         }
 
@@ -129,8 +150,8 @@ footer {
         }
 
         header .search_bar {
-            width: 100%;
-            margin: 10px 0;
+            /*width: 100%;*/
+            /*margin: 10px 0;*/
         }
 
         header .menu {
@@ -159,4 +180,8 @@ footer {
     color: #fff;
     padding: 10px;
     border-radius: 5px;
+}
+
+.hidden {
+    display: none !important;
 }

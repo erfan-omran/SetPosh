@@ -14,6 +14,6 @@ namespace Core
         public static ShoppingCartSchema ShoppingCart = new ShoppingCartSchema();
         public static ShoppingCartDetailSchema ShoppingCartDetail = new ShoppingCartDetailSchema();
         public static UserSchema User = new UserSchema();
-        public static UserTypeSchema UserType = new UserTypeSchema();
+        public static Enum_UserTypeSchema UserType = new Enum_UserTypeSchema();
     }
 }

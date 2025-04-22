@@ -85,7 +85,7 @@ namespace SetPosh.Controllers
                 if (!ModelState.IsValid)
                     return View(new Tuple<UserModel, string>(userModel, returnURL));
 
-                userModel.UserType.SID = (int)UserTypeEnum.Normal;
+                userModel.UserType.ID = (int)UserTypeEnum.Normal;
                 userModel.UName = _userService.GenerateRandomUsername();
 
                 bool Ans = false;

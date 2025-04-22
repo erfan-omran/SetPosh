@@ -104,22 +104,6 @@ namespace Service
             return list;
         }
         //------------------------------------------
-        public async Task<long> ChangeSCDCount(long USID, long PSID, bool IsIncrease)
-        {
-            List<SqlParameter> parameters = new List<SqlParameter>()
-            {
-                new SqlParameter("@" + Dictionary.ShoppingCart.USID.EngName, USID),
-                new SqlParameter("@" + Dictionary.ShoppingCartDetail.PSID.EngName, PSID),
-                new SqlParameter("@CurrentUSID", USID),
-                new SqlParameter("@CurrentDate", PersianDate.Now.ConvertToString()),
-                new SqlParameter("@CurrentTime", PersianTime.Now.ConvertToString())
-            };
-            long Ans = -1;
-            if (IsIncrease)
-                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.IncreaseSCDCount]", parameters, "ItemsInCart");
-            else
-                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.DecreaseSCDCount]", parameters, "ItemsInCart");
-            return Ans;
-        }
+        
     }
 }

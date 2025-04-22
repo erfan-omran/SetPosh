@@ -33,32 +33,16 @@ namespace SetPosh.Controllers
             return View(new Tuple<ProductModel, List<ProductModel>, long>(productModel, RelatedProducts, UserProductCount));
         }
 
-        public IActionResult ProductList(string serachText)
+        public IActionResult ProductList(string searchText, string? PCSID)
         {
-            return View(serachText);
+            return View(new Tuple<string, string>(searchText, PCSID));
         }
 
         public async Task<IActionResult> _ProductList(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isActive)
         {
-            QueryBuilder ProductQB = _productService.GetWithMainImage();
+            List<ProductModel> ProductList = await _productService.GetProductsWithFilter(searchText, PCSID, minPrice, maxPrice, inStock, isActive);
 
-            if (!string.IsNullOrEmpty(searchText))
-                ProductQB.AddLikeCondition(Dictionary.Product.PName.FullDBName, searchText);
-            if (!string.IsNullOrEmpty(PCSID))
-                ProductQB.AddEqualCondition(Dictionary.Product.PCSID.FullDBName, PCSID);
-            if (minPrice.HasValue)
-                ProductQB.AddGreaterThanCondition(Dictionary.Product.PPrice.FullDBName, minPrice);
-            if (maxPrice.HasValue)
-                ProductQB.AddLessThanCondition(Dictionary.Product.PPrice.FullDBName, maxPrice);
-            //inStock ToDo
-            if (isActive >= 0)
-                ProductQB.AddEqualCondition(Dictionary.Product.Blocked.FullDBName, isActive);
-
-            string ProductQuery = ProductQB.CreateQuery();
-            DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);
-            List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT, true);
             return View(Settings.PartialPathProductList, ProductList);
-            //return PartialView("_ProductList", products); // نتایج فیلتر شده
         }
     }
 }

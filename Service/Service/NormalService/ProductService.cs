@@ -135,7 +135,6 @@ namespace Service
 
             return productImageList;
         }
-
         public async Task<List<ProductModel>> GetRelatedProducts(long PSID, long PCSID)
         {
             QueryBuilder qb = GetSimple();
@@ -151,6 +150,28 @@ namespace Service
             }
 
             return Products;
+        }
+        public async Task<List<ProductModel>> GetProductsWithFilter(string? searchText, string? PCSID, decimal? minPrice, decimal? maxPrice, int? inStock, int? isBlocked)
+        {
+            QueryBuilder ProductQB = GetWithMainImage();
+
+            if (!string.IsNullOrEmpty(searchText))
+                ProductQB.AddLikeCondition(Dictionary.Product.PName.FullDBName, searchText);
+            if (!string.IsNullOrEmpty(PCSID))
+                ProductQB.AddEqualCondition(Dictionary.Product.PCSID.FullDBName, PCSID);
+            if (minPrice.HasValue)
+                ProductQB.AddGreaterThanOrEqualCondition(Dictionary.Product.PPrice.FullDBName, minPrice);
+            if (maxPrice.HasValue)
+                ProductQB.AddLessThanOrEqualCondition(Dictionary.Product.PPrice.FullDBName, maxPrice);
+            //inStock ToDo
+            if (isBlocked >= 0)
+                ProductQB.AddEqualCondition(Dictionary.Product.Blocked.FullDBName, isBlocked);
+
+            string ProductQuery = ProductQB.CreateQuery();
+            DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);
+            List<ProductModel> ProductList = MapDTToModel(ProductDT, true);
+
+            return ProductList;
         }
 
         public QueryBuilder GetSimple()

@@ -36,7 +36,7 @@
         <div class="category">ورزش و سفر</div>*@
         @foreach (ProductCategoryModel category in ProductCategories)
         {
-            <div sid="@category.SID" class="category">@category.PCName</div>
+            <a asp-controller="Product" asp-action="@(nameof(ProductController.ProductList))" asp-route-PCSID="@category.SID" class="category">@category.PCName</a>
         }
     </div>
 
@@ -46,7 +46,7 @@
     @await Html.PartialAsync(Settings.PartialPathProductList, Products)
 </div>
 
-@section Links {
+@section Styles {
     <link rel="stylesheet" href="~/css/Index.css">
 }
 @section Scripts {

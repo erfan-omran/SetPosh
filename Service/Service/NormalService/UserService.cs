@@ -1,7 +1,6 @@
 ﻿using Core;
 using Core.Model;
 using DataBase;
-using Microsoft.AspNetCore.Http.Authentication;
 using Service.ServiceInterface;
 using System.Data;
 using System.Security.Claims;
@@ -77,7 +76,7 @@ namespace Service
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
 
             UserModel user = new UserModel(dr);
-            user.UserType = new UserTypeModel(dr);
+            user.UserType = new Enum_UserTypeModel(dr);
 
             return user;
         }
@@ -93,8 +92,8 @@ namespace Service
         public QueryBuilder GetWithRelatedEntities()
         {
             QueryBuilder qb = GetSimple();
-            qb.AddColumns(UserTypeService.MainColumns);
-            qb.AddLeftJoin(Dictionary.UserType.TableName, qb => { qb.AddEqualCondition(Dictionary.UserType.SID.FullDBName, Dictionary.User.UTSID.FullDBName); });
+            qb.AddColumns(Enum_UserTypeService.MainColumns);
+            qb.AddLeftJoin(Dictionary.UserType.TableName, qb => { qb.AddEqualCondition(Dictionary.UserType.ID.FullDBName, Dictionary.User.UTSID.FullDBName); });
             return qb;
         }
         //------------------------------------------
@@ -123,7 +122,7 @@ namespace Service
             {
                 new Claim(ClaimTypes.Name, userModel.UName),
                 new Claim(ClaimTypes.NameIdentifier, userModel.SID.ConvertToString()),
-                new Claim(ClaimTypes.Role, userModel.UserType.SID.ConvertToString()),
+                new Claim(ClaimTypes.Role, userModel.UserType.ID.ConvertToString()),
                 new Claim(nameof(userModel.UTel), userModel.UTel)
             };
 

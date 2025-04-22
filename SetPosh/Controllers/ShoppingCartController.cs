@@ -55,7 +55,7 @@ namespace SetPosh.Controllers
                 string? USID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!string.IsNullOrEmpty(USID))
                 {
-                    long SCDCount = await _shoppingCartService.ChangeSCDCount(USID.ConvertToLong(), PSID, true);
+                    long SCDCount = await _shoppingCartDetailService.ChangeSCDCount(USID.ConvertToLong(), PSID, true);
                     return Json(new { success = true, SCDCount = SCDCount });
                 }
                 return LocalRedirect($"/Auth/{nameof(AuthController.Login)}");
@@ -77,7 +77,7 @@ namespace SetPosh.Controllers
                 string? USID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!string.IsNullOrEmpty(USID))
                 {
-                    long SCDCount = await _shoppingCartService.ChangeSCDCount(USID.ConvertToLong(), PSID, false);
+                    long SCDCount = await _shoppingCartDetailService.ChangeSCDCount(USID.ConvertToLong(), PSID, false);
                     return Json(new { success = true, SCDCount = SCDCount });
                 }
                 return LocalRedirect($"/Auth/{nameof(AuthController.Login)}");

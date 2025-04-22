@@ -17,7 +17,7 @@ builder.Services.AddSingleton<ProductCategoryService>();
 builder.Services.AddSingleton<ShoppingCartService>();
 builder.Services.AddSingleton<ShoppingCartDetailService>();
 builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<UserTypeService>();
+builder.Services.AddSingleton<Enum_UserTypeService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers().AddJsonOptions(options =>

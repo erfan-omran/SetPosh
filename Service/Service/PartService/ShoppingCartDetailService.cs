@@ -3,6 +3,7 @@ using Core.Model;
 using DataBase;
 using Service.ServiceInterface;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace Service
 {
@@ -15,19 +16,6 @@ namespace Service
             Dictionary.ShoppingCartDetail.PSID.FullDBName,
             Dictionary.ShoppingCartDetail.SCDCount.FullDBName
         };
-        public static List<string> DefaultColumns = new List<string>()
-        {
-            Dictionary.ShoppingCartDetail.Blocked.FullDBName,
-            Dictionary.ShoppingCartDetail.Deleted.FullDBName,
-
-            Dictionary.ShoppingCartDetail.CreationUSID.FullDBName,
-            Dictionary.ShoppingCartDetail.CreationDate.FullDBName,
-            Dictionary.ShoppingCartDetail.CreationTime.FullDBName,
-
-            Dictionary.ShoppingCartDetail.LastModifiedUSID.FullDBName,
-            Dictionary.ShoppingCartDetail.LastModifiedDate.FullDBName,
-            Dictionary.ShoppingCartDetail.LastModifiedTime.FullDBName
-        };
         //------------------------------------------
         public async Task<bool> AddAsync(ShoppingCartDetailModel entity)
         {
@@ -35,23 +23,22 @@ namespace Service
             bool Added = await DBConnection.ExecTransactionProcedureAsync("[ShoppingCartDetail.Add]", entity.Parameters);
             return Added;
         }
-        public async Task<bool> EditAsync(ShoppingCartDetailModel entity)
+        public async Task<long> ChangeSCDCount(long USID, long PSID, bool IsIncrease)
         {
-            entity.SaveEditParameters(entity.ShoppingCart.USID);
-            bool Edited = await DBConnection.ExecProcedureAsync("[ShoppingCartDetail.Edit]", entity.Parameters);
-            return Edited;
-        }
-        public async Task BlockAsync(long SID)
-        {
-            ShoppingCartDetailModel ShoppingCartDetail = new ShoppingCartDetailModel();
-            ShoppingCartDetail.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ShoppingCartDetail.Block]", ShoppingCartDetail.Parameters);
-        }
-        public async Task DeleteAsync(long SID)
-        {
-            ShoppingCartDetailModel ShoppingCartDetail = new ShoppingCartDetailModel();
-            ShoppingCartDetail.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ShoppingCartDetail.Delete]", ShoppingCartDetail.Parameters);
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@" + Dictionary.ShoppingCart.USID.EngName, USID),
+                new SqlParameter("@" + Dictionary.ShoppingCartDetail.PSID.EngName, PSID),
+                new SqlParameter("@CurrentUSID", USID),
+                new SqlParameter("@CurrentDate", PersianDate.Now.ConvertToString()),
+                new SqlParameter("@CurrentTime", PersianTime.Now.ConvertToString())
+            };
+            long Ans = -1;
+            if (IsIncrease)
+                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.IncreaseSCDCount]", parameters, "ItemsInCart");
+            else
+                Ans = await DBConnection.ExecTransactionProcedureAsync<long>("[ShoppingCartDetail.DecreaseSCDCount]", parameters, "ItemsInCart");
+            return Ans;
         }
         //------------------------------------------
         public async Task<ShoppingCartDetailModel> GetModelSimpleAsync(long SID)
@@ -108,7 +95,7 @@ namespace Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
-            qb.AddColumns(DefaultColumns);
+            //qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.ShoppingCartDetail.TableName);
             return qb;
         }

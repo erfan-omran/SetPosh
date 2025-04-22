@@ -15,19 +15,6 @@ namespace Service
             Dictionary.ProductImage.ImgName.FullDBName,
             Dictionary.ProductImage.IsMain.FullDBName
         };
-        public static List<string> DefaultColumns = new List<string>()
-        {
-            Dictionary.ProductImage.Blocked.FullDBName,
-            Dictionary.ProductImage.Deleted.FullDBName,
-
-            Dictionary.ProductImage.CreationUSID.FullDBName,
-            Dictionary.ProductImage.CreationDate.FullDBName,
-            Dictionary.ProductImage.CreationTime.FullDBName,
-
-            Dictionary.ProductImage.LastModifiedUSID.FullDBName,
-            Dictionary.ProductImage.LastModifiedDate.FullDBName,
-            Dictionary.ProductImage.LastModifiedTime.FullDBName
-        };
         //------------------------------------------
         public async Task<bool> AddAsync(ProductImageModel entity)
         {
@@ -35,19 +22,6 @@ namespace Service
             //bool Added = await DBConnection.ExecProcedureAsync("[ProductImage.Add]", entity.Parameters);
             //return Added;
             return true;
-        }
-        public async Task<bool> EditAsync(ProductImageModel entity)
-        {
-            //entity.SaveMainParameters(false);
-            //bool Edited = await DBConnection.ExecProcedureAsync("[ProductImage.Edit]", entity.Parameters);
-            //return Edited;
-            return true;
-        }
-        public async Task BlockAsync(long SID)
-        {
-            //ProductImageModel ProductImage = new ProductImageModel();
-            //ProductImage.SaveBlockedParameter(SID);
-            //await DBConnection.ExecProcedureAsync("[ProductImage.Block]", ProductImage.Parameters);
         }
         public async Task DeleteAsync(long SID)
         {
@@ -81,7 +55,6 @@ namespace Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
-            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.ProductImage.TableName);
             return qb;
         }

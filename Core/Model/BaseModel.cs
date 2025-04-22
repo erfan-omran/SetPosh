@@ -17,13 +17,6 @@ namespace Core.Model
 
         public void InitBaseModel(DataRow dr)
         {
-            //CreationUSID = dr[nameof(CreationUSID)].ConvertToLong();
-            //CreationDate = new PersianDate(dr[nameof(CreationDate)].ConvertToString());
-            //CreationTime = new PersianTime(dr[nameof(CreationTime)].ConvertToString());
-            //LastModifiedUSID = dr[nameof(LastModifiedUSID)].ConvertToLong();
-            //LastModifiedDate = new PersianDate(dr[nameof(LastModifiedDate)].ConvertToString());
-            //LastModifiedTime = new PersianTime(dr[nameof(LastModifiedTime)].ConvertToString());
-            
             CreationUSID = dr.GetValueOfLongColumn(nameof(CreationUSID));
             CreationDate = dr.GetValueOfPersianDateColumn(nameof(CreationDate));
             CreationTime = dr.GetValueOfPersianTimeColumn(nameof(CreationTime));

@@ -18,3 +18,20 @@ function ShowMessage(MessageTagElm, MessageText, Success = true) {
 function HideMessage(MessageTagElm) {
     MessageTagElm.classList.add("hidden")
 }
+
+function ShowLoader(LoadingContainer, LoadingMessage = "") {
+
+    let ResTxt = `
+                <div class="loading_state">
+                    <div class="dots_loader">
+                        <span>.</span>
+                        <span>.</span>
+                        <span>.</span>
+                    </div>`
+
+    if (true)
+        ResTxt += `<p>${LoadingMessage}</p>`;
+    ResTxt += "</div>"
+
+    $("#" + LoadingContainer).html(ResTxt);
+}

@@ -13,7 +13,7 @@ namespace SetPosh
 
         public const string DefaultReturnUrl = $"/Home/{nameof(HomeController.Index)}";
 
-        public const string LinkSectionName = "Links";
+        public const string LinkSectionName = "Styles";
         public const string ScriptSectionName = "Scripts";
 
         public const string MainSearchInputID = "SearchInput";

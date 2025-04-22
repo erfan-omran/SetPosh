@@ -16,19 +16,6 @@ namespace Service
             Dictionary.DemandDetail.DDCount.FullDBName,
             Dictionary.DemandDetail.DDPrice.FullDBName
         };
-        public static List<string> DefaultColumns = new List<string>()
-        {
-            Dictionary.DemandDetail.Blocked.FullDBName,
-            Dictionary.DemandDetail.Deleted.FullDBName,
-
-            Dictionary.DemandDetail.CreationUSID.FullDBName,
-            Dictionary.DemandDetail.CreationDate.FullDBName,
-            Dictionary.DemandDetail.CreationTime.FullDBName,
-
-            Dictionary.DemandDetail.LastModifiedUSID.FullDBName,
-            Dictionary.DemandDetail.LastModifiedDate.FullDBName,
-            Dictionary.DemandDetail.LastModifiedTime.FullDBName
-        };
         //------------------------------------------
         public async Task<bool> AddAsync(DemandDetailModel entity)
         {
@@ -82,7 +69,6 @@ namespace Service
         {
             QueryBuilder qb = new QueryBuilder();
             qb.AddColumns(MainColumns);
-            qb.AddColumns(DefaultColumns);
             qb.SetTable(Dictionary.DemandDetail.TableName);
             return qb;
         }

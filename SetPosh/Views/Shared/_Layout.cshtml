@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     @*<link rel="icon" href="~/Image/download.jpeg" type="image/x-icon">*@
     <link rel="stylesheet" href="~/css/Global.css">
+    <link rel="stylesheet" href="~/css/Product.css">
     <title>@ViewData["Title"]</title>
-    @RenderSection("Links", false)
+    @RenderSection("Styles", false)
 </head>
 <body>
     <header>
@@ -16,10 +17,10 @@
                 <img src="~/Image/BrandLogo.jpg" />
             </a>
         </div>
-        <div class="search_bar">
-            <i class="search_icon">🔍</i>
-            <input type="text" id="@(Settings.MainSearchInputID)" name="searchText" placeholder="جستجو در فروشگاه..." autocomplete="off" />
-        </div>
+        <form class="search_bar" asp-controller="Product" asp-action="@(nameof(ProductController.ProductList))">
+            <button type="submit"  class="search_icon">🔍</button>
+            <input type="text" id="@(Settings.MainSearchInputID)" name="searchText" placeholder="جستجو در فروشگاه..." />
+        </form>
 
         <div class="icons">
             @if (!(User.Identity?.IsAuthenticated ?? false))
@@ -52,7 +53,7 @@
     </header>
 
     <main id="MainTag">
-        @RenderBody();
+        @RenderBody()
     </main>
 
     <footer>
@@ -62,30 +63,32 @@
     <script src="~/js/jquery.js"></script>
     @RenderSection("Scripts" , false)
     <script>
-        $(document).ready(function () {
-            $("#@(Settings.MainSearchInputID)").on("keydown", function (e) {
-                if (e.key === "Enter") { // بررسی کلید Enter
-                    e.preventDefault(); // جلوگیری از ارسال فرم معمولی
+        //$(document).ready(function () {
+        //    $("#@(Settings.MainSearchInputID)").on("keydown", function (e) {
+        //        if (e.key === "Enter") { 
+        //            e.preventDefault();
 
-                    var searchText = $("#@(Settings.MainSearchInputID)").val(); // مقدار سرچ
+        //            var searchText = $("#@(Settings.MainSearchInputID)").val();
 
-                    $.ajax({
-                        url: "/Product/ProductList", // آدرس اکشن
-                        type: "GET",
-                        data: { searchText: searchText }, // ارسال مقدار سرچ به کنترلر
-                        beforeSend: function () {
-                            $("#products").html("<p>در حال جستوجو...</p>");
-                        },
-                        success: function (response) {
-                            $("#MainTag").html(response); // نمایش نتایج در بخش لیست محصولات
-                        },
-                        error: function () {
-                            alert("مشکلی در جستجو پیش آمده است!");
-                        }
-                    });
-                }
-            });
-        });
+        //            $.ajax({
+        //                url: "/Product/ProductList",
+        //                type: "GET",
+        //                data: { 
+        //                    searchText: searchText
+        //                },
+        //                beforeSend: function () {
+        //                    $("#products").html("<p>در حال جستوجو...</p>");
+        //                },
+        //                success: function (response) {
+        //                    $("#MainTag").html(response); 
+        //                },
+        //                error: function (response) {
+        //                    alert("مشکلی در جستجو پیش آمده است!" + " : " + Response.Message
+        //                }
+        //            });
+        //        }
+        //    });
+        //});
     </script>
 
 </body>

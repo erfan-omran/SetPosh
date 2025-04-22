@@ -5,118 +5,303 @@
 @{
     List<ProductCategoryModel> Categories = Model.Item1;
 }
-
 <style>
-    #filterForm {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        background-color: #f8f9fa; /* پس‌زمینه ملایم */
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        align-items: center;
+    .filter_container {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --bg-color: #ffffff;
+        --border-color: #e9ecef;
+        --text-color: #495057;
+        --hover-color: #f8f9fa;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        --radius: 8px;
+        --transition: all 0.3s ease;
+        background: var(--bg-color);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        width: 280px;
     }
 
-        #filterForm select,
-        #filterForm input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            width: 100%;
-            max-width: 200px;
-            transition: all 0.3s ease;
-        }
+    .filter_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
 
-            #filterForm input:focus,
-            #filterForm select:focus {
-                border-color: #007bff;
-                outline: none;
-                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-            }
-
-        #filterForm label {
+        .filter_header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 14px;
-            color: #333;
+            gap: 8px;
         }
 
-        #filterForm button {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
+        .filter_header svg {
+            color: var(--primary-color);
         }
 
-            #filterForm button:hover {
-                background-color: #0056b3;
-            }
-
-    /* تنظیمات ریسپانسیو برای موبایل */
-    @@media (max-width: 768px) {
-        #filterForm {
-            flex-direction: column;
-            gap: 12px;
-        }
-
-            #filterForm select,
-            #filterForm input {
-                width: 100%;
-            }
-
-            #filterForm button {
-                width: 100%;
-            }
+    .clear_filters {
+        background: none;
+        border: none;
+        color: var(--secondary-color);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        padding: 4px 8px;
+        border-radius: 4px;
     }
+
+        .clear_filters:hover {
+            color: var(--primary-color);
+            background: var(--hover-color);
+        }
+
+    .filter_form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px;
+    }
+
+    .filter_group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter_label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
+        color: var(--text-color);
+        font-weight: 500;
+    }
+
+        .filter_label svg {
+            color: var(--secondary-color);
+        }
+
+    .filter_select, .filter_input {
+            width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 0.9rem;
+        transition: var(--transition);
+        background: var(--bg-color);
+        color: var(--text-color);
+    }
+
+        .filter_select:focus, .filter_input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        }
+
+    .price_range {
+        gap: 8px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+        .price_range .filter_input {
+            flex: 1;
+        }
+
+    .range_separator {
+        color: var(--secondary-color);
+        font-size: 0.8rem;
+    }
+
+    .filter_submit {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+        .filter_submit:hover {
+            background: #0069d9;
+        }
+
+        .filter_submit svg {
+            color: white;
+        }
+
+    /* حالت تاریک */
+    /*@@media (prefers-color-scheme: dark) {
+        .filter_container {
+            --primary-color: #3a86ff;
+            --secondary-color: #adb5bd;
+            --bg-color: #2d3748;
+            --border-color: #4a5568;
+            --text-color: #f8f9fa;
+            --hover-color: #4a5568;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+    }*/
+
+    /* واکنش‌گرایی */
+    @@media (max-width: 768px) {
+        .filter_container {
+            width: 100%;
+        }
+
+        .price_range {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .range_separator {
+            display: none;
+        }
+    }
+
+
 </style>
 
-<form id="filterForm">
-    <!-- فیلتر دسته‌بندی -->
-    <select id="category" name="category">
-        <option value="">دسته‌بندی را انتخاب کنید</option>
-        @foreach (var category in Categories)
+<div class="filter_container">
+    <div class="filter_header">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M14,12V19.88C14.04,20.18 13.94,20.5 13.71,20.71C13.32,21.1 12.69,21.1 12.3,20.71L10.29,18.7C10.06,18.47 9.96,18.16 10,17.87V12H9.97L4.21,4.62C3.87,4.19 3.95,3.56 4.38,3.22C4.57,3.08 4.78,3 5,3V3H19V3C19.22,3 19.43,3.08 19.62,3.22C20.05,3.56 20.13,4.19 19.79,4.62L14.03,12H14Z" />
+        </svg>
+        <h3>فیلتر محصولات</h3>
+        <button id="ClearFilters" class="clear_filters" type="button">پاک کردن</button>
+    </div>
+
+    <form id="filterForm" class="filter_form">
+        <!-- فیلتر دسته‌بندی -->
+        <div class="filter_group">
+            <label class="filter_label">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M5,9H19V7H5V9M5,13H19V11H5V13M5,17H19V15H5V17M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5Z" />
+                </svg>
+                دسته‌بندی
+            </label>
+            <select id="category" name="category" class="filter_select">
+                <option value="">همه دسته‌بندی‌ها</option>
+                @foreach (var category in Categories)
+                {
+                    <option value="@category.SID">@category.PCName</option>
+                }
+            </select>
+        </div>
+
+        <!-- فیلتر محدوده قیمت -->
+        <div class="filter_group">
+            <label class="filter_label">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V11H17V13H13V17H11V13H7V11H11V7Z" />
+                </svg>
+                محدوده قیمت (تومان)
+            </label>
+            <div class="price_range">
+                <input type="number" id="minPrice" name="minPrice" placeholder="حداقل" class="filter_input" min="0">
+                <span class="range_separator">تا</span>
+                <input type="number" id="maxPrice" name="maxPrice" placeholder="حداکثر" class="filter_input">
+            </div>
+        </div>
+
+        <!-- فیلتر وضعیت موجودی -->
+        <div class="filter_group">
+            <label class="filter_label">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M7,9.5C7,8.7 7.7,8 8.5,8C9.3,8 10,8.7 10,9.5C10,10.3 9.3,11 8.5,11C7.7,11 7,10.3 7,9.5M12,17.23C10.25,17.23 8.71,16.5 7.81,15.42L9.23,14C9.68,14.72 10.75,15.23 12,15.23C13.25,15.23 14.32,14.72 14.77,14L16.19,15.42C15.29,16.5 13.75,17.23 12,17.23M15.5,11C14.7,11 14,10.3 14,9.5C14,8.7 14.7,8 15.5,8C16.3,8 17,8.7 17,9.5C17,10.3 16.3,11 15.5,11Z" />
+                </svg>
+                وضعیت موجودی
+            </label>
+            <select id="inStock" class="filter_select">
+                <option value="-1">همه محصولات</option>
+                <option value="1">فقط موجود</option>
+                <option value="0">فقط ناموجود</option>
+            </select>
+        </div>
+
+        <!-- فیلتر وضعیت فعال (برای ادمین) -->
+        @if (User.Identity?.IsAuthenticated ?? false)
         {
-            <option value="@category.SID">@category.PCName</option>
-        }
-    </select>
-
-    <!-- فیلتر قیمت -->
-    <input type="number" id="minPrice" name="minPrice" placeholder="حداقل قیمت" value="0" />
-    <input type="number" id="maxPrice" name="maxPrice" placeholder="حداکثر قیمت" value="@Decimal.MaxValue" />
-
-    <!-- فیلتر فقط کالاهای موجود -->
-    <label>موجود:</label>
-    <select id="inStock">
-        <option value="-1">همه</option>
-        <option value="1">باشد</option>
-        <option value="0">نباشد</option>
-    </select>
-
-    <!-- فیلتر اضافی برای ادمین -->
-    @if (User.Identity?.IsAuthenticated ?? false)
-    {
-        string? UserType = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (UserType != null)
-        {
-            if (UserType.ConvertToInt() == (int)UserTypeEnum.Admin)
+            string? UserType = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserType != null && UserType.ConvertToInt() == (int)UserTypeEnum.Admin)
             {
-                <label>فعال:</label>
-                <select id="isActive">
-                    <option value="-1">همه</option>
-                    <option value="1">باشد</option>
-                    <option value="0">نباشد</option>
-                </select>
-
+                <div class="filter_group">
+                    <label class="filter_label">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17H13V7H11V17Z" />
+                        </svg>
+                        وضعیت فعال
+                    </label>
+                    <select id="isActive" class="filter_select">
+                        <option value="-1">همه وضعیت‌ها</option>
+                        <option value="1">فقط فعال</option>
+                        <option value="0">فقط غیرفعال</option>
+                    </select>
+                </div>
             }
         }
-    }
 
-    <button type="submit">اعمال فیلترها</button>
-</form>
+        <button id="ProductFilterSubmitBtn" class="filter_submit" type="submit">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor" d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+            </svg>
+            اعمال فیلترها
+        </button>
+    </form>
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // پاک کردن فیلترها
+            //document.getElementById('.clear_filters').addEventListener('click', function () {
+                //document.getElementById('filterForm').reset();
+                // اعمال فیلترهای خالی
+                //document.getElementById('ProductFilterSubmitBtn').click();
+            //});
+
+            // اعتبارسنجی محدوده قیمت
+            document.getElementById('filterForm').addEventListener('submit', function (e) {
+                const minPrice = parseFloat(document.getElementById('minPrice').value);
+                const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+
+                if (minPrice > maxPrice) {
+                    e.preventDefault();
+                    alert('حداقل قیمت نمی‌تواند از حداکثر قیمت بیشتر باشد');
+                    document.getElementById('minPrice').focus();
+                }
+            });
+        });
+
+        let ClearFilterBtn = document.getElementById('ClearFilters');
+        ClearFilterBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById("filterForm").reset();
+
+            let Category = document.getElementById('category');
+            let MinPrice = document.getElementById('minPrice');
+            let MaxPrice = document.getElementById('maxPrice');
+            let InStock = document.getElementById('inStock');
+            let IsActive = document.getElementById('isActive');
+
+            Category.value = -1;
+            MinPrice.value = "";
+            MaxPrice.value = "";
+            InStock.value = -1;
+            if (IsActive) {//چون ممکنه کاربر ادمین نباشه این المنت رو چک میکنیم که وجود دارد یا خیر
+                IsActive.value = -1;
+            }
+        });
+    </script>

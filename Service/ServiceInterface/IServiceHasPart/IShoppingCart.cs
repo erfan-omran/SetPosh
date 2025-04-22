@@ -1,7 +1,7 @@
 ﻿
 namespace Service.ServiceInterface
 {
-    public interface IShoppingCart : IBasePartService<IShoppingCart>
+    public interface IShoppingCart : IBaseEnumService<IShoppingCart>
     {
     }
 }

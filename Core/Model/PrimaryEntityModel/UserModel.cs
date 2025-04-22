@@ -16,7 +16,7 @@ namespace Core.Model
         [Required]
         public string UPass { get; set; } = string.Empty;
 
-        public UserTypeModel UserType { get; set; } = new UserTypeModel();
+        public Enum_UserTypeModel UserType { get; set; } = new Enum_UserTypeModel();
 
         public UserModel() { }
         public UserModel(DataRow dr)
