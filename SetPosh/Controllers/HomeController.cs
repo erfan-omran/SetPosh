@@ -44,7 +44,6 @@ namespace SetPosh.Controllers
             return View(message);
         }
 
-        //[Authorize("Admin")]
         public IActionResult Privacy()
         {
             return View();

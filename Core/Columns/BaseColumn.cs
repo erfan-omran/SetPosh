@@ -1,4 +1,4 @@
-﻿using DataBase.Enum;
+﻿using Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;

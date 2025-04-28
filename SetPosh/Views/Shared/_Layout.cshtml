@@ -1,4 +1,8 @@
-﻿@using SetPosh.Controllers;
+﻿@using Core.Enum;
+@using Core;
+@using SetPosh.Controllers;
+@using System.Security.Claims;
+
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -11,6 +15,8 @@
     @RenderSection("Styles", false)
 </head>
 <body>
+    <div id="NotificationsContainer" class="notificationContainer"></div>
+
     <header>
         <div class="logo">
             <a href="/">
@@ -18,7 +24,7 @@
             </a>
         </div>
         <form class="search_bar" asp-controller="Product" asp-action="@(nameof(ProductController.ProductList))">
-            <button type="submit"  class="search_icon">🔍</button>
+            <button type="submit" class="search_icon">🔍</button>
             <input type="text" id="@(Settings.MainSearchInputID)" name="searchText" placeholder="جستجو در فروشگاه..." />
         </form>
 
@@ -29,6 +35,33 @@
             }
             else
             {
+                string? UTSID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (UTSID != null && UTSID.ConvertToInt() == (int)UserTypeEnum.Admin)
+                {
+                    <a title="پنل ادمین" class="header_btn" asp-controller="Admin" asp-action="@(nameof(AdminController.Dashboard))" target="_blank">
+                        <svg viewBox="0 0 512 512">
+                            <path d="M173.8,234.7V256c70.7,0,128-57.3,128-128c0-70.7-57.3-128-128-128c-70.7,0-128,57.3-128,128c0,70.7,57.3,128,128,128
+		                             V234.7v-21.3c-23.6,0-44.8-9.5-60.3-25c-15.5-15.5-25-36.7-25-60.3c0-23.6,9.5-44.8,25-60.3c15.5-15.5,36.7-25,60.3-25
+		                             c23.6,0,44.8,9.5,60.3,25c15.5,15.5,25,36.7,25,60.3c0,23.6-9.5,44.8-25,60.3c-15.5,15.5-36.7,25-60.3,25V234.7z M296.1,262.8
+		                             c-30.7-31.1-74-49.5-122.3-49.5c-48,0-91.1,18.2-121.8,48.9C21.3,292.9,3.1,336,3.1,384v128h170.7v-42.7l-128,0l0-85.3
+		                             c0-37.3,13.8-68.9,36.4-91.6c22.7-22.6,54.3-36.4,91.6-36.4c37.6,0,69.3,14,92,36.8L296.1,262.8L296.1,262.8z M216.5,416h-21.3
+		                             c0,41.2,33.4,74.6,74.7,74.7c41.3,0,74.6-33.4,74.7-74.7c0-41.2-33.4-74.7-74.7-74.7c-41.2,0-74.6,33.4-74.7,74.7H216.5h21.3
+		                             c0-17.7,14.4-32,32-32c17.7,0,32,14.3,32,32c0,17.6-14.3,32-32,32c-17.6,0-32-14.4-32-32H216.5z M508.9,304.9l-79.1-79.1
+		                             L286.7,368.9l30.2,30.2l112.9-112.9l48.9,48.9L508.9,304.9L508.9,304.9z M376.5,309.3l-15.1,15.1l64,64l30.2-30.2l-64-64
+		                             l-30.2,30.2L376.5,309.3l-15.1,15.1l64,64l30.2-30.2l-64-64l-30.2,30.2L376.5,309.3z" />
+                        </svg>
+                    </a>
+                }
+                <a title="سبد خرید" class="header_btn">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M4.5 5H18.2768C19.0446 5 19.526 5.82948 19.1451 6.49614L16.5758 10.9923C16.2198 11.6154 15.5571 12 14.8394 12H8M8 12L6.45625 14.47C6.03997 15.136 6.51881 16 7.30425 16H18M8 12L4.05279 4.10557C3.714 3.428 3.02148 3 2.26393 3H2M8 20C8 20.5523 7.55228 21 7 21C6.44772 21 6 20.5523 6 20C6 19.4477 6.44772 19 7 19C7.55228 19 8 19.4477 8 20ZM18 20C18 20.5523 17.5523 21 17 21C16.4477 21 16 20.5523 16 20C16 19.4477 16.4477 19 17 19C17.5523 19 18 19.4477 18 20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
+                <a title="اعلان" class="header_btn">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M9.00195 17H5.60636C4.34793 17 3.71872 17 3.58633 16.9023C3.4376 16.7925 3.40126 16.7277 3.38515 16.5436C3.37082 16.3797 3.75646 15.7486 4.52776 14.4866C5.32411 13.1835 6.00031 11.2862 6.00031 8.6C6.00031 7.11479 6.63245 5.69041 7.75766 4.6402C8.88288 3.59 10.409 3 12.0003 3C13.5916 3 15.1177 3.59 16.2429 4.6402C17.3682 5.69041 18.0003 7.11479 18.0003 8.6C18.0003 11.2862 18.6765 13.1835 19.4729 14.4866C20.2441 15.7486 20.6298 16.3797 20.6155 16.5436C20.5994 16.7277 20.563 16.7925 20.4143 16.9023C20.2819 17 19.6527 17 18.3943 17H15.0003M9.00195 17L9.00031 18C9.00031 19.6569 10.3435 21 12.0003 21C13.6572 21 15.0003 19.6569 15.0003 18V17M9.00195 17H15.0003" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
                 <form title="خروج" style="display:inline-block;" asp-controller="Auth" asp-action="@(nameof(AuthController.Logout))" method="post">
                     <button class="header_btn" type="submit">
                         <svg viewBox="0 0 24 24" fill="Red">
@@ -38,16 +71,6 @@
                         </svg>
                     </button>
                 </form>
-                <button title="سبد خرید" class="header_btn">
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M4.5 5H18.2768C19.0446 5 19.526 5.82948 19.1451 6.49614L16.5758 10.9923C16.2198 11.6154 15.5571 12 14.8394 12H8M8 12L6.45625 14.47C6.03997 15.136 6.51881 16 7.30425 16H18M8 12L4.05279 4.10557C3.714 3.428 3.02148 3 2.26393 3H2M8 20C8 20.5523 7.55228 21 7 21C6.44772 21 6 20.5523 6 20C6 19.4477 6.44772 19 7 19C7.55228 19 8 19.4477 8 20ZM18 20C18 20.5523 17.5523 21 17 21C16.4477 21 16 20.5523 16 20C16 19.4477 16.4477 19 17 19C17.5523 19 18 19.4477 18 20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-                <button title="اعلان" class="header_btn">
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M9.00195 17H5.60636C4.34793 17 3.71872 17 3.58633 16.9023C3.4376 16.7925 3.40126 16.7277 3.38515 16.5436C3.37082 16.3797 3.75646 15.7486 4.52776 14.4866C5.32411 13.1835 6.00031 11.2862 6.00031 8.6C6.00031 7.11479 6.63245 5.69041 7.75766 4.6402C8.88288 3.59 10.409 3 12.0003 3C13.5916 3 15.1177 3.59 16.2429 4.6402C17.3682 5.69041 18.0003 7.11479 18.0003 8.6C18.0003 11.2862 18.6765 13.1835 19.4729 14.4866C20.2441 15.7486 20.6298 16.3797 20.6155 16.5436C20.5994 16.7277 20.563 16.7925 20.4143 16.9023C20.2819 17 19.6527 17 18.3943 17H15.0003M9.00195 17L9.00031 18C9.00031 19.6569 10.3435 21 12.0003 21C13.6572 21 15.0003 19.6569 15.0003 18V17M9.00195 17H15.0003" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
             }
         </div>
     </header>
@@ -65,7 +88,7 @@
     <script>
         //$(document).ready(function () {
         //    $("#@(Settings.MainSearchInputID)").on("keydown", function (e) {
-        //        if (e.key === "Enter") { 
+        //        if (e.key === "Enter") {
         //            e.preventDefault();
 
         //            var searchText = $("#@(Settings.MainSearchInputID)").val();
@@ -73,14 +96,14 @@
         //            $.ajax({
         //                url: "/Product/ProductList",
         //                type: "GET",
-        //                data: { 
+        //                data: {
         //                    searchText: searchText
         //                },
         //                beforeSend: function () {
         //                    $("#products").html("<p>در حال جستوجو...</p>");
         //                },
         //                success: function (response) {
-        //                    $("#MainTag").html(response); 
+        //                    $("#MainTag").html(response);
         //                },
         //                error: function (response) {
         //                    alert("مشکلی در جستجو پیش آمده است!" + " : " + Response.Message

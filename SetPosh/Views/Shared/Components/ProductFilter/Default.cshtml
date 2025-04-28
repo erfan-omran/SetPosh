@@ -193,7 +193,7 @@
                 دسته‌بندی
             </label>
             <select id="category" name="category" class="filter_select">
-                <option value="">همه دسته‌بندی‌ها</option>
+                <option value="0">همه دسته‌بندی‌ها</option>
                 @foreach (var category in Categories)
                 {
                     <option value="@category.SID">@category.PCName</option>
@@ -234,8 +234,8 @@
         <!-- فیلتر وضعیت فعال (برای ادمین) -->
         @if (User.Identity?.IsAuthenticated ?? false)
         {
-            string? UserType = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (UserType != null && UserType.ConvertToInt() == (int)UserTypeEnum.Admin)
+            string? UTSID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UTSID != null && UTSID.ConvertToInt() == (int)UserTypeEnum.Admin)
             {
                 <div class="filter_group">
                     <label class="filter_label">

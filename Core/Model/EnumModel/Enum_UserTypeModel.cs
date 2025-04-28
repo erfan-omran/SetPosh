@@ -11,6 +11,7 @@ namespace Core.Model
         public Enum_UserTypeModel() { }
         public Enum_UserTypeModel(DataRow dr)
         {
+            ID = dr.GetValueOfLongColumn(nameof(ID));
             UTName = dr.GetValueOfStringColumn(nameof(UTName));
             UTDescription = dr.GetValueOfStringColumn(nameof(UTDescription));
         }

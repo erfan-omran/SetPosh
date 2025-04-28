@@ -163,6 +163,14 @@ namespace DataBase
             OrderByList.Add($"{column} {direction}");
         }
 
+        //-------------------------
+        public void AddValidationCondition(string TableName)
+        {
+            AddEqualCondition(TableName + ".Blocked", 0);
+            AddEqualCondition(TableName + ".Deleted", 0);
+        }
+        //-------------------------
+
         public string CreateQuery()
         {
             if (string.IsNullOrEmpty(TableName))

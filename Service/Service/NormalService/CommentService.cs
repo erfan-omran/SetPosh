@@ -42,17 +42,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[Comment.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             CommentModel Comment = new CommentModel();
+            Comment.Blocked = true;
             Comment.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Comment.Block]", Comment.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Block]", Comment.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             CommentModel Comment = new CommentModel();
+            Comment.Blocked = false;
             Comment.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Block]", Comment.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            CommentModel Comment = new CommentModel();
+            Comment.Deleted = true;
+            Comment.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            CommentModel Comment = new CommentModel();
+            Comment.Deleted = false;
+            Comment.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<CommentModel> GetModelSimpleAsync(long SID)

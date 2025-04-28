@@ -1,0 +1,50 @@
+﻿@using SetPosh.Controllers;
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت</title>
+    <link rel="stylesheet" href="~/css/Global.css">
+    <link rel="stylesheet" href="~/css/Admin.css">
+    @*<title>@ViewData["Title"]</title>*@
+    @RenderSection("Styles", false)
+</head>
+<body>
+    <div id="NotificationsContainer" class="notificationContainer"></div>
+
+    <div class="admin_container">
+
+        <!-- سایدبار -->
+        <aside class="sidebar">
+            <div class="sidebar_header">
+                <h2>پنل مدیریت</h2>
+            </div>
+            <nav class="sidebar_menu">
+                <ul>
+                    <li id="DashboardTab"><a asp-controller="Admin" asp-action="@(nameof(AdminController.Dashboard))"><i class="icon">📊</i> داشبورد</a></li>
+                    <li id="UserManagerTab"><a asp-controller="Admin" asp-action="@(nameof(AdminController.UserManager))"><i class="icon">👥</i> مدیریت کاربران</a></li>
+                    <li id="ProductManagerTab"><a asp-controller="Admin" asp-action="@(nameof(AdminController.ProductManager))"><i class="icon">🛍️</i> مدیریت محصولات</a></li>
+                    <li id="CommentManagerTab"><a asp-controller="Admin" asp-action="@(nameof(AdminController.CommentManager))"><i class="icon">💬</i> مدیریت کامنت‌ها</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- محتوای اصلی -->
+        <main class="main_content">
+
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <script src="~/js/Global.js"></script>
+    <script src="~/js/jquery.js"></script>
+    @RenderSection("Scripts" , false)
+    <script>
+    </script>
+
+</body>
+</html>
+
+

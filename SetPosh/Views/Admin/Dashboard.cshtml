@@ -1,0 +1,45 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<header class="content_header">
+    <h1>داشبورد آماری</h1>
+</header>
+
+<div class="stats_grid">
+    <!-- کارت آمار -->
+    <div class="stat_card">
+        <h3>تعداد کاربران</h3>
+        <p>۱,۲۴۵</p>
+    </div>
+    <div class="stat_card">
+        <h3>تعداد محصولات</h3>
+        <p>۳۸۹</p>
+    </div>
+    <div class="stat_card">
+        <h3>کامنت‌های جدید</h3>
+        <p>۲۴</p>
+    </div>
+</div>
+
+<!-- گزارشات -->
+<section class="reports">
+    <h2>گزارشات اخیر</h2>
+    <div class="report_item">
+        <h3>فروش هفتگی</h3>
+        <div class="chart_placeholder"></div>
+    </div>
+    <div class="report_item">
+        <h3>محصولات پرفروش</h3>
+        <div class="chart_placeholder"></div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            let DashboardTabElm = document.getElementById("DashboardTab");
+            DashboardTabElm.classList.add("active");
+        })
+    </script>
+}

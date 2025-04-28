@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<header class="content_header">
+    <h1>مدیریت نظرات</h1>
+</header>
+
+<div class="comments_list">
+    <!-- دیتای تستی -->
+    <div class="comment_card pending">
+        <div class="comment_header">
+            <span class="user">کاربر: user123</span>
+            <span class="product">محصول: گوشی موبایل</span>
+            <span class="date">1402/08/15</span>
+        </div>
+        <div class="comment_text">
+            این محصول عالی بود! کیفیت ساخت فوق‌العاده‌ای داره.
+        </div>
+        <div class="comment_actions">
+            <button class="btn btn_approve">تایید</button>
+            <button class="btn btn_reject">رد</button>
+            <button class="btn btn_delete">حذف</button>
+        </div>
+    </div>
+
+    <div class="comment_card approved">
+        <div class="comment_header">
+            <span class="user">کاربر: shopper22</span>
+            <span class="product">محصول: لپ‌تاپ</span>
+            <span class="date">1402/08/10</span>
+        </div>
+        <div class="comment_text">
+            سرعت پردازش خوبیه اما باتری ضعیف‌تر از حد انتظار بود.
+        </div>
+        <div class="comment_actions">
+            <button class="btn btn_approve" disabled>تایید شده</button>
+            <button class="btn btn_delete">حذف</button>
+        </div>
+    </div>
+
+    <div class="comment_card rejected">
+        <div class="comment_header">
+            <span class="user">کاربر: anonymous</span>
+            <span class="product">محصول: هدفون</span>
+            <span class="date">1402/08/05</span>
+        </div>
+        <div class="comment_text">
+            این کامنت به دلیل استفاده از الفاظ نامناسب حذف شد.
+        </div>
+        <div class="comment_actions">
+            <button class="btn btn_approve">بازگردانی</button>
+            <button class="btn btn_delete">حذف دائم</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            let CommentManagerTabElm = document.getElementById("CommentManagerTab");
+            CommentManagerTabElm.classList.add("active");
+        })
+    </script>
+}

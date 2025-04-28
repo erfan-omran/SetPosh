@@ -1,4 +1,4 @@
-﻿using DataBase.Enum;
+﻿using Core.Enum;
 
 namespace DataBase.Columns
 {

@@ -1,5 +1,5 @@
 ﻿using DataBase.Columns;
-using DataBase.Enum;
+using Core.Enum;
 
 namespace Core.Schema
 {

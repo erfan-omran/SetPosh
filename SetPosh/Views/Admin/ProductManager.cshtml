@@ -1,0 +1,72 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<header class="content_header">
+    <h1>مدیریت محصولات</h1>
+    <button class="btn btn_add">+ محصول جدید</button>
+</header>
+
+<div class="table_container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>تصویر</th>
+                <th>نام محصول</th>
+                <th>قیمت</th>
+                <th>موجودی</th>
+                <th>دسته‌بندی</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- دیتای تستی -->
+            <tr>
+                <td>101</td>
+                <td><img src="placeholder-product.jpg" alt="محصول" class="product_img"></td>
+                <td>گوشی موبایل سامسونگ</td>
+                <td>۱۲,۵۰۰,۰۰۰ تومان</td>
+                <td>۱۵</td>
+                <td>موبایل</td>
+                <td>
+                    <button class="btn_edit">ویرایش</button>
+                    <button class="btn_delete">حذف</button>
+                </td>
+            </tr>
+            <tr>
+                <td>102</td>
+                <td><img src="placeholder-product.jpg" alt="محصول" class="product-img"></td>
+                <td>لپ‌تاپ ایسوس</td>
+                <td>۲۵,۰۰۰,۰۰۰ تومان</td>
+                <td>۸</td>
+                <td>لپ‌تاپ</td>
+                <td>
+                    <button class="btn_edit">ویرایش</button>
+                    <button class="btn_delete">حذف</button>
+                </td>
+            </tr>
+            <tr>
+                <td>103</td>
+                <td><img src="placeholder-product.jpg" alt="محصول" class="product_img"></td>
+                <td>هدفون بلوتوث</td>
+                <td>۳,۲۰۰,۰۰۰ تومان</td>
+                <td>۲۳</td>
+                <td>اکسسوری</td>
+                <td>
+                    <button class="btn btn_edit">ویرایش</button>
+                    <button class="btn btn_delete">حذف</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            let ProductManagerTabElm = document.getElementById("ProductManagerTab");
+            ProductManagerTabElm.classList.add("active");
+        })
+    </script>
+}

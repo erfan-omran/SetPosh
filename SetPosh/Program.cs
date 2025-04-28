@@ -1,4 +1,6 @@
-﻿using DataBase;
+﻿using Core;
+using Core.Enum;
+using DataBase;
 using Service;
 using SetPosh;
 using System.Security.Claims;
@@ -32,7 +34,7 @@ builder.Services.AddAuthentication(Settings.AuthCookieName)
     {
         //options.Cookie.SameSite = SameSiteMode.None;
         //options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-        //options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.LoginPath = Settings.LoginPath;
         options.AccessDeniedPath = Settings.AccessDeniedPath;
         options.Cookie.Name = Settings.AuthCookieName;
@@ -42,7 +44,11 @@ builder.Services.AddAuthentication(Settings.AuthCookieName)
 builder.Services.AddAuthorization(
     option =>
     {
-        option.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "1"));//To do : Create an enum for UserType
+        int AdminID = (int)UserTypeEnum.Admin;
+        option.AddPolicy(
+            UserTypeEnum.Admin.ConvertToString(),
+            policy => policy.RequireRole(AdminID.ConvertToString())
+        );
     }
 );
 
@@ -62,8 +68,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

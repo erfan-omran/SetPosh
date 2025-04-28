@@ -45,6 +45,11 @@ namespace SetPosh.Controllers
                 if (dr != null)
                 {
                     UserModel User = new UserModel(dr);
+                    if (User.Blocked)
+                    {
+                        ViewBag.ErrorMessage = "حساب کاربری شما مسدود شده است";
+                        return View(new Tuple<UserModel, string>(userModel, returnURL));
+                    }
                     ClaimsPrincipal claimsPrincipal = _userService.CreateCookie(User, Settings.AuthCookieName);
                     AuthenticationProperties AuthProps = new AuthenticationProperties
                     {
@@ -92,7 +97,7 @@ namespace SetPosh.Controllers
                 if (!ModelState.IsValid)
                     return View(new Tuple<UserModel, string>(userModel, returnURL));
 
-                userModel.UserType.ID = (int)UserTypeEnum.Normal;
+                userModel.UTSID = (int)UserTypeEnum.Normal;
                 userModel.UName = _userService.GenerateRandomUsername();
 
                 bool Ans = false;

@@ -46,17 +46,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[Product.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             ProductModel Product = new ProductModel();
+            Product.Blocked = true;
             Product.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Product.Block]", Product.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Product.Block]", Product.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             ProductModel Product = new ProductModel();
+            Product.Blocked = false;
             Product.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Product.Delete]", Product.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Product.Block]", Product.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            ProductModel Product = new ProductModel();
+            Product.Deleted = true;
+            Product.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Product.Delete]", Product.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            ProductModel Product = new ProductModel();
+            Product.Deleted = false;
+            Product.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Product.Delete]", Product.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<ProductModel> GetModelSimpleAsync(long SID)
@@ -90,7 +112,7 @@ namespace Service
 
             qb.AddGroupBy(MainColumns);
             qb.AddGroupBy(DefaultColumns);
-            
+
             DataRow dr = await DBConnection.GetDataRowAsync(qb.CreateQuery());
             ProductModel Product = new ProductModel(dr);
             Product.RateAVG = dr.GetValueOfDecimalColumn("RateAVG");
@@ -165,7 +187,7 @@ namespace Service
                 ProductQB.AddLessThanOrEqualCondition(Dictionary.Product.PPrice.FullDBName, maxPrice);
             if (inStock == 0)
                 ProductQB.AddLessThanOrEqualCondition(Dictionary.Product.PCount.FullDBName, 0);
-            else if(inStock == 1)
+            else if (inStock == 1)
                 ProductQB.AddGreaterThanCondition(Dictionary.Product.PCount.FullDBName, 0);
             if (isBlocked >= 0)
                 ProductQB.AddEqualCondition(Dictionary.Product.Blocked.FullDBName, isBlocked);
@@ -220,26 +242,18 @@ namespace Service
             }
             return list;
         }
-        public List<ProductModel> MapDTToModel(DataTable dt, bool hasMainImg)
+        public List<ProductModel> MapDTToModel(DataTable dt, bool hasMainImg = false)
         {
             List<ProductModel> list = new List<ProductModel>();
-            if (hasMainImg)
+            foreach (DataRow dr in dt.Rows)
             {
-                foreach (DataRow dr in dt.Rows)
+                ProductModel Product = new ProductModel(dr);
+                if (hasMainImg)
                 {
-                    ProductModel Product = new ProductModel(dr);
                     ProductImageModel ProductImage = new ProductImageModel(dr);
                     Product.ProductImages.Add(ProductImage);
-                    list.Add(Product);
                 }
-            }
-            else
-            {
-                foreach (DataRow dr in dt.Rows)
-                {
-                    ProductModel Product = new ProductModel(dr);
-                    list.Add(Product);
-                }
+                list.Add(Product);
             }
             return list;
         }

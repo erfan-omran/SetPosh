@@ -1,0 +1,149 @@
+﻿@using Core.Enum;
+@using SetPosh.Controllers;
+@model List<UserModel>
+@{
+    Layout = "_AdminLayout";
+
+    List<UserModel> UserList = Model;
+}
+
+<header class="content_header">
+    <h1>مدیریت کاربران</h1>
+    <a class="btn btn_add" asp-controller="Admin" asp-action="@(nameof(AdminController.UserAddEdit))" asp-route-SID="-1">+ کاربر جدید</a>
+</header>
+
+<div class="table_container">
+    <table>
+        <thead>
+            <tr>
+                <th>شناسه</th>
+                <th>نام کاربری</th>
+                <th>ایمیل</th>
+                <th>نقش</th>
+                <th>تاریخ ثبت‌نام</th>
+                <th>زمان ثبت‌نام</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (UserModel User in UserList)
+                {
+                    <tr>
+                        <td>@(User.SID)</td>
+                        <td>@(User.UName)</td>
+                        <td>@(User.UEmail)</td>
+                        <td>
+                            @if (User.UTSID == (int)UserTypeEnum.Admin)
+                            {
+                                <span class="role admin">
+                                    ادمین
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="role user">
+                                    کاربر
+                                </span>
+                            }
+                        </td>
+                        <td>@(User.CreationDate)</td>
+                        <td>@(User.CreationTime)</td>
+                        <td class="button_container">
+                            <a class="btn btn_edit" asp-controller="Admin" asp-action="@(nameof(AdminController.UserAddEdit))" asp-route-SID="@User.SID">ویرایش</a>
+                            @if (User.Blocked)
+                            {
+                                <button class="btn btn_unBlock" data-user-sid="@(User.SID)">رفع مسدودیت</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn_block" data-user-sid="@(User.SID)">مسدود کردن</button>
+                            }
+                            <button class="btn btn_delete" data-user-sid="@(User.SID)">حذف</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            let UserManagerTabElm = document.getElementById("UserManagerTab");
+            UserManagerTabElm.classList.add("active");
+
+
+            var ButtoncontainerList = document.getElementsByClassName('button_container');
+            for (var i = 0; i < ButtoncontainerList.length; i++) {
+
+                ButtoncontainerList[i].addEventListener('click', function () {
+                    const target = event.target;
+                    const IsBlockBtn = target.classList.contains('btn_block');
+                    const IsUnblockBtn = target.classList.contains('btn_unBlock');
+                    const IsDeleteBtn = target.classList.contains('btn_delete');
+
+                    const CurrentBtn = target;
+                    const UserSID = CurrentBtn.getAttribute('data-user-sid');
+
+                    if (IsBlockBtn || IsUnblockBtn) {
+                        const URL = IsBlockBtn
+                            ? '@(Url.Action(nameof(AdminController.UserBlock), "Admin"))'
+                            : '@(Url.Action(nameof(AdminController.UserUnBlock), "Admin"))';
+
+                        $.ajax({
+                            url: URL,
+                            type: 'POST',
+                            data: { SID: UserSID },
+                            success: function (response) {
+                                if (response.success) {
+                                    ShowFloatingMessage(response.message, 'success');
+
+                                    if (IsBlockBtn) {
+                                        CurrentBtn.innerText = "رفع مسدودیت";
+                                        CurrentBtn.classList.remove('btn_block');
+                                        CurrentBtn.classList.add('btn_unBlock');
+                                    } else {
+                                        CurrentBtn.innerText = "مسدود کردن";
+                                        CurrentBtn.classList.remove('btn_unBlock');
+                                        CurrentBtn.classList.add('btn_block');
+                                    }
+                                } else {
+                                    ShowFloatingMessage(response.message, 'error');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, 'error');
+                            }
+                        });
+                    }
+                    if (IsDeleteBtn) {
+                        $.ajax({
+                            url: '@(Url.Action(nameof(AdminController.UserDelete), "Admin"))',
+                            type: 'POST',
+                            data: { SID: UserSID },
+                            success: function (response) {
+                                if (response.success) {
+                                    ShowFloatingMessage(response.message, 'success');
+
+                                    const UserRow = CurrentBtn.closest('tr');
+                                    if (UserRow) {
+                                        UserRow.remove();
+                                    }
+                                } else {
+                                    ShowFloatingMessage(response.message, 'error');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, 'error');
+                            }
+                        });
+                    }
+
+                });
+            }
+
+        })
+    </script>
+}

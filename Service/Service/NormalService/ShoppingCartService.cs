@@ -42,17 +42,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[ShoppingCart.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             ShoppingCartModel ShoppingCart = new ShoppingCartModel();
+            ShoppingCart.Blocked = true;
             ShoppingCart.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ShoppingCart.Block]", ShoppingCart.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ShoppingCart.Block]", ShoppingCart.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             ShoppingCartModel ShoppingCart = new ShoppingCartModel();
+            ShoppingCart.Blocked = false;
             ShoppingCart.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ShoppingCart.Delete]", ShoppingCart.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ShoppingCart.Block]", ShoppingCart.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            ShoppingCartModel ShoppingCart = new ShoppingCartModel();
+            ShoppingCart.Deleted = true;
+            ShoppingCart.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ShoppingCart.Delete]", ShoppingCart.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            ShoppingCartModel ShoppingCart = new ShoppingCartModel();
+            ShoppingCart.Deleted = false;
+            ShoppingCart.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ShoppingCart.Delete]", ShoppingCart.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<ShoppingCartModel> GetModelSimpleAsync(long SID)

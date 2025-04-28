@@ -17,6 +17,8 @@ namespace Core.Model
 
         public void InitBaseModel(DataRow dr)
         {
+            Blocked = dr.GetValueOfBoolColumn(nameof(Blocked));
+            Deleted = dr.GetValueOfBoolColumn(nameof(Deleted));
             CreationUSID = dr.GetValueOfLongColumn(nameof(CreationUSID));
             CreationDate = dr.GetValueOfPersianDateColumn(nameof(CreationDate));
             CreationTime = dr.GetValueOfPersianTimeColumn(nameof(CreationTime));

@@ -41,17 +41,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[ProductCategory.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             ProductCategoryModel ProductCategory = new ProductCategoryModel();
+            ProductCategory.Blocked = true;
             ProductCategory.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ProductCategory.Block]", ProductCategory.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ProductCategory.Block]", ProductCategory.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             ProductCategoryModel ProductCategory = new ProductCategoryModel();
+            ProductCategory.Blocked = false;
             ProductCategory.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[ProductCategory.Delete]", ProductCategory.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ProductCategory.Block]", ProductCategory.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            ProductCategoryModel ProductCategory = new ProductCategoryModel();
+            ProductCategory.Deleted = true;
+            ProductCategory.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ProductCategory.Delete]", ProductCategory.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            ProductCategoryModel ProductCategory = new ProductCategoryModel();
+            ProductCategory.Deleted = false;
+            ProductCategory.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[ProductCategory.Delete]", ProductCategory.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<ProductCategoryModel> GetModelSimpleAsync(long SID)

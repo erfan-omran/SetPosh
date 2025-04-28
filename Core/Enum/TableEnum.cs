@@ -1,5 +1,5 @@
 ﻿
-namespace DataBase.Enum
+namespace Core.Enum
 {
     public enum TableEnum : int
     {

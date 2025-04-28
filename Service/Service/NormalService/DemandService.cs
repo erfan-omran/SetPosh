@@ -43,17 +43,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[Demand.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             DemandModel Demand = new DemandModel();
+            Demand.Blocked = true;
             Demand.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Demand.Block]", Demand.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Demand.Block]", Demand.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             DemandModel Demand = new DemandModel();
+            Demand.Blocked = false;
             Demand.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[Demand.Delete]", Demand.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Demand.Block]", Demand.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            DemandModel Demand = new DemandModel();
+            Demand.Deleted = true;
+            Demand.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Demand.Delete]", Demand.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            DemandModel Demand = new DemandModel();
+            Demand.Deleted = false;
+            Demand.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[Demand.Delete]", Demand.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<DemandModel> GetModelSimpleAsync(long SID)

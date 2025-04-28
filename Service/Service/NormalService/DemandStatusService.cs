@@ -40,17 +40,39 @@ namespace Service
             bool Edited = await DBConnection.ExecProcedureAsync("[DemandStatus.Edit]", entity.Parameters);
             return Edited;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             DemandStatusModel DemandStatus = new DemandStatusModel();
+            DemandStatus.Blocked = true;
             DemandStatus.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[DemandStatus.Block]", DemandStatus.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[DemandStatus.Block]", DemandStatus.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             DemandStatusModel DemandStatus = new DemandStatusModel();
+            DemandStatus.Blocked = false;
             DemandStatus.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[DemandStatus.Delete]", DemandStatus.Parameters);
+            bool Ans = await DBConnection.ExecProcedureAsync("[DemandStatus.Block]", DemandStatus.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            DemandStatusModel DemandStatus = new DemandStatusModel();
+            DemandStatus.Deleted = true;
+            DemandStatus.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[DemandStatus.Delete]", DemandStatus.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            DemandStatusModel DemandStatus = new DemandStatusModel();
+            DemandStatus.Deleted = false;
+            DemandStatus.SaveBlockedParameter(SID);
+            bool Ans = await DBConnection.ExecProcedureAsync("[DemandStatus.Delete]", DemandStatus.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<DemandStatusModel> GetModelSimpleAsync(long SID)

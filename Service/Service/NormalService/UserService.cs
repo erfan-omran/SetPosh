@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.Enum;
 using Core.Model;
 using DataBase;
 using Service.ServiceInterface;
@@ -46,17 +47,43 @@ namespace Service
             bool Ans = await DBConnection.ExecProcedureAsync("[User.Edit]", entity.Parameters);
             return Ans;
         }
-        public async Task BlockAsync(long SID)
+
+        public async Task<bool> BlockAsync(long SID)
         {
             UserModel user = new UserModel();
+            user.Blocked = true;
             user.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[User.Block]", user.Parameters);
+            user.SaveModificationParameters();
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Block]", user.Parameters);
+            return Ans;
         }
-        public async Task DeleteAsync(long SID)
+        public async Task<bool> UnBlockAsync(long SID)
         {
             UserModel user = new UserModel();
+            user.Blocked = false;
             user.SaveBlockedParameter(SID);
-            await DBConnection.ExecProcedureAsync("[User.Delete]", user.Parameters);
+            user.SaveModificationParameters();
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Block]", user.Parameters);
+            return Ans;
+        }
+
+        public async Task<bool> DeleteAsync(long SID)
+        {
+            UserModel user = new UserModel();
+            user.Deleted = true;
+            user.SaveDeletedParameter(SID);
+            user.SaveModificationParameters();
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Delete]", user.Parameters);
+            return Ans;
+        }
+        public async Task<bool> UnDeleteAsync(long SID)
+        {
+            UserModel user = new UserModel();
+            user.Deleted = false;
+            user.SaveDeletedParameter(SID);
+            user.SaveModificationParameters();
+            bool Ans = await DBConnection.ExecProcedureAsync("[User.Delete]", user.Parameters);
+            return Ans;
         }
         //------------------------------------------
         public async Task<UserModel> GetModelSimpleAsync(long SID)
@@ -103,6 +130,7 @@ namespace Service
             foreach (DataRow dr in dt.Rows)
             {
                 UserModel User = new UserModel(dr);
+                User.UserType = new Enum_UserTypeModel(dr);
                 list.Add(User);
             }
             return list;
@@ -113,6 +141,7 @@ namespace Service
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.User.UTel.FullDBName, userModel.UTel.SetSingleQuotes());
             qb.AddEqualCondition(Dictionary.User.UPass.FullDBName, userModel.UPass.SetSingleQuotes());
+            qb.AddEqualCondition(Dictionary.User.Deleted.FullDBName, 0);
             DataRow dr = await DBConnection.GetDataRowAsync(qb);
             return dr;
         }
@@ -122,7 +151,7 @@ namespace Service
             {
                 new Claim(ClaimTypes.Name, userModel.UName),
                 new Claim(ClaimTypes.NameIdentifier, userModel.SID.ConvertToString()),
-                new Claim(ClaimTypes.Role, userModel.UserType.ID.ConvertToString()),
+                new Claim(ClaimTypes.Role, userModel.UTSID.ConvertToString()),
                 new Claim(nameof(userModel.UTel), userModel.UTel)
             };
 

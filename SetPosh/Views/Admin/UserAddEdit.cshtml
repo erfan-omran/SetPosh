@@ -1,0 +1,252 @@
+﻿@using Core.Enum;
+@using SetPosh.Controllers;
+
+@model Tuple<UserModel, bool>
+@{
+    Layout = "_AdminLayout";
+
+    UserModel User = Model.Item1;
+    bool IsAdd = Model.Item2;
+
+    string ActionName = IsAdd ? nameof(AdminController.UserAdd) : nameof(AdminController.UserEdit);
+}
+
+<style>
+    /* فرم‌ها */
+    .user_form {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form_group {
+        margin-bottom: 15px;
+    }
+
+        .form_group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form_group input,
+        .form_group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+            .form_group input:focus,
+            .form_group select:focus {
+                border-color: #3498db;
+                outline: none;
+                box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            }
+
+    .form_actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    /* رسپانسیو فرم */
+    @@media (max-width: 768px) {
+        .user_form {
+            padding: 15px;
+        }
+
+        .form_actions {
+            flex-direction: column;
+        }
+
+            .form_actions button {
+                width: 100%;
+            }
+    }
+
+    /* استایل بخش رمز عبور */
+    .password_wrapper {
+        position: relative;
+    }
+
+        .password_wrapper input {
+            padding-right: 40px !important;
+        }
+
+    .toggle_password {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        user-select: none;
+        background: rgba(0,0,0,0.05);
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+        .toggle_password:hover {
+            background: rgba(0,0,0,0.1);
+        }
+</style>
+
+<header class="content_header">
+    <h1>افزودن کاربر جدید</h1>
+</header>
+
+<form id="AddEditUserForm" class="user_form" asp-controller="Admin" asp-action="@(ActionName)" method="post">
+    <input name="SID" value="@(User.SID)" type="hidden">
+
+    <!-- فیلد نوع کاربر -->
+    <div class="form_group">
+        <label for="UTSID">نوع کاربر:</label>
+        <select id="UTSID" name="UTSID">
+            <option value="0">-- انتخاب کنید --</option>
+            @{
+                if (User.UTSID == (int)UserTypeEnum.Normal)
+                {
+                    <option selected value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
+                }
+                else
+                {
+                    <option value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
+                }
+                if (User.UTSID == (int)UserTypeEnum.Admin)
+                {
+                    <option selected value="@((int)UserTypeEnum.Admin)">ادمین</option>
+                }
+                else
+                {
+                    <option value="@((int)UserTypeEnum.Admin)">ادمین</option>
+                }
+
+            }
+        </select>
+        <span class="validation_message" id="UTSIDValidation"></span>
+    </div>
+
+    <!-- فیلد نام کاربری -->
+    <div class="form_group">
+        <label for="UName">نام کاربری:</label>
+        <input id="UName" name="UName" value="@(IsAdd ? "" : User.UName)" type="text">
+        <span class="validation_message" id="UNameValidation"></span>
+    </div>
+
+    <!-- فیلد نام -->
+    <div class="form_group">
+        <label for="UFirstName">نام کاربری:</label>
+        <input id="UFirstName" name="UFirstName" value="@(IsAdd ? "" : User.UFirstName)" type="text">
+    </div>
+
+    <!-- فیلد نام خانوادگی -->
+    <div class="form_group">
+        <label for="ULastName">نام خانوادگی:</label>
+        <input id="ULastName" name="ULastName" value="@(IsAdd ? "" : User.ULastName)" type="text">
+    </div>
+
+    <!-- فیلد ایمیل -->
+    <div class="form_group">
+        <label for="UEmail">ایمیل:</label>
+        <input id="UEmail" name="UEmail" value="@(IsAdd ? "" : User.UEmail)" type="email">
+    </div>
+
+    <!-- فیلد تلفن -->
+    <div class="form_group">
+        <label for="UTel">تلفن:</label>
+        <input id="UTel" name="UTel" value="@(IsAdd ? "" : User.UTel)" pattern="09[0-9]{9}" placeholder="09XXXXXXXXX" type="tel">
+        <span class="validation_message" id="UTelValidation"></span>
+    </div>
+
+    <!-- فیلد پسورد -->
+    <div class="form_group">
+        <label for="UPass">رمز عبور:</label>
+        <div class="password_wrapper">
+            <input value="@(IsAdd ? "" : User.UPass)" type="password" id="UPass" name="UPass" minlength="6">
+            <span class="toggle_password">
+                <i id="PassIcon" class="icon">👁️</i>
+            </span>
+        </div>
+        <span class="validation_message" id="UPassValidation"></span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert_danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="form_actions">
+        <button id="SubmitBtn" type="submit" class="btn btn_save">@(IsAdd ? "افزودن" : "ویرایش")</button>
+        <a type="reset" class="btn btn_cancel" asp-controller="Admin" asp-action="@(nameof(AdminController. UserManager))">انصراف</a>
+    </div>
+</form>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            document.getElementById('SubmitBtn').addEventListener('click', function (e) {
+                debugger;
+                e.preventDefault();
+                let IsValid = true;
+
+                const UTSID = document.getElementById('UTSID');
+                const UName = document.getElementById('UName');
+                const UTel = document.getElementById('UTel');
+                const UPass = document.getElementById('UPass');
+
+                const UTSIDValidation = document.getElementById('UTSIDValidation');
+                const UNameValidation = document.getElementById('UNameValidation');
+                const UTelValidation = document.getElementById('UTelValidation');
+                const UPassValidation = document.getElementById('UPassValidation');
+
+                if (IsNullOrEmpty(UTSID.value) || UTSID.value <= 0) {
+                    UTSIDValidation.textContent = 'لطفا نوع کاربر را انتخاب کنید.';
+                    IsValid = false;
+                }
+                else { UTSIDValidation.textContent = ''; }
+
+                if (IsNullOrEmpty(UName.value)) {
+                    UNameValidation.textContent = 'لطفا نام کاربری را وارد کنید.';
+                    IsValid = false;
+                }
+                else { UNameValidation.textContent = ''; }
+
+                if (IsNullOrEmpty(UTel.value)) {
+                    UTelValidation.textContent = 'لطفا شماره تلفن را وارد کنید.';
+                    IsValid = false;
+                }
+                else { UTelValidation.textContent = ''; }
+
+                if (IsNullOrEmpty(UPass.value)) {
+                    UPassValidation.textContent = 'لطفا رمزعبور را وارد کنید.';
+                    IsValid = false;
+                }
+                else { UPassValidation.textContent = ''; }
+
+                if (IsValid) {
+                    document.getElementById('AddEditUserForm').submit();
+                }
+            });
+
+            document.getElementById('PassIcon').addEventListener('click', function (e) {
+                debugger;
+                const passwordField = document.getElementById('UPass');
+
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    this.textContent = '🙈';
+                } else {
+                    passwordField.type = 'password';
+                    this.textContent = '👁️';
+                }
+            });
+        });
+    </script>
+}

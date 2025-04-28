@@ -78,11 +78,6 @@ h2 {
         outline: none;
     }
 
-.validation_message {
-    color: #dc3545;
-    font-size: small;
-}
-
 .btn_primary {
     background-color: #4caf50;
     border: none;
