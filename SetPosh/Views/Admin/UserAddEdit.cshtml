@@ -12,187 +12,361 @@
 }
 
 <style>
-    /* فرم‌ها */
-    .user_form {
-        background: white;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        max-width: 600px;
+    :root {
+        --primary-color: #4361ee;
+        --primary-light: #e6ebff;
+        --success-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --text-color: #2c3e50;
+        --text-light: #7f8c8d;
+        --border-color: #e0e0e0;
+        --bg-light: #f9fafb;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+    }
+
+    .user_management_container {
+        /*max-width: 800px;*/
         margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .page_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .page_title {
+        font-size: 1.75rem;
+        color: var(--text-color);
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .back_link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s;
+    }
+
+        .back_link:hover {
+            background-color: var(--primary-light);
+        }
+
+        .back_link svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+    .user_form_card {
+        background: white;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+    }
+
+    .form_grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1.5rem;
     }
 
     .form_group {
-        margin-bottom: 15px;
+        /*margin-bottom: 1.25rem;*/
+        grid-column: span 2;
     }
 
-        .form_group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .form_group input,
-        .form_group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-            .form_group input:focus,
-            .form_group select:focus {
-                border-color: #3498db;
-                outline: none;
-                box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-            }
-
-    .form_actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
+    .form_label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.9rem;
     }
 
-    /* رسپانسیو فرم */
-    @@media (max-width: 768px) {
-        .user_form {
-            padding: 15px;
+        .form_label.required:after {
+            content: " *";
+            color: var(--danger-color);
         }
 
-        .form_actions {
-            flex-direction: column;
-        }
-
-            .form_actions button {
-                width: 100%;
-            }
+    .form_control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background-color: white;
     }
 
-    /* استایل بخش رمز عبور */
+        .form_control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
     .password_wrapper {
         position: relative;
     }
 
-        .password_wrapper input {
-            padding-right: 40px !important;
-        }
-
     .toggle_password {
         position: absolute;
-        left: 10px;
+        left: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
+        background: none;
+        border: none;
         cursor: pointer;
-        user-select: none;
-        background: rgba(0,0,0,0.05);
-        padding: 5px;
-        border-radius: 3px;
+        color: var(--text-light);
+        padding: 0.25rem;
+        border-radius: 50%;
+        transition: all 0.2s;
     }
 
         .toggle_password:hover {
-            background: rgba(0,0,0,0.1);
+            color: var(--text-color);
+            background-color: rgba(0, 0, 0, 0.05);
         }
-</style>
 
-<header class="content_header">
-    <h1>افزودن کاربر جدید</h1>
-</header>
-
-<form id="AddEditUserForm" class="user_form" asp-controller="Admin" asp-action="@(ActionName)" method="post">
-    <input name="SID" value="@(User.SID)" type="hidden">
-
-    <!-- فیلد نوع کاربر -->
-    <div class="form_group">
-        <label for="UTSID">نوع کاربر:</label>
-        <select id="UTSID" name="UTSID">
-            <option value="0">-- انتخاب کنید --</option>
-            @{
-                if (User.UTSID == (int)UserTypeEnum.Normal)
-                {
-                    <option selected value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
-                }
-                else
-                {
-                    <option value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
-                }
-                if (User.UTSID == (int)UserTypeEnum.Admin)
-                {
-                    <option selected value="@((int)UserTypeEnum.Admin)">ادمین</option>
-                }
-                else
-                {
-                    <option value="@((int)UserTypeEnum.Admin)">ادمین</option>
-                }
-
-            }
-        </select>
-        <span class="validation_message" id="UTSIDValidation"></span>
-    </div>
-
-    <!-- فیلد نام کاربری -->
-    <div class="form_group">
-        <label for="UName">نام کاربری:</label>
-        <input id="UName" name="UName" value="@(IsAdd ? "" : User.UName)" type="text">
-        <span class="validation_message" id="UNameValidation"></span>
-    </div>
-
-    <!-- فیلد نام -->
-    <div class="form_group">
-        <label for="UFirstName">نام کاربری:</label>
-        <input id="UFirstName" name="UFirstName" value="@(IsAdd ? "" : User.UFirstName)" type="text">
-    </div>
-
-    <!-- فیلد نام خانوادگی -->
-    <div class="form_group">
-        <label for="ULastName">نام خانوادگی:</label>
-        <input id="ULastName" name="ULastName" value="@(IsAdd ? "" : User.ULastName)" type="text">
-    </div>
-
-    <!-- فیلد ایمیل -->
-    <div class="form_group">
-        <label for="UEmail">ایمیل:</label>
-        <input id="UEmail" name="UEmail" value="@(IsAdd ? "" : User.UEmail)" type="email">
-    </div>
-
-    <!-- فیلد تلفن -->
-    <div class="form_group">
-        <label for="UTel">تلفن:</label>
-        <input id="UTel" name="UTel" value="@(IsAdd ? "" : User.UTel)" pattern="09[0-9]{9}" placeholder="09XXXXXXXXX" type="tel">
-        <span class="validation_message" id="UTelValidation"></span>
-    </div>
-
-    <!-- فیلد پسورد -->
-    <div class="form_group">
-        <label for="UPass">رمز عبور:</label>
-        <div class="password_wrapper">
-            <input value="@(IsAdd ? "" : User.UPass)" type="password" id="UPass" name="UPass" minlength="6">
-            <span class="toggle_password">
-                <i id="PassIcon" class="icon">👁️</i>
-            </span>
-        </div>
-        <span class="validation_message" id="UPassValidation"></span>
-    </div>
-
-    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-    {
-        <div class="alert_danger">
-            @ViewBag.ErrorMessage
-        </div>
+    .form_actions {
+        grid-column: span 6;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
     }
 
-    <div class="form_actions">
-        <button id="SubmitBtn" type="submit" class="btn btn_save">@(IsAdd ? "افزودن" : "ویرایش")</button>
-        <a type="reset" class="btn btn_cancel" asp-controller="Admin" asp-action="@(nameof(AdminController. UserManager))">انصراف</a>
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn_primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: 1px solid var(--primary-color);
+    }
+
+        .btn_primary:hover {
+            background-color: #3a56d4;
+            border-color: #3a56d4;
+        }
+
+    .btn_outline {
+        background: none;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+        .btn_outline:hover {
+            background-color: var(--bg-light);
+        }
+
+    .validation_message {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+        min-height: 1.25rem;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert_danger {
+        background-color: #fdecea;
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .alert_icon {
+        font-size: 1.25rem;
+    }
+
+    .password_strength {
+        height: 4px;
+        background-color: #e0e0e0;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .password_strength_bar {
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    @@media (max-width: 768px) {
+        .form_grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form_group.full-width,
+        .form_actions {
+            grid-column: span 6;
+        }
+
+        .user_management_container {
+            padding: 0.5rem;
+        }
+
+        .user_form_card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="user_management_container">
+    <div class="page_header">
+        <h1 class="page_title">@(IsAdd ? "افزودن کاربر جدید" : "ویرایش کاربر")</h1>
+        <a class="back_link" asp-controller="Admin" asp-action="@(nameof(AdminController.UserManager))">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            بازگشت به لیست
+        </a>
     </div>
-</form>
+
+    <div class="user_form_card">
+        <form id="AddEditUserForm" class="form_grid" asp-controller="Admin" asp-action="@(ActionName)" method="post">
+            <input name="SID" value="@(User.SID)" type="hidden">
+
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert alert_danger full-width">
+                    <span class="alert_icon">!</span>
+                    <span>@ViewBag.ErrorMessage</span>
+                </div>
+            }
+
+            <!-- فیلد نوع کاربر -->
+            <div class="form_group">
+                <label class="form_label required" for="UTSID">نوع کاربر</label>
+                <select id="UTSID" name="UTSID" class="form_control form-select">
+                    <option value="0">-- انتخاب کنید --</option>
+                    @{
+                        if (User.UTSID == (int)UserTypeEnum.Normal)
+                        {
+                            <option selected value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)UserTypeEnum.Normal)">کاربر عادی</option>
+                        }
+                        if (User.UTSID == (int)UserTypeEnum.Admin)
+                        {
+                            <option selected value="@((int)UserTypeEnum.Admin)">ادمین</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)UserTypeEnum.Admin)">ادمین</option>
+                        }
+                    }
+                </select>
+                <span class="validation_message" id="UTSIDValidation"></span>
+            </div>
+
+            <!-- فیلد نام کاربری -->
+            <div class="form_group">
+                <label class="form_label required" for="UName">نام کاربری</label>
+                <input id="UName" name="UName" value="@(IsAdd ? "" : User.UName)" type="text" class="form_control">
+                <span class="validation_message" id="UNameValidation"></span>
+            </div>
+
+            <!-- فیلد تلفن -->
+            <div class="form_group">
+                <label class="form_label required" for="UTel">تلفن همراه</label>
+                <input id="UTel" name="UTel" value="@(IsAdd ? "" : User.UTel)" pattern="09[0-9]{9}" placeholder="09XXXXXXXXX" type="tel" class="form_control">
+                <span class="validation_message" id="UTelValidation"></span>
+            </div>
+
+            <!-- فیلد نام -->
+            <div class="form_group" style="grid-column:span 3;">
+                <label class="form_label" for="UFirstName">نام</label>
+                <input id="UFirstName" name="UFirstName" value="@(IsAdd ? "" : User.UFirstName)" type="text" class="form_control">
+            </div>
+
+            <!-- فیلد نام خانوادگی -->
+            <div class="form_group" style="grid-column:span 3;">
+                <label class="form_label" for="ULastName">نام خانوادگی</label>
+                <input id="ULastName" name="ULastName" value="@(IsAdd ? "" : User.ULastName)" type="text" class="form_control">
+            </div>
+
+            <!-- فیلد رمز عبور -->
+            <div class="form_group" style="grid-column:span 3;">
+                <label class="form_label required" for="UPass">رمز عبور</label>
+                <div class="password_wrapper">
+                    <input value="@(IsAdd ? "" : User.UPass)" type="password" id="UPass" name="UPass" minlength="6" class="form_control" autocomplete="new-password">
+                    <button type="button" class="toggle_password" id="PassToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="password_strength">
+                    <div class="password_strength_bar" id="passwordStrengthBar"></div>
+                </div>
+                <span class="validation_message" id="UPassValidation"></span>
+            </div>
+
+            <!-- فیلد ایمیل -->
+            <div class="form_group" style="grid-column:span 3;">
+                <label class="form_label" for="UEmail">ایمیل</label>
+                <input id="UEmail" name="UEmail" value="@(IsAdd ? "" : User.UEmail)" type="email" class="form_control">
+            </div>
+
+            <div class="form_actions">
+                <button id="SubmitBtn" type="submit" class="btn btn_primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    @(IsAdd ? "ثبت کاربر" : "ذخیره تغییرات")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts{
     <script>
         $(document).ready(function () {
+            // اعتبارسنجی فرم
             document.getElementById('SubmitBtn').addEventListener('click', function (e) {
-                debugger;
                 e.preventDefault();
                 let IsValid = true;
 
@@ -206,46 +380,95 @@
                 const UTelValidation = document.getElementById('UTelValidation');
                 const UPassValidation = document.getElementById('UPassValidation');
 
+                // ریست پیام‌های خطا
+                [UTSIDValidation, UNameValidation, UTelValidation, UPassValidation].forEach(el => el.textContent = '');
+
                 if (IsNullOrEmpty(UTSID.value) || UTSID.value <= 0) {
                     UTSIDValidation.textContent = 'لطفا نوع کاربر را انتخاب کنید.';
                     IsValid = false;
                 }
-                else { UTSIDValidation.textContent = ''; }
 
                 if (IsNullOrEmpty(UName.value)) {
                     UNameValidation.textContent = 'لطفا نام کاربری را وارد کنید.';
                     IsValid = false;
                 }
-                else { UNameValidation.textContent = ''; }
 
                 if (IsNullOrEmpty(UTel.value)) {
                     UTelValidation.textContent = 'لطفا شماره تلفن را وارد کنید.';
                     IsValid = false;
+                } else if (!/^09[0-9]{9}$/.test(UTel.value)) {
+                    UTelValidation.textContent = 'شماره تلفن معتبر نیست (مثال: 09123456789)';
+                    IsValid = false;
                 }
-                else { UTelValidation.textContent = ''; }
 
                 if (IsNullOrEmpty(UPass.value)) {
                     UPassValidation.textContent = 'لطفا رمزعبور را وارد کنید.';
                     IsValid = false;
+                } else if (UPass.value.length < 6) {
+                    UPassValidation.textContent = 'رمز عبور باید حداقل 6 کاراکتر باشد.';
+                    IsValid = false;
                 }
-                else { UPassValidation.textContent = ''; }
 
                 if (IsValid) {
                     document.getElementById('AddEditUserForm').submit();
                 }
             });
 
-            document.getElementById('PassIcon').addEventListener('click', function (e) {
-                debugger;
+            // نمایش/مخفی کردن رمز عبور
+            document.getElementById('PassToggle').addEventListener('click', function () {
                 const passwordField = document.getElementById('UPass');
+                const icon = this.querySelector('svg');
 
                 if (passwordField.type === 'password') {
                     passwordField.type = 'text';
-                    this.textContent = '🙈';
+                    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
                 } else {
                     passwordField.type = 'password';
-                    this.textContent = '👁️';
+                    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
                 }
+            });
+
+            // بررسی قدرت رمز عبور
+            document.getElementById('UPass')?.addEventListener('input', function () {
+                const password = this.value;
+                const strengthBar = document.getElementById('passwordStrengthBar');
+
+                if (!password) {
+                    strengthBar.style.width = '0%';
+                    strengthBar.style.backgroundColor = '';
+                    return;
+                }
+
+                // محاسبه قدرت رمز عبور
+                let strength = 0;
+
+                // طول رمز عبور
+                if (password.length >= 6) strength += 1;
+                if (password.length >= 8) strength += 1;
+                if (password.length >= 12) strength += 1;
+
+                // کاراکترهای متنوع
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+                // تنظیم رنگ و عرض نوار قدرت
+                let width = 0;
+                let color = '';
+
+                if (strength <= 2) {
+                    width = 33;
+                    color = '#e74c3c'; // قرمز
+                } else if (strength <= 4) {
+                    width = 66;
+                    color = '#f39c12'; // نارنجی
+                } else {
+                    width = 100;
+                    color = '#2ecc71'; // سبز
+                }
+
+                strengthBar.style.width = width + '%';
+                strengthBar.style.backgroundColor = color;
             });
         });
     </script>
