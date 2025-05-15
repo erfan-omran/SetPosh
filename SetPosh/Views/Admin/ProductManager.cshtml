@@ -1,10 +1,14 @@
-﻿@{
+﻿@using SetPosh.Controllers;
+@model List<ProductModel>
+@{
     Layout = "_AdminLayout";
+    List<ProductModel> ProductList = Model;
 }
 
 <header class="content_header">
     <h1>مدیریت محصولات</h1>
-    <button class="btn btn_add">+ محصول جدید</button>
+    <a class="btn btn_add" asp-controller="Admin" asp-action="@(nameof(AdminController.ProductAddEdit))" asp-route-SID="-1">+ محصول جدید</a>
+
 </header>
 
 <div class="table_container">
@@ -21,52 +25,99 @@
             </tr>
         </thead>
         <tbody>
-            <!-- دیتای تستی -->
-            <tr>
-                <td>101</td>
-                <td><img src="placeholder-product.jpg" alt="محصول" class="product_img"></td>
-                <td>گوشی موبایل سامسونگ</td>
-                <td>۱۲,۵۰۰,۰۰۰ تومان</td>
-                <td>۱۵</td>
-                <td>موبایل</td>
-                <td>
-                    <button class="btn_edit">ویرایش</button>
-                    <button class="btn_delete">حذف</button>
-                </td>
-            </tr>
-            <tr>
-                <td>102</td>
-                <td><img src="placeholder-product.jpg" alt="محصول" class="product-img"></td>
-                <td>لپ‌تاپ ایسوس</td>
-                <td>۲۵,۰۰۰,۰۰۰ تومان</td>
-                <td>۸</td>
-                <td>لپ‌تاپ</td>
-                <td>
-                    <button class="btn_edit">ویرایش</button>
-                    <button class="btn_delete">حذف</button>
-                </td>
-            </tr>
-            <tr>
-                <td>103</td>
-                <td><img src="placeholder-product.jpg" alt="محصول" class="product_img"></td>
-                <td>هدفون بلوتوث</td>
-                <td>۳,۲۰۰,۰۰۰ تومان</td>
-                <td>۲۳</td>
-                <td>اکسسوری</td>
-                <td>
-                    <button class="btn btn_edit">ویرایش</button>
-                    <button class="btn btn_delete">حذف</button>
-                </td>
-            </tr>
+            @{
+                foreach (ProductModel Product in ProductList)
+                {
+                    ProductImageModel? MainImg = Product.ProductImages.FirstOrDefault(img => img.IsMain == true);
+                    bool IsStock = Product.PCount > 0;
+
+                    <tr>
+                        <td>@(Product.SID)</td>
+                        <td><img src="~/Image/ProductImage/@(MainImg?.ImgName ?? "NoPhoto.jpg")" alt="@(Product.PName)" class="product_img"></td>
+                        <td>@(Product.PName)</td>
+                        <td>@(Product.PPrice.ToString("N0")) تومان</td>
+                        @if (IsStock)
+                        {
+                            <td>
+                                <span class="stock_state in_stock">@(Product.PCount)</span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <span class="stock_state out_of_stock">ناموجود</span>
+                            </td>
+                        }
+                        <td>@(Product.ProductCategory.PCName)</td>
+                        <td >
+                            <a class="btn btn_edit" asp-controller="Admin" asp-action="@(nameof(AdminController.ProductAddEdit))" asp-route-SID="@Product.SID">ویرایش</a>
+                            <button class="btn btn_delete" data-product-sid="@(Product.SID)">حذف</button>
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>
 
+@section Styles{
+    <style>
+        .in_stock {
+            color: #fff;
+            background-color: #28a745;
+        }
+
+        .out_of_stock {
+            color: #fff;
+            background-color: #dc3545;
+        }
+
+        .stock_state {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+    </style>
+}
 @section Scripts{
     <script>
         $(document).ready(function () {
             let ProductManagerTabElm = document.getElementById("ProductManagerTab");
             ProductManagerTabElm.classList.add("active");
         })
+
+        var DeleteButtonList = document.getElementsByClassName('btn_delete');
+        for (var i = 0; i < DeleteButtonList.length; i++) {
+
+            DeleteButtonList[i].addEventListener('click', function () {
+
+                const CurrentBtn = event.target;
+                const ProductSID = CurrentBtn.getAttribute('data-product-sid');
+
+                $.ajax({
+                    url: '@(Url.Action(nameof(AdminController.ProductDelete), "Admin"))',
+                    type: 'POST',
+                    data: { SID: ProductSID },
+                    success: function (response) {
+                        if (response.success) {
+                            ShowFloatingMessage(response.message, MessageTypeEnum.success);
+
+                            const ProductRow = CurrentBtn.closest('tr');
+                            if (ProductRow) {
+                                ProductRow.remove();
+                            }
+                        } else {
+                            ShowFloatingMessage(response.message, MessageTypeEnum.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, MessageTypeEnum.error);
+                    }
+                });
+
+            });
+        }
     </script>
 }

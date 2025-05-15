@@ -1,0 +1,542 @@
+﻿@using Core.Enum;
+@using SetPosh.Controllers;
+
+@model Tuple<ProductModel, List<ProductCategoryModel>, bool>
+@{
+    Layout = "_AdminLayout";
+
+    ProductModel Product = Model.Item1;
+    List<ProductCategoryModel> productCategoryList = Model.Item2;
+    ProductImageModel? MainImg = Product.ProductImages.FirstOrDefault(img => img.IsMain == true);
+    bool IsAdd = Model.Item3;
+
+    string ActionName = IsAdd ? nameof(AdminController.ProductAdd) : nameof(AdminController.ProductEdit);
+}
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-light: #e6ebff;
+        --success-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --text-color: #2c3e50;
+        --text-light: #7f8c8d;
+        --border-color: #e0e0e0;
+        --bg-light: #f9fafb;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+    }
+
+    .user_management_container {
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .page_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .page_title {
+        font-size: 1.75rem;
+        color: var(--text-color);
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .back_link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s;
+    }
+
+        .back_link:hover {
+            background-color: var(--primary-light);
+        }
+
+        .back_link svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+    .user_form_card {
+        background: white;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+    }
+
+    .form_grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        grid-auto-flow: row;
+    }
+
+    .form_group {
+        grid-column: span 3;
+        grid-row: span 1;
+    }
+
+    .form_label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.9rem;
+    }
+
+        .form_label.required:after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+    .form_control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background-color: white;
+    }
+
+        .form_control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+    .form_actions {
+        grid-column: span 6;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn_primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: 1px solid var(--primary-color);
+    }
+
+        .btn_primary:hover {
+            background-color: #3a56d4;
+            border-color: #3a56d4;
+        }
+
+    .btn_outline {
+        background: none;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+        .btn_outline:hover {
+            background-color: var(--bg-light);
+        }
+
+    .validation_message {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+        min-height: 1.25rem;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert_danger {
+        background-color: #fdecea;
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .alert_icon {
+        font-size: 1.25rem;
+    }
+
+    /* Image upload styles */
+    .image_upload_container {
+        grid-column: span 2;
+        grid-row: span 3;
+    }
+
+    .image_preview {
+        width: 100%;
+        height: 200px;
+        border: 1px dashed var(--border-color);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+        .image_preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+    .upload_btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--bg-light);
+        border: 1px dashed var(--border-color);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .upload_btn:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+    .remove_image {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+        .remove_image:hover {
+            opacity: 1;
+        }
+
+    @@media (max-width: 768px) {
+        .form_grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form_group, .form_actions, .image_upload_container {
+            grid-column: span 6;
+        }
+
+        .user_management_container {
+            padding: 0.5rem;
+        }
+
+        .user_form_card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="user_management_container">
+    <div class="page_header">
+        <h1 class="page_title">@(IsAdd ? "افزودن کالای جدید" : "ویرایش کالا")</h1>
+        <a class="back_link" asp-controller="Admin" asp-action="@(nameof(AdminController.ProductManager))">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            بازگشت به لیست
+        </a>
+    </div>
+
+    <div class="user_form_card">
+        <form id="AddEditProductForm" class="form_grid" enctype="multipart/form-data">
+            <input id="SID" name="SID" value="@(Product.SID)" type="hidden">
+            <input id="CurrentImagePath" name="CurrentImagePath" value="@(MainImg?.ImgName ?? "")" type="hidden">
+
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert alert_danger full-width">
+                    <span class="alert_icon">!</span>
+                    <span>@ViewBag.ErrorMessage</span>
+                </div>
+            }
+
+            <!-- فیلد دسته‌بندی کالا -->
+            <div class="form_group">
+                <label class="form_label required" for="PCSID">دسته‌بندی کالا</label>
+                <select id="PCSID" name="PCSID" class="form_control">
+                    <option value="">-- انتخاب دسته‌بندی --</option>
+                    @foreach (var category in productCategoryList)
+                    {
+                        if (Product.PCSID == category.SID)
+                        {
+                            <option value="@category.SID" selected>@category.PCName</option>
+                        }
+                        else
+                        {
+                            <option value="@category.SID">@category.PCName</option>
+                        }
+                    }
+                </select>
+                <span class="validation_message" id="PCSIDValidation"></span>
+            </div>
+
+            <!-- Image Upload Section -->
+            <div class="image_upload_container">
+                <label class="form_label">تصویر کالا</label>
+                <div class="image_preview" id="imagePreview">
+                    @if (!IsAdd && MainImg != null)
+                    {
+                        <img src="~/Image/ProductImage/@(MainImg.ImgName)" alt="Product Image" id="previewImage">
+                        <button type="button" class="remove_image" id="removeImageBtn">×</button>
+                    }
+                    else
+                    {
+                        <img src="~/Image/ProductImage/NoPhoto.jpg" alt="Product Image" id="previewImage">
+                    }
+                </div>
+                <label for="productImage" class="upload_btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    انتخاب تصویر
+                </label>
+                <input type="file" id="productImage" name="ProductImage" accept="image/*" style="display: none;">
+                <span class="validation_message" id="imageValidation"></span>
+            </div>
+            <!-- فیلد نام کالا -->
+            <div class="form_group">
+                <label class="form_label required" for="PName">نام کالا</label>
+                <input id="PName" name="PName" value="@(IsAdd ? "" : Product.PName)" type="text" class="form_control">
+                <span class="validation_message" id="PNameValidation"></span>
+            </div>
+            <!-- فیلد قیمت -->
+            <div class="form_group">
+                <label class="form_label required" for="PPrice">قیمت (تومان)</label>
+                <input id="PPrice" name="PPrice" value="@(IsAdd ? "" : Product.PPrice.ToString())" type="number" class="form_control">
+                <span class="validation_message" id="PPriceValidation"></span>
+            </div>
+            <!-- فیلد تعداد -->
+            <div class="form_group">
+                <label class="form_label required" for="PCount">تعداد</label>
+                <input id="PCount" name="PCount" value="@(IsAdd ? "" : Product.PCount.ToString())" type="number" class="form_control">
+                <span class="validation_message" id="PCountValidation"></span>
+            </div>
+            <!-- فیلد توضیحات -->
+            <div class="form_group" style="grid-column:span 6;">
+                <label class="form_label" for="PDescription">توضیحات</label>
+                <textarea id="PDescription" name="PDescription" class="form_control" rows="4">@(IsAdd ? "" : Product.PDescription)</textarea>
+            </div>
+
+            <div class="form_actions">
+                <button id="SubmitBtn" type="submit" class="btn btn_primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    @(IsAdd ? "ثبت کالا" : "ذخیره تغییرات")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            // Image upload preview
+            const productImage = document.getElementById('productImage');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const imageValidation = document.getElementById('imageValidation');
+
+            productImage.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!file.type.match('image.*')) {
+                        imageValidation.textContent = 'لطفا یک فایل تصویری انتخاب کنید.';
+                        return;
+                    }
+
+                    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                        imageValidation.textContent = 'حجم تصویر باید کمتر از 2 مگابایت باشد.';
+                        return;
+                    }
+
+                    imageValidation.textContent = '';
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        if (!previewImage) {
+                            // Create image element if it doesn't exist
+                            const img = document.createElement('img');
+                            img.id = 'previewImage';
+                            img.src = e.target.result;
+                            img.alt = 'Product Image';
+                            imagePreview.innerHTML = '';
+                            imagePreview.appendChild(img);
+
+                            // Add remove button
+                            const removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className = 'remove_image';
+                            removeBtn.id = 'removeImageBtn';
+                            removeBtn.innerHTML = '×';
+                            imagePreview.appendChild(removeBtn);
+                        } else {
+                            previewImage.src = e.target.result;
+                        }
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove image
+            imagePreview.addEventListener('click', function (e) {
+                if (e.target.id === 'removeImageBtn') {
+                    productImage.value = '';
+                    imagePreview.innerHTML = '<img src="/Image/ProductImage/NoPhoto.jpg" alt="No Image" id="previewImage">';
+                    imageValidation.textContent = '';
+                }
+            });
+
+            // اعتبارسنجی فرم
+            document.getElementById('SubmitBtn').addEventListener('click', function (e) {
+                e.preventDefault();
+                let IsAdd = @Html.Raw(Json.Serialize(IsAdd));
+                let IsValid = true;
+
+                const PCSID = document.getElementById('PCSID');
+                const PName = document.getElementById('PName');
+                const PPrice = document.getElementById('PPrice');
+                const PCount = document.getElementById('PCount');
+                const PDescription = document.getElementById('PDescription');
+
+                const PCSIDValidation = document.getElementById('PCSIDValidation');
+                const PNameValidation = document.getElementById('PNameValidation');
+                const PPriceValidation = document.getElementById('PPriceValidation');
+                const PCountValidation = document.getElementById('PCountValidation');
+
+                // ریست پیام‌های خطا
+                [PCSIDValidation, PNameValidation, PPriceValidation, PCountValidation, imageValidation].forEach(el => el.textContent = '');
+
+                // اعتبارسنجی دسته‌بندی
+                if (IsNullOrEmpty(PCSID.value)) {
+                    PCSIDValidation.textContent = 'لطفا دسته‌بندی را انتخاب کنید.';
+                    IsValid = false;
+                }
+
+                // بقیه اعتبارسنجی‌ها...
+                if (IsNullOrEmpty(PName.value)) {
+                    PNameValidation.textContent = 'لطفا نام کالا را وارد کنید.';
+                    IsValid = false;
+                }
+
+                if (IsNullOrEmpty(PPrice.value) || parseFloat(PPrice.value) <= 0) {
+                    PPriceValidation.textContent = 'لطفا قیمت معتبر وارد کنید.';
+                    IsValid = false;
+                }
+
+                if (IsNullOrEmpty(PCount.value) || parseInt(PCount.value) < 0) {
+                    PCountValidation.textContent = 'لطفا تعداد معتبر وارد کنید.';
+                    IsValid = false;
+                }
+
+                if (IsNullOrEmpty(PDescription.value))
+                    PDescription.value = "";
+
+                if (IsValid) {
+                    // Create FormData for file upload
+                    const formData = new FormData();
+                    formData.append('SID', document.getElementById('SID').value); // اضافه کردن SID
+                    formData.append('PCSID', PCSID.value);
+                    formData.append('PName', PName.value);
+                    formData.append('PPrice', PPrice.value);
+                    formData.append('PCount', PCount.value);
+                    formData.append('PDescription', PDescription.value);
+
+                    const currentImagePath = document.getElementById('CurrentImagePath').value;
+                    if (currentImagePath) {
+                        formData.append('CurrentImagePath', currentImagePath);
+                    }
+
+                    if (productImage.files[0]) {
+                        formData.append('ProductImage', productImage.files[0]);
+                    }
+
+                    $.ajax({
+                        url: "@Url.Action(ActionName, "Admin")",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+                                ShowFloatingMessage(response.message, MessageTypeEnum.success);
+                                if (IsAdd) {
+                                    // Reset form
+                                    document.getElementById('AddEditProductForm').reset();
+                                    imagePreview.innerHTML = '<span>تصویری انتخاب نشده است</span>';
+                                }
+                            }
+                            else {
+                                ShowFloatingMessage(response.message, MessageTypeEnum.error);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            ShowFloatingMessage('خطا در ارسال اطلاعات', MessageTypeEnum.error);
+                        }
+                    });
+                }
+            });
+
+            function IsNullOrEmpty(value) {
+                return value === null || value === undefined || value.toString().trim() === '';
+            }
+        });
+    </script>
+}

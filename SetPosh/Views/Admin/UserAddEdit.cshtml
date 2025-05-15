@@ -260,8 +260,8 @@
     </div>
 
     <div class="user_form_card">
-        <form id="AddEditUserForm" class="form_grid" asp-controller="Admin" asp-action="@(ActionName)" method="post">
-            <input name="SID" value="@(User.SID)" type="hidden">
+        <form id="AddEditUserForm" class="form_grid">
+            <input id="USID" name="SID" value="@(User.SID)" type="hidden">
 
             @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
             {
@@ -349,7 +349,7 @@
             </div>
 
             <div class="form_actions">
-                <button id="SubmitBtn" type="submit" class="btn btn_primary">
+                <button id="SubmitBtn" type="submit" class="btn @(IsAdd ? "btn_add" : "btn_primary")">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -368,10 +368,15 @@
             // اعتبارسنجی فرم
             document.getElementById('SubmitBtn').addEventListener('click', function (e) {
                 e.preventDefault();
+                let IsAdd = @Html.Raw(Json.Serialize(IsAdd));
                 let IsValid = true;
 
+                const SID = document.getElementById('USID');
                 const UTSID = document.getElementById('UTSID');
                 const UName = document.getElementById('UName');
+                const UFirstName = document.getElementById('UFirstName');
+                const ULastName = document.getElementById('ULastName');
+                const UEmail = document.getElementById('UEmail');
                 const UTel = document.getElementById('UTel');
                 const UPass = document.getElementById('UPass');
 
@@ -409,8 +414,51 @@
                     IsValid = false;
                 }
 
+                if (IsNullOrEmpty(UFirstName.value))
+                    UFirstName.value = "";
+                if (IsNullOrEmpty(ULastName.value))
+                    ULastName.value = "";
+                if (IsNullOrEmpty(UEmail.value))
+                    UEmail.value = "";
+
+                debugger;
                 if (IsValid) {
-                    document.getElementById('AddEditUserForm').submit();
+                    //document.getElementById('AddEditUserForm').submit();
+                    $.ajax({
+                        url: "@Url.Action(ActionName, "Admin")",
+                        type: "GET",
+                        data: {
+                            SID: SID.value,
+                            UTSID: UTSID.value,
+                            UName: UName.value,
+                            UFirstName: UFirstName.value,
+                            ULastName: ULastName.value,
+                            UEmail: UEmail.value,
+                            UTel: UTel.value,
+                            UPass: UPass.value,
+                        },
+                        //beforeSend: function () {
+                        //},
+                        success: function (response) {
+                            if (response.success) {
+                                ShowFloatingMessage(response.message, MessageTypeEnum.success);
+                                if (IsAdd) {
+                                    UTSID.value = "";
+                                    UName.value = "";
+                                    UFirstName.value = "";
+                                    ULastName.value = "";
+                                    UEmail.value = "";
+                                    UTel.value = "";
+                                    UPass.value = "";
+                                }
+                            }
+                            else
+                                ShowFloatingMessage(response.message, MessageTypeEnum.error);
+                        },
+                        error: function () {
+                            ShowFloatingMessage(response.message, MessageTypeEnum.error);
+                        }
+                    });
                 }
             });
 

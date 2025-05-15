@@ -28,7 +28,7 @@ namespace SetPosh.Controllers
                 QueryBuilder ProductQB = _productService.GetWithMainImage();
                 string ProductQuery = ProductQB.CreateQuery();
                 DataTable ProductDT = await DBConnection.GetDataTableAsync(ProductQuery);
-                List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT, true);
+                List<ProductModel> ProductList = _productService.MapDTToModel(ProductDT);
                 //-------------------
                 return View(new Tuple<List<ProductModel>, List<ProductCategoryModel>>(ProductList, PCList));
             }

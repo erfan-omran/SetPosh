@@ -36,6 +36,11 @@ function ShowLoader(LoadingContainer, LoadingMessage = "") {
     $("#" + LoadingContainer).html(ResTxt);
 }
 
+const MessageTypeEnum = Object.freeze({
+    success: 'success',
+    error: 'error',
+    warning: 'warning'
+});
 function ShowFloatingMessage(message, type) {
     const NotificationContainer = document.getElementById('NotificationsContainer');
     const Notification = document.createElement('div');

@@ -1,10 +1,8 @@
 ﻿using Core;
 using Core.Model;
-using DataBase;
-using Microsoft.AspNetCore.Mvc;
 using Service;
-using System.Data;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SetPosh.Controllers
 {

@@ -35,7 +35,6 @@ namespace Core.Model
             SaveBlockedParameter();
             SaveDeletedParameter();
             SaveCreationParameters();
-            SaveModificationParameters();
         }
         public void SaveEditParameters()
         {

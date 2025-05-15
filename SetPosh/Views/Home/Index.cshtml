@@ -29,11 +29,6 @@
 <section class="categories">
     <h2>دسته‌بندی‌ها</h2>
     <div class="category_list">
-        @*<div class="category">کالای دیجیتال</div>
-        <div class="category">مد و پوشاک</div>
-        <div class="category">زیبایی و سلامت</div>
-        <div class="category">خانه و آشپزخانه</div>
-        <div class="category">ورزش و سفر</div>*@
         @foreach (ProductCategoryModel category in ProductCategories)
         {
             <a asp-controller="Product" asp-action="@(nameof(ProductController.ProductList))" asp-route-PCSID="@category.SID" class="category">@category.PCName</a>

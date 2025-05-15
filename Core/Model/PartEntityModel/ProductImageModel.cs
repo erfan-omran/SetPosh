@@ -10,7 +10,7 @@ namespace Core.Model
         public string ImgName { get; set; } = string.Empty;
         public bool IsMain { get; set; } = default;
 
-        List<SqlParameter> Parameters = new List<SqlParameter>();
+        public List<SqlParameter> Parameters = new List<SqlParameter>();
 
         public ProductImageModel() { }
         public ProductImageModel(DataRow dr)
@@ -23,8 +23,8 @@ namespace Core.Model
 
         public void SaveMainParameters()
         {
-            Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.ID.EngName, ID));
-            Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.PSID.EngName, PSID));
+            //Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.ID.EngName, ID));
+            Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.PSID.EngName, PSID > 0 ? PSID : SqlDbType.BigInt));
             Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.ImgName.EngName, ImgName));
             Parameters.Add(new SqlParameter("@" + Dictionary.ProductImage.IsMain.EngName, IsMain));
         }

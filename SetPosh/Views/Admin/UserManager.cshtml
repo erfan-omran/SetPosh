@@ -98,7 +98,7 @@
                             data: { SID: UserSID },
                             success: function (response) {
                                 if (response.success) {
-                                    ShowFloatingMessage(response.message, 'success');
+                                    ShowFloatingMessage(response.message, MessageTypeEnum.success);
 
                                     if (IsBlockBtn) {
                                         CurrentBtn.innerText = "رفع مسدودیت";
@@ -110,11 +110,11 @@
                                         CurrentBtn.classList.add('btn_block');
                                     }
                                 } else {
-                                    ShowFloatingMessage(response.message, 'error');
+                                    ShowFloatingMessage(response.message, MessageTypeEnum.error);
                                 }
                             },
                             error: function (xhr, status, error) {
-                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, 'error');
+                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, MessageTypeEnum.error);
                             }
                         });
                     }
@@ -125,18 +125,18 @@
                             data: { SID: UserSID },
                             success: function (response) {
                                 if (response.success) {
-                                    ShowFloatingMessage(response.message, 'success');
+                                    ShowFloatingMessage(response.message, MessageTypeEnum.success);
 
                                     const UserRow = CurrentBtn.closest('tr');
                                     if (UserRow) {
                                         UserRow.remove();
                                     }
                                 } else {
-                                    ShowFloatingMessage(response.message, 'error');
+                                    ShowFloatingMessage(response.message, MessageTypeEnum.error);
                                 }
                             },
                             error: function (xhr, status, error) {
-                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, 'error');
+                                ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, MessageTypeEnum.error);
                             }
                         });
                     }

@@ -97,6 +97,12 @@ namespace SetPosh.Controllers
                 if (!ModelState.IsValid)
                     return View(new Tuple<UserModel, string>(userModel, returnURL));
 
+                if (!Regex.IsMatch(userModel.UTel, "09(1[0-9]|3[1-9]|2[1-9])-?[0-9]{3}-?[0-9]{4}"))
+                {
+                    ViewBag.ErrorMessage = "شماره تلفن اشتباه است";
+                    return View(new Tuple<UserModel, string>(userModel, returnURL));
+                }
+
                 userModel.UTSID = (int)UserTypeEnum.Normal;
                 userModel.UName = _userService.GenerateRandomUsername();
 

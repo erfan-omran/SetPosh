@@ -1,7 +1,5 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 
 namespace DataBase
 {
@@ -122,7 +120,7 @@ namespace DataBase
                 throw new Exception(ex.Message);
             }
         }
-        public static async Task<bool> ExecTransactionProcedureAsync(string procedureName, List<SqlParameter>? parameters = null)
+        public static async Task<bool> ExecTransactionProcedureAsync(string procedureName, List<SqlParameter> parameters)
         {
             try
             {
@@ -255,8 +253,51 @@ namespace DataBase
             }
         }
 
+        //public static async Task<bool> ExecTransactionMultiProcedureAsync(List<(string ProcedureName, List<SqlParameter> Parameters)> procedures)
+        //{
+        //    try
+        //    {
+        //        using (SqlConnection sqlConnection = new SqlConnection(_setPoshConnectionString))
+        //        {
+        //            await sqlConnection.OpenAsync();
 
-        public static async Task<bool> ExecTransactionProcedureAsync(List<(string ProcedureName, List<SqlParameter>? Parameters)> procedures)
+        //            using (SqlTransaction transaction = sqlConnection.BeginTransaction())
+        //            {
+        //                try
+        //                {
+        //                    foreach (var procedure in procedures)
+        //                    {
+        //                        using (SqlCommand cmd = new SqlCommand(procedure.ProcedureName, sqlConnection, transaction))
+        //                        {
+        //                            cmd.CommandType = CommandType.StoredProcedure;
+        //                            cmd.CommandTimeout = 300;
+
+        //                            if (procedure.Parameters != null && procedure.Parameters.Count > 0)
+        //                            {
+        //                                cmd.Parameters.AddRange(procedure.Parameters.ToArray());
+        //                            }
+        //                            await cmd.ExecuteNonQueryAsync();
+        //                        }
+        //                    }
+        //                    await transaction.CommitAsync();
+        //                    return true;
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    await transaction.RollbackAsync();
+        //                    await LogException(ex, "ExecuteTransactionAsync (Procedures)", null);
+        //                    return false;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await LogException(ex, "ExecuteTransactionAsync (Connection Error - Procedures)", null);
+        //        return false;
+        //    }
+        //}
+        public static async Task<bool> ExecTransactionMultiProcedureAsync(List<(string ProcedureName, List<SqlParameter> Parameters, bool ReturnsValue)> procedures)
         {
             try
             {
@@ -268,6 +309,8 @@ namespace DataBase
                     {
                         try
                         {
+                            long NewID = 0;
+
                             foreach (var procedure in procedures)
                             {
                                 using (SqlCommand cmd = new SqlCommand(procedure.ProcedureName, sqlConnection, transaction))
@@ -277,18 +320,43 @@ namespace DataBase
 
                                     if (procedure.Parameters != null && procedure.Parameters.Count > 0)
                                     {
+                                        if (NewID > 0)
+                                        {
+                                            foreach (var param in procedure.Parameters)
+                                            {
+                                                if (param.Value.ToString() == SqlDbType.BigInt.ToString())
+                                                {
+                                                    param.Value = NewID;
+                                                }
+                                            }
+                                        }
                                         cmd.Parameters.AddRange(procedure.Parameters.ToArray());
                                     }
-                                    await cmd.ExecuteNonQueryAsync();
+
+                                    if (procedure.ReturnsValue)
+                                    {
+                                        using (var reader = await cmd.ExecuteReaderAsync())
+                                        {
+                                            if (reader.Read())
+                                            {
+                                                NewID = reader.GetInt64(0);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await cmd.ExecuteNonQueryAsync();
+                                    }
                                 }
                             }
+
                             await transaction.CommitAsync();
                             return true;
                         }
                         catch (Exception ex)
                         {
                             await transaction.RollbackAsync();
-                            await LogException(ex, "ExecuteTransactionAsync (Procedures)", null);
+                            await LogException(ex, "ExecTransactionMultiProcedureAsync", null);
                             return false;
                         }
                     }
@@ -296,10 +364,11 @@ namespace DataBase
             }
             catch (Exception ex)
             {
-                await LogException(ex, "ExecuteTransactionAsync (Connection Error - Procedures)", null);
+                await LogException(ex, "ExecTransactionMultiProcedureAsync (Connection Error)", null);
                 return false;
             }
         }
+
         public static async Task<bool> LogException(Exception ex, string query, List<SqlParameter>? parameters = null)
         {
             return await LogException(ex.Message, query, parameters);
