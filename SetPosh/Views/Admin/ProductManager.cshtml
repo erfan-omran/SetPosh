@@ -4,6 +4,53 @@
     Layout = "_AdminLayout";
     List<ProductModel> ProductList = Model;
 }
+<style>
+    .product_image_container {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+
+    .product_img {
+        display: block;
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .product_image_overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 4px;
+    }
+
+        .product_image_overlay span {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px;
+        }
+
+    .product_image_container:hover .product_img {
+        transform: scale(1.05);
+    }
+
+    .product_image_container:hover .product_image_overlay {
+        opacity: 1;
+    }
+</style>
 
 <header class="content_header">
     <h1>مدیریت محصولات</h1>
@@ -33,7 +80,14 @@
 
                     <tr>
                         <td>@(Product.SID)</td>
-                        <td><img src="~/Image/ProductImage/@(MainImg?.ImgName ?? "NoPhoto.jpg")" alt="@(Product.PName)" class="product_img"></td>
+                        <td>
+                            <a asp-controller="Product" asp-action="@(nameof(ProductController.ProductDetails))" asp-route-psid="@Product.SID" class="product_image_container" target="_blank">
+                                <img src="~/Image/ProductImage/@(MainImg?.ImgName ?? "NoPhoto.jpg")" alt="@(Product.PName)" class="product_img">
+                                <div class="product_image_overlay">
+                                    <span>مشاهده محصول</span>
+                                </div>
+                            </a>
+                        </td>
                         <td>@(Product.PName)</td>
                         <td>@(Product.PPrice.ToString("N0")) تومان</td>
                         @if (IsStock)
@@ -49,7 +103,7 @@
                             </td>
                         }
                         <td>@(Product.ProductCategory.PCName)</td>
-                        <td >
+                        <td>
                             <a class="btn btn_edit" asp-controller="Admin" asp-action="@(nameof(AdminController.ProductAddEdit))" asp-route-SID="@Product.SID">ویرایش</a>
                             <button class="btn btn_delete" data-product-sid="@(Product.SID)">حذف</button>
                         </td>

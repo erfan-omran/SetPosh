@@ -464,13 +464,11 @@
                 // ریست پیام‌های خطا
                 [PCSIDValidation, PNameValidation, PPriceValidation, PCountValidation, imageValidation].forEach(el => el.textContent = '');
 
-                // اعتبارسنجی دسته‌بندی
                 if (IsNullOrEmpty(PCSID.value)) {
                     PCSIDValidation.textContent = 'لطفا دسته‌بندی را انتخاب کنید.';
                     IsValid = false;
                 }
 
-                // بقیه اعتبارسنجی‌ها...
                 if (IsNullOrEmpty(PName.value)) {
                     PNameValidation.textContent = 'لطفا نام کالا را وارد کنید.';
                     IsValid = false;
@@ -502,6 +500,15 @@
                     const currentImagePath = document.getElementById('CurrentImagePath').value;
                     if (currentImagePath) {
                         formData.append('CurrentImagePath', currentImagePath);
+                    }
+
+                    debugger;
+                    const previewImage = document.getElementById('previewImage');
+                    if (previewImage.attributes.src.nodeValue == "/Image/ProductImage/NoPhoto.jpg") {
+                        formData.append('HasImage', false);
+                    }
+                    else{
+                        formData.append('HasImage', true);
                     }
 
                     if (productImage.files[0]) {

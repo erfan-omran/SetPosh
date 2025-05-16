@@ -208,7 +208,7 @@ namespace SetPosh.Controllers
                         return RedirectToAction(nameof(ProductManager));
                     }
                 }
-                return View(new Tuple<ProductModel, List<ProductCategoryModel>, bool>(ProductIcon, PCList,  IsAdd));
+                return View(new Tuple<ProductModel, List<ProductCategoryModel>, bool>(ProductIcon, PCList, IsAdd));
             }
             catch (Exception ex)
             {
@@ -250,42 +250,50 @@ namespace SetPosh.Controllers
             }
         }
 
-        public async Task<JsonResult> ProductEdit(ProductModel Product, IFormFile ProductImage, string CurrentImagePath)
+        public async Task<JsonResult> ProductEdit(ProductModel Product, IFormFile ProductImage, string CurrentImagePath, bool HasImage)
         {
             try
             {
+                bool result = false;
                 Product.PDescription ??= string.Empty;
 
-                ProductImageModel productImageModel = new ProductImageModel();
-                productImageModel.PSID = Product.SID;
-                productImageModel.IsMain = true;
-
-                bool result = false;
-                if (ProductImage != null || CurrentImagePath != null)
+                if (HasImage)
                 {
+                    ProductImageModel productImageModel = new ProductImageModel();
+                    productImageModel.PSID = Product.SID;
+                    productImageModel.IsMain = true;
+
                     // مدیریت عکس جدید (حذف عکس قدیم و ذخیره عکس جدید)
                     if (ProductImage != null && ProductImage.Length > 0)
                     {
                         productImageModel.ImgName = await FileManager.SaveProductImageAsync(ProductImage);
-                        Product.ProductImages.Add(productImageModel);
 
                         // حذف عکس قبلی (در صورت وجود)
                         if (!string.IsNullOrEmpty(CurrentImagePath))
                             FileManager.DeleteProductImage(CurrentImagePath);
                     }
+                    else if (!string.IsNullOrEmpty(CurrentImagePath))
+                    {
+                        productImageModel.ImgName = CurrentImagePath;
+                    }
 
+                    Product.ProductImages.Add(productImageModel);
                     result = await _productService.EditWithImageAsync(Product);
+
+                    if (!result)
+                    {
+                        // اگر ویرایش شکست خورد، عکس جدید را پاک کن
+                        if (ProductImage != null && !string.IsNullOrEmpty(productImageModel.ImgName))
+                            FileManager.DeleteProductImage(productImageModel.ImgName);
+                    }
                 }
                 else
                 {
                     result = await _productService.EditAsync(Product);
                 }
+
                 if (!result)
                 {
-                    // اگر ویرایش شکست خورد، عکس جدید را پاک کن
-                    if (ProductImage != null && !string.IsNullOrEmpty(productImageModel.ImgName))
-                        FileManager.DeleteProductImage(productImageModel.ImgName);
-
                     return Json(new { success = false, message = "ویرایش کالا با مشکل مواجه شد!" });
                 }
 
