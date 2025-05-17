@@ -207,17 +207,12 @@ namespace Service
         }
         public async Task<List<ProductModel>> GetRelatedProducts(long PSID, long PCSID)
         {
-            QueryBuilder qb = GetSimple();
+            QueryBuilder qb = GetWithMainImage();
             qb.AddNotEqualCondition(Dictionary.Product.SID.FullDBName, PSID);
             qb.AddEqualCondition(Dictionary.Product.PCSID.FullDBName, PCSID);
-            DataTable dt = await DBConnection.GetDataTableAsync(qb.CreateQuery());
 
-            List<ProductModel> Products = new List<ProductModel>();
-            foreach (DataRow dr in dt.Rows)
-            {
-                ProductModel product = new ProductModel(dr);
-                Products.Add(product);
-            }
+            DataTable dt = await DBConnection.GetDataTableAsync(qb.CreateQuery());
+            List<ProductModel> Products = MapDTToModel(dt);
 
             return Products;
         }

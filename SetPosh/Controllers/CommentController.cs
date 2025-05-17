@@ -22,7 +22,7 @@ namespace SetPosh.Controllers
             try
             {
                 if (!(User.Identity?.IsAuthenticated ?? false))
-                    return LocalRedirect($"/Auth/{nameof(AuthController.Login)}");
+                    return Json(new { success = false, message = "-1" });
 
                 string? USID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 string? UserName = User.FindFirst(ClaimTypes.Name)?.Value;

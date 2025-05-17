@@ -15,6 +15,7 @@
     <div class="authentication_container">
         <h2>ورود به حساب کاربری</h2>
         <form id="LoginForm" asp-controller="Auth" asp-action="Login" method="post">
+            <input value="@(ReturnURL)" name="returnURL" hidden />
             <div class="form_group">
                 <label for="UTel">شماره تلفن</label>
                 <input value="@(UserModel.UTel)" type="text" id="UTel" name="@nameof(UserModel.UTel)" class="form_control" placeholder="09XXXXXXXXX" autocomplete="username">

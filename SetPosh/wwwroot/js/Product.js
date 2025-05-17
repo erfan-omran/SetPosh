@@ -56,14 +56,3 @@ function UpdateStars(rating) {
         }
     });
 }
-
-function ShowLoadingAndHideElement(TargetElm, LoadingElm) {
-    TargetElm.classList.add("hidden");
-    LoadingElm.classList.remove("hidden");
-}
-function HideLoadingAndShowElement(TargetElm, LoadingElm) {
-    TargetElm.classList.remove("hidden");
-    LoadingElm.classList.add("hidden");
-}
-//ShowOverlayLoading 
-//HhowOverlayLoading 

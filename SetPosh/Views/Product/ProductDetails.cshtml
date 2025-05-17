@@ -1,4 +1,7 @@
-﻿@using SetPosh.Controllers;
+﻿@using Core.Enum;
+@using Core;
+@using SetPosh.Controllers;
+@using System.Security.Claims;
 @model Tuple<ProductModel, List<ProductModel>, long>
 @{
     ProductModel MainProduct = Model.Item1;
@@ -76,10 +79,10 @@
             {
                 @foreach (var item in RelatedProducts)
                 {
-                    var img = item.ProductImages.FirstOrDefault(x => x.IsMain)?.ImgName ?? "NoPhoto.jpg";
+                    string img = item.ProductImages.FirstOrDefault(x => x.IsMain)?.ImgName ?? "NoPhoto.jpg";
                     <div class="related_product">
                         <a href="@Url.Action(nameof(ProductController.ProductDetails), "Product", new { PSID = item.SID })">
-                            <img src="~/Image/ProductImage/@img" alt="@item.PName" draggable="false" />
+                            <img src="~/Image/ProductImage/@(img)" alt="@item.PName" draggable="false" />
                             <p>@item.PName</p>
                         </a>
                     </div>
@@ -119,7 +122,7 @@
                 {
                     <div class="comment_item">
                         <div class="comment_author">
-                            @comment.User.UName
+                            <div>@comment.User.UName</div>
                             <div class="comment_rating">
                                 @for (int i = 0; i < comment.CRate; i++)
                                 {
@@ -128,6 +131,13 @@
                             </div>
                         </div>
                         <div class="comment_text">@comment.CDescription</div>
+                        @{
+                            string? UTSID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                            if (UTSID != null && UTSID.ConvertToInt() == (int)UserTypeEnum.Admin)
+                            {
+                                <button class="delete_comment_button" data-comment-sid="@comment.SID">حذف</button>
+                            }
+                        }
                     </div>
                 }
             }
@@ -145,6 +155,31 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Product.css">
+    <style>
+        .delete_comment_button {
+            display: block;
+            margin-right: auto;
+            padding: 5px 10px;
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .delete_comment_button:hover {
+                background-color: #d9363e;
+                transform: scale(1.05);
+            }
+
+            .delete_comment_button:active {
+                transform: scale(0.95);
+                background-color: #a82a2d;
+            }
+
+    </style>
  }
 @section Scripts {
     <script src="~/js/Product.js"></script>
@@ -207,6 +242,10 @@
                     debugger;
                     HideLoadingAndShowElement(PCountElm, LoaderContainerElm);
                     if (!response.success) {
+                        if (response.message == -1) {
+                            ReturnToLoginPage();
+                            return;
+                        }
                         ShowMessage(ProductMessageElm, response.message, false);
                         return;
                     }
@@ -227,7 +266,6 @@
         const CommentTextElm = document.getElementById("Comment");
         const StarsElms = document.getElementsByClassName("star");
         const CommentMessageElm = document.getElementById("CommentMessage");
-
 
         SendCommentElm.addEventListener("click", () => {
 
@@ -263,19 +301,23 @@
                     //HideLoadingAndShowElement();
 
                     if (!response.Success) {
+                        if (response.message == -1) {
+                            ReturnToLoginPage();
+                            return;
+                        }
                         ShowMessage(CommentMessageElm, response.Message, false);
                         return;
                     }
 
                     const commentHTML = `
-                                            <div class="comment_item">
-                                                <div class="comment_author">
-                                                            ${response.UserName}
-                                                                    <div class="comment_rating">${'&#9733; '.repeat(Rate)}</div>
-                                                </div>
-                                                <div class="comment_text">${CommentTextElm.value}</div>
-                                            </div>
-                                        `;
+                            <div class="comment_item">
+                                <div class="comment_author">
+                                            ${response.UserName}
+                                                    <div class="comment_rating">${'&#9733; '.repeat(Rate)}</div>
+                                </div>
+                                <div class="comment_text">${CommentTextElm.value}</div>
+                            </div>
+                        `;
 
                     if (EmptyCommentsListElm)
                         EmptyCommentsListElm.innerHTML = '';
@@ -294,5 +336,37 @@
 
             });
         });
+        //-------------------------------------------
+        var DeleteButtonList = document.getElementsByClassName('delete_comment_button');
+        for (var i = 0; i < DeleteButtonList.length; i++) {
+
+            DeleteButtonList[i].addEventListener('click', function () {
+
+                const Target = event.target;
+                const CommentSID = Target.getAttribute('data-comment-sid');
+
+                $.ajax({
+                    url: '@(Url.Action(nameof(AdminController.CommentDelete), "Admin"))',
+                    type: 'POST',
+                    data: { SID: CommentSID },
+                    success: function (response) {
+                        if (response.success) {
+                            ShowFloatingMessage(response.message, MessageTypeEnum.success);
+
+                            const CommentItem = Target.closest('.comment_item');
+                            if (CommentItem) {
+                                CommentItem.remove();
+                            }
+                        } else {
+                            ShowFloatingMessage(response.message, MessageTypeEnum.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        ShowFloatingMessage('خطا در ارتباط با سرور : ' + errore, MessageTypeEnum.error);
+                    }
+                });
+
+            });
+        }
     </script>
  }

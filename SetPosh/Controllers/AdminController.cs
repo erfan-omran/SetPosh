@@ -15,11 +15,13 @@ namespace SetPosh.Controllers
         private readonly UserService _userService;
         private readonly ProductService _productService;
         private readonly ProductCategoryService _productCategoryService;
-        public AdminController(UserService userService, ProductService productService, ProductCategoryService productCategoryService)
+        private readonly CommentService _commentService;
+        public AdminController(UserService userService, ProductService productService, ProductCategoryService productCategoryService, CommentService commentService)
         {
             _userService = userService;
             _productService = productService;
             _productCategoryService = productCategoryService;
+            _commentService = commentService;
         }
 
         public IActionResult Dashboard()
@@ -327,6 +329,23 @@ namespace SetPosh.Controllers
         public IActionResult CommentManager()
         {
             return View();
+        }
+
+        public async Task<JsonResult> CommentDelete(long SID)
+        {
+            try
+            {
+                bool ans = await _commentService.DeleteAsync(SID);
+                if (ans)
+                    return Json(new { success = true, message = "نظر با موفقیت حذف شد" });
+                else
+                    return Json(new { success = false, message = "حذف کردن نظر با مشکل مواجه شد" });
+            }
+            catch (Exception ex)
+            {
+                DBConnection.LogException(ex.Message, "CommentDelete");
+                return Json(new { success = false, message = "عملیات با مشکل مواجه شد: " + ex.Message });
+            }
         }
         #endregion
     }

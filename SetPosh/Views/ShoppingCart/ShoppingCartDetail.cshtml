@@ -1,0 +1,631 @@
+﻿@using SetPosh.Controllers;
+@model Tuple<List<ShoppingCartDetailModel>, List<ProductModel>, decimal>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "سبد خرید";
+
+    List<ShoppingCartDetailModel> SCDList = Model.Item1;
+    List<ProductModel> ProductList = Model.Item2;
+    decimal FinalPrice = Model.Item3;
+}
+
+<div class="main-container">
+    <!-- پنل سفارشات -->
+    <div class="orders-sidebar">
+        <div class="order-section">
+            <div class="order-header delivered-header" onclick="toggleSection(this)">
+                <span>
+                    سفارشات تحویل شده
+                    <span class="fa-check-circle-badge">۲</span>
+                </span>
+                <i class="toggle-icon">▼</i>
+            </div>
+            <div class="order-items">
+                <a href="order.html?id=1254" class="order-item">
+                    <div>سفارش #1254</div>
+                    <div class="order-date">۱۴۰۲/۰۵/۲۰</div>
+                    <div class="order-total status-delivered">12,450,000 تومان</div>
+                </a>
+                <!-- سایر سفارشات -->
+            </div>
+        </div>
+
+        <div class="order-section">
+            <div class="order-header shipping-header" onclick="toggleSection(this)">
+                <span>
+                    سفارشات در حال ارسال
+                    <span class="fa-truck-badge">۲</span>
+                </span>
+                <i class="toggle-icon">▼</i>
+            </div>
+            <div class="order-items">
+                <a href="order.html?id=0956" class="order-item">
+                    <div>سفارش #0956</div>
+                    <div class="order-date">۱۴۰۲/۰۳/۰۲</div>
+                    <div class="order-total status-shipping">5,300,000 تومان</div>
+                </a>
+                <!-- سایر سفارشات -->
+            </div>
+        </div>
+    </div>
+
+    <!-- سبد خرید فعلی -->
+    <div class="cart-container">
+        <h1>سبد خرید فعلی</h1>
+
+        @{
+            foreach (ProductModel Product in ProductList)
+            {
+                ProductImageModel? MainImg = Product.ProductImages.FirstOrDefault(img => img.IsMain == true);
+                ShoppingCartDetailModel? CurrentProductSCD = SCDList.FirstOrDefault(SCD => SCD.PSID == Product.SID);
+
+                <div class="cart-item">
+                    <input hidden value="@(Product.SID)" id="PSID" />
+
+                    <a asp-controller="Product" asp-action="@(nameof(ProductController.ProductDetails))" asp-route-psid="@Product.SID" class="product_image_container" target="_blank">
+                        <img src="~/Image/ProductImage/@(MainImg?.ImgName ?? "NoPhoto.jpg")" alt="@(Product.PName)" class="product_img">
+                        <div class="product_image_overlay">
+                            <span>مشاهده محصول</span>
+                        </div>
+                    </a>
+                    <div class="item-details">
+                        <h3>@(Product.PName)</h3>
+                        <span class="item-price" data-price="@(Product.PPrice)">@(Product.PPrice.ToString("N0")) تومان</span>
+
+                        <div id="QuantityContainer" class="quantity_container">
+                            <button id="DecreaseBtn" class="decrease_btn">
+                                <div id="DecreaseBtnMainIco" class="@(CurrentProductSCD.SCDCount > 1 ? " " : " hidden")">
+                                    ➖
+                                </div>
+                                <div id="DecreaseBtnSvgIco" class="@(CurrentProductSCD.SCDCount > 1 ? " hidden" : "" )">
+                                    <svg viewBox="0 0 24 24" fill="#ff0000" stroke="#ff0000" style="width: 20px;height: 20px;">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0" />
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+                                        <g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /> </g>
+                                    </svg>
+                                </div>
+                            </button>
+                            <span class="quantity">
+                                <span id="LoaderContainer" class="dots_loader hidden">
+                                    <span>.</span>
+                                    <span>.</span>
+                                    <span>.</span>
+                                </span>
+                                <label id="PCount">@(CurrentProductSCD.SCDCount)</label>
+                            </span>
+                            <button id="IncreaseBtn" class="increase_btn">➕</button>
+                        </div>
+                        <div id="ProductMessage" class="alert_danger hidden"></div>
+
+                    </div>
+                    @*<button class="remove-btn" onclick="removeItem(this)">حذف</button>*@
+                </div>
+            }
+        }
+
+        <div class="cart-summary">
+            @*<div class="summary-row">
+            <span>جمع کل:</span>
+            <span>10,340,000 تومان</span>
+            </div>
+            <div class="summary-row">
+            <span>تخفیف:</span>
+            <span>1,000,000 تومان</span>
+            </div>*@
+            <div class="summary-row total">
+                <span>مبلغ نهایی:</span>
+                <span id="FinalPrice">@(FinalPrice.ToString("N0")) تومان</span>
+            </div>
+            <button class="checkout-btn">تکمیل سفارش</button>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .quantity_container {
+            background: none;
+        }
+
+        * {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 15px;
+        }
+
+        .orders-sidebar {
+            flex: 1;
+            min-width: 250px;
+            /* background: #fff; */
+            border-radius: 8px;
+            padding: 15px;
+            /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); */
+            height: fit-content;
+        }
+
+        .cart-container {
+            flex: 2;
+            min-width: 0;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+            h2 i {
+                transition: transform 0.3s;
+            }
+
+            h2.collapsed i {
+                transform: rotate(-90deg);
+            }
+
+        .order-section {
+            margin-bottom: 20px;
+        }
+
+        .order-items {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+            .order-items.collapsed {
+                max-height: 0 !important;
+            }
+
+        .order-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #eee;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+            .order-item:hover {
+                background: #f8f9fa;
+                border-color: #ddd;
+            }
+
+        .order-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .order-total {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-delivered {
+            color: #27ae60;
+        }
+
+        .status-shipping {
+            color: #f39c12;
+        }
+
+        .cart-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .item-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .item-details {
+            flex: 1;
+            min-width: 150px;
+        }
+
+            .item-details h3 {
+                margin-bottom: 5px;
+                font-size: 1.1rem;
+            }
+
+        .item-price {
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 10px 0;
+            display: block;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            background: #f8d7da;
+            color: #721c24;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .cart-summary {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .checkout-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+            .checkout-btn:hover {
+                background: #219653;
+            }
+
+        .order-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .order-section {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .delivered-header {
+            background-color: #e8f5e9;
+            /* سبز بسیار کم رنگ */
+            color: #2e7d32;
+            /* سبز تیره */
+        }
+
+        .shipping-header {
+            background-color: #fff3e0;
+            /* نارنجی بسیار کم رنگ */
+            color: #e65100;
+            /* نارنجی تیره */
+        }
+
+        .order-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #fff;
+        }
+
+            .order-items.show {
+                padding: 10px;
+                height: auto;
+                max-height: none;
+            }
+
+        .order-header i {
+            transition: transform 0.3s;
+        }
+
+        .order-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .order-header {
+            transition: background-color 0.3s;
+        }
+
+        .delivered-header:hover {
+            background-color: #dcedc8 !important;
+        }
+
+        .shipping-header:hover {
+            background-color: #ffe0b2 !important;
+        }
+
+        .fa-check-circle-badge,
+        .fa-truck-badge {
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        .fa-check-circle-badge {
+            background: #4caf50;
+        }
+
+        .fa-truck-badge {
+            background: #e65100;
+        }
+
+        @@media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .orders-sidebar {
+                order: -1;
+                margin-bottom: 20px;
+            }
+
+            .item-img {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+            }
+
+            .order-header {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .order-item {
+                padding: 8px;
+            }
+        }
+
+        .product_image_container {
+            height: fit-content;
+            align-self: center;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .product_img {
+            display: block;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .product_image_overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 4px;
+        }
+
+            .product_image_overlay span {
+                font-size: 12px;
+                font-weight: bold;
+                text-align: center;
+                padding: 5px;
+            }
+
+        .product_image_container:hover .product_img {
+            transform: scale(1.05);
+        }
+
+        .product_image_container:hover .product_image_overlay {
+            opacity: 1;
+        }
+    </style>
+    }
+@section Scripts {
+    <script>
+        function toggleSection(header) {
+            const section = header.parentElement;
+            const content = section.querySelector('.order-items');
+
+            header.classList.toggle('collapsed');
+            content.classList.toggle('show');
+        }
+
+        // همه بخش‌ها به صورت پیش‌فرض بسته باشند
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.order-header').forEach(header => {
+                header.classList.add('collapsed');
+            });
+        });
+
+        function updateFinalPrice() {
+            debugger;
+            let finalPrice = 0;
+
+            // پیدا کردن تمام آیتم‌های سبد
+            const cartItems = document.querySelectorAll('.cart-item');
+
+            for (var i = 0; i < cartItems.length; i++) {
+                var cartItem = cartItems[i];
+
+                const qtyInput = cartItem.querySelector('#PCount');
+                const priceElement = cartItem.querySelector('.item-price');
+
+                const currentQty = parseInt(qtyInput.innerText);
+                const pricePerItem = parseInt(priceElement.getAttribute('data-price'));
+
+                if (!isNaN(currentQty) && !isNaN(pricePerItem)) {
+                    finalPrice += currentQty * pricePerItem;
+                }
+            }
+
+            // به‌روزرسانی مقدار قیمت نهایی در DOM
+            const finalPriceElement = document.getElementById('FinalPrice');
+            finalPriceElement.textContent = `${finalPrice.toLocaleString()} تومان`;
+        }
+
+
+        // حذف محصول
+        function removeItem(btn) {
+            if (confirm('آیا می‌خواهید این محصول را حذف کنید؟')) {
+                btn.closest('.cart-item').style.opacity = 0;
+                setTimeout(() => {
+                    btn.closest('.cart-item').remove();
+                }, 300);
+            }
+        }
+
+        debugger;
+        const Items = document.getElementsByClassName('cart-item');
+        for (var i = 0; i < Items.length; i++) {
+            const cartItem = Items[i];
+
+            const ProductMessageElm = cartItem.querySelector("#ProductMessage");
+            const LoaderContainerElm = cartItem.querySelector("#LoaderContainer");
+
+            const IncreaseBtn = cartItem.querySelector("#IncreaseBtn");
+            const DecreaseBtn = cartItem.querySelector("#DecreaseBtn");
+
+            const DecreaseBtnMainIcoElm = cartItem.querySelector("#DecreaseBtnMainIco");
+            const DecreaseBtnSvgIcoElm = cartItem.querySelector("#DecreaseBtnSvgIco");
+            const QuantityContainerElm = cartItem.querySelector("#QuantityContainer");
+
+            const PSID = cartItem.querySelector("#PSID").value;
+            const PCountElm = cartItem.querySelector("#PCount");
+            //---------------------------------
+            DecreaseBtn.addEventListener("click", () => {
+                SendChangeCountAjax("@(Url.Action(nameof(ShoppingCartController.DecreaseSCDCount), "ShoppingCart"))", PSID, ProductMessageElm, LoaderContainerElm, QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm);
+            });
+            IncreaseBtn.addEventListener("click", () => {
+                SendChangeCountAjax("@(Url.Action(nameof(ShoppingCartController.IncreaseSCDCount), "ShoppingCart"))", PSID, ProductMessageElm, LoaderContainerElm, QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm);
+            });
+        }
+
+        function UpdateQuantityDisplay(QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm, count = "0") {
+            DecreaseBtnMainIcoElm.classList.remove("hidden");
+            DecreaseBtnSvgIcoElm.classList.add("hidden");
+
+            if (count == "0") {
+                QuantityContainerElm.parentElement.parentElement.remove();
+            }
+            else if (count == "1") {
+                DecreaseBtnMainIcoElm.classList.add("hidden");
+                DecreaseBtnSvgIcoElm.classList.remove("hidden");
+            }
+
+            PCountElm.textContent = count;
+        }
+        function SendChangeCountAjax(RouteUrl, ProductSID, ProductMessageElm, LoaderContainerElm, QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm) {
+            $.ajax({
+                url: RouteUrl,
+                type: "POST",
+                data: {
+                    PSID: ProductSID,
+                },
+                beforeSend: function () {
+                    ShowLoadingAndHideElement(PCountElm, LoaderContainerElm);
+                    HideMessage(ProductMessageElm);
+                },
+                success: function (response) {
+                    debugger;
+                    HideLoadingAndShowElement(PCountElm, LoaderContainerElm);
+                    if (!response.success) {
+                        if (response.message == -1) {
+                            ReturnToLoginPage();
+                            return;
+                        }
+                        ShowMessage(ProductMessageElm, response.message, false);
+                        return;
+                    }
+
+                    UpdateQuantityDisplay(QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm, response.SCDCount);
+                    updateFinalPrice();
+                },
+                error: function () {
+                    debugger;
+                    UpdateQuantityDisplay(QuantityContainerElm, DecreaseBtnMainIcoElm, DecreaseBtnSvgIcoElm, PCountElm);
+                    ShowMessage(ProductMessageElm, "مشکلی در ارسال درخواست پیش آمده است", false);
+                }
+            });
+        }
+
+    </script>
+}

@@ -64,7 +64,8 @@ namespace Service
         {
             CommentModel Comment = new CommentModel();
             Comment.Deleted = true;
-            Comment.SaveBlockedParameter(SID);
+            Comment.SaveDeletedParameter(SID);
+            Comment.SaveModificationParameters();
             bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
             return Ans;
         }
@@ -72,7 +73,8 @@ namespace Service
         {
             CommentModel Comment = new CommentModel();
             Comment.Deleted = false;
-            Comment.SaveBlockedParameter(SID);
+            Comment.SaveDeletedParameter(SID);
+            Comment.SaveModificationParameters();
             bool Ans = await DBConnection.ExecProcedureAsync("[Comment.Delete]", Comment.Parameters);
             return Ans;
         }
