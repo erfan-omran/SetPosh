@@ -81,7 +81,7 @@
                 {
                     string img = item.ProductImages.FirstOrDefault(x => x.IsMain)?.ImgName ?? "NoPhoto.jpg";
                     <div class="related_product">
-                        <a href="@Url.Action(nameof(ProductController.ProductDetails), "Product", new { PSID = item.SID })">
+                        <a href="@Url.Action(nameof(ProductController.ProductDetails), "Product", new { PSID = item.SID })" style="text-decoration: none;">
                             <img src="~/Image/ProductImage/@(img)" alt="@item.PName" draggable="false" />
                             <p>@item.PName</p>
                         </a>
