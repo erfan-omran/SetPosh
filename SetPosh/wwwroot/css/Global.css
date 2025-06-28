@@ -111,6 +111,7 @@ header {
 
     header .icons .login_btn {
         width: auto;
+        text-decoration: none;
     }
 
 footer {

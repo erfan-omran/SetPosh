@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using System.Globalization;
+using System.Text;
 
 namespace Core
 {
@@ -142,6 +142,32 @@ namespace Core
             if (dr.HasColumn(columnName))
                 return new PersianTime(dr[columnName].ConvertToString());
             return new PersianTime(defaultValue);
+        }
+
+        public static string Encrypt(this string input)
+        {
+            StringBuilder encrypted = new StringBuilder();
+            int key = 13;
+
+            foreach (char c in input)
+            {
+                char encryptedChar = (char)(c + key);
+                encrypted.Append(encryptedChar);
+            }
+            return encrypted.ToString();
+        }
+
+        public static string Decrypt(this string input)
+        {
+            StringBuilder decrypted = new StringBuilder();
+            int key = 13;
+
+            foreach (char c in input)
+            {
+                char decryptedChar = (char)(c - key);
+                decrypted.Append(decryptedChar);
+            }
+            return decrypted.ToString();
         }
         //----------------------
         private static bool HasColumn(this DataRow dr, string columnName)

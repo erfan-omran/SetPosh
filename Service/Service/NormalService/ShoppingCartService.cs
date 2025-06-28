@@ -3,7 +3,7 @@ using Core.Model;
 using DataBase;
 using Service.ServiceInterface;
 using System.Data;
-using System.Data.SqlClient;
+using Core;
 
 namespace Service
 {

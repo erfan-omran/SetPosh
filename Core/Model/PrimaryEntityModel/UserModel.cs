@@ -27,7 +27,7 @@ namespace Core.Model
             ULastName = dr.GetValueOfStringColumn(Dictionary.User.ULastName.EngName);
             UEmail = dr.GetValueOfStringColumn(Dictionary.User.UEmail.EngName);
             UTel = dr.GetValueOfStringColumn(Dictionary.User.UTel.EngName);
-            UPass = dr.GetValueOfStringColumn(Dictionary.User.UPass.EngName);
+            UPass = dr.GetValueOfStringColumn(Dictionary.User.UPass.EngName).Decrypt();
                 base.InitBaseEntityModel(dr);
         }
         //-------------
@@ -55,7 +55,7 @@ namespace Core.Model
             Parameters.Add(new SqlParameter("@" + Dictionary.User.ULastName.EngName, ULastName));
             Parameters.Add(new SqlParameter("@" + Dictionary.User.UEmail.EngName, UEmail));
             Parameters.Add(new SqlParameter("@" + Dictionary.User.UTel.EngName, UTel));
-            Parameters.Add(new SqlParameter("@" + Dictionary.User.UPass.EngName, UPass));
+            Parameters.Add(new SqlParameter("@" + Dictionary.User.UPass.EngName, UPass.Encrypt()));
         }
     }
 }

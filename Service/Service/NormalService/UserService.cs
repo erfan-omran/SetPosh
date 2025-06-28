@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.Enum;
 using Core.Model;
 using DataBase;
 using Service.ServiceInterface;
@@ -140,7 +139,7 @@ namespace Service
         {
             QueryBuilder qb = GetSimple();
             qb.AddEqualCondition(Dictionary.User.UTel.FullDBName, userModel.UTel.SetSingleQuotes());
-            qb.AddEqualCondition(Dictionary.User.UPass.FullDBName, userModel.UPass.SetSingleQuotes());
+            qb.AddEqualCondition(Dictionary.User.UPass.FullDBName, userModel.UPass.Encrypt().SetSingleQuotes());
             qb.AddEqualCondition(Dictionary.User.Deleted.FullDBName, 0);
             DataRow dr = await DBConnection.GetDataRowAsync(qb);
             return dr;
